@@ -21,12 +21,13 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use ieee.math_real.all;
 
 -- A wrapper over the blockram unit that holds the matrix weights for a single layer
 entity weight_memory is
 generic (
-    nrows: integer;
-    ncols: integer
+    nrows: integer := 100;
+    ncols: integer := 100
 );
 port (
     clk: in std_logic;
@@ -57,7 +58,7 @@ architecture Behavioral of weight_memory is
     signal sig_validout: std_logic;
     signal sig_dataout: std_logic_vector (15 downto 0);
     signal validout_delayed: std_logic;
-    signal dataout_dalayed: std_logic_vector (15 downto 0);
+    signal dataout_delayed: std_logic_vector (15 downto 0);
 begin
     -- put everything here between pipeline registers
     -- to improve block ram performance
