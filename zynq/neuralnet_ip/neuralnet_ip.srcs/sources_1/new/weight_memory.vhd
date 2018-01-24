@@ -51,6 +51,8 @@ architecture Behavioral of weight_memory is
     signal bram_out: std_logic_vector (63 downto 0);
     signal write_ptr: integer range nwords - 1 downto 0;
     signal memarray: memarray_t;
+    attribute ram_style: string;
+    attribute ram_style of memarray: signal is "auto";
     --input pipeline registers
     signal validin_delayed: std_logic;
     signal datain_delayed: std_logic_vector (63 downto 0);
@@ -80,25 +82,29 @@ begin
         end if;
     end process;
 
-    blockram_proc:
+    blockram_read:
     process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                for I in nwords - 1 downto 0 loop
-                    memarray (I) <= (others => '0');
-                end loop;
+                bram_out <= (others => '0');
             else
-                if (validin_delayed = '1') then
-                    memarray (write_ptr) <= datain;
-                end if;
-
                 if (read_enable = '1') then
                     bram_out <= memarray (read_ptr);
                     sig_validout <= '1';
                 else
                     sig_validout <= '0'; 
                 end if;
+            end if;
+        end if;
+    end process;
+
+    blockram_write:
+    process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (validin_delayed = '1') then
+                memarray (write_ptr) <= datain;
             end if;
         end if;
     end process;

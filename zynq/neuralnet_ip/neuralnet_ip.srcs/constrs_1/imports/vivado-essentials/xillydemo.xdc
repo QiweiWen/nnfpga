@@ -1,5 +1,5 @@
-create_clock -name gclk -period 10 [get_ports "clk_100"]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets "clk_100"]
+create_clock -name gclk -period 10 [get_ports "clk"]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets "clk"]
 
 # Vivado constraints unrelated clocks. So set false paths.
 set_false_path -from [get_clocks clk_fpga_1] -to [get_clocks vga_clk_ins/*]
