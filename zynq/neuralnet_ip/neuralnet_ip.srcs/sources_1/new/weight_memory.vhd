@@ -112,10 +112,14 @@ begin
             else
                 if (validin_delayed = '1') then
                     write_ptr <= (write_ptr + 1) mod nwords;
+                elsif (flush = '1') then
+                    write_ptr <= 0;
                 end if;
 
                 if (read_enable = '1') then
                     read_ptr <= (read_ptr + 1) mod nwords;
+                elsif (flush = '0') then
+                    read_ptr <= 0;
                 end if;
 
             end if;
@@ -127,14 +131,14 @@ begin
     process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
-            if (alrst = '0') then
-                word_ptr <= 0;
+            if (alrst = '0' or flush = '0') then
+                word_ptr <= 3;
             else
                 word_ptr <= (word_ptr + 1) mod 4;
             end if;
         end if;
     end process;
-    read_enable <= '1' when word_ptr = 3 else '0';
+    read_enable <= '1' when (word_ptr = 3 and flush = '1') else '0';
     sig_dataout <= bram_out ((word_ptr + 1)* 16 - 1 downto word_ptr * 16);
 
     dataout <= dataout_delayed;
