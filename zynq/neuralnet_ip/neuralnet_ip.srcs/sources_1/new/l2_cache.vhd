@@ -35,8 +35,8 @@ use ieee.numeric_std.all;
 entity l2_cache is
 
     generic (
-        nrows: integer := 400;
-        ncols: integer := 100
+        nrows: integer := 10;
+        ncols: integer := 10
     );
     port (
         clk: in std_logic;
