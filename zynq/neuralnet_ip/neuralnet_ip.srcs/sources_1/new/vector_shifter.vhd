@@ -58,16 +58,19 @@ architecture Behavioral of vector_shifter is
 
 begin
 
+shiftgen:
 for I in nrows - 1 downto 1 generate
     data_shift (I) <= data_shift (I - 1);
 end generate;
 data_shift (0) <= (others => '0');
 
+inputgen:
 for I in nrows - 1 downto 0 generate
     data_input (I) (16) <= valid_in (I);
     data_input (I) (15 downto 0) <= array_in (I); 
 end generate;
 
+muxgen:
 for I in nrows - 1 downto 0 generate
     data_signals (I) <= data_shift(I) when sel_signals(I) = '1' else data_input(I);
 end generate;
