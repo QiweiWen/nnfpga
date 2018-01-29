@@ -56,6 +56,10 @@ architecture Behavioral of vector_shifter is
     signal data_shift: register_array_t (nrows - 1 downto 0);
     signal data_input: register_array_t (nrows - 1 downto 0);
 
+    -- counter indicating which elements in the register
+    -- we want to flush
+    signal flush_counter: integer range nrows - 1 downto 0;
+    signal flush_counter_next: integer range nrows - 1 downto 0;
 begin
 
 shiftgen:
@@ -84,7 +88,7 @@ begin
                 registers(I) <= (others => '0');
             end loop;
         else
-            registers(I) <= data_signals(I);
+            registers <= data_signals;
         end if;
     end if;
 end process;
@@ -92,5 +96,26 @@ end process;
 --TODO:
 -- wire output to sigmoid unit
 -- mux selection bit logic
+
+flush_counter_proc:
+process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            flush_counter <= nrows - 1;
+        else
+            flush_counter <= flush_counter_next;
+        end if;
+    end if;
+end process;
+
+flush_counter_next <= 0 when (flush_counter = 0 and valid_in(nrows - 1) = '1') else
+                      flush_counter when (flush_counter = nrows - 1) else
+                      flush_counter + 1;
+
+muxsel_gen:
+for I in nrows - 1 downto 0 generate
+    sel_signals (I) <= '1' when I > flush_counter else '0'; 
+end generate;
 
 end Behavioral;
