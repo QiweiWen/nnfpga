@@ -23,9 +23,12 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 package helperpkg is
+    constant PARAM_DEC: integer;
+    constant PARAM_FRC: integer;
     type wordarr_t is array (integer range <>) of std_logic_vector (15 downto 0);
 end package;
 
 package body helperpkg is
-
+    constant PARAM_DEC: integer := 7;
+    constant PARAM_FRC: integer := 8;
 end package body;

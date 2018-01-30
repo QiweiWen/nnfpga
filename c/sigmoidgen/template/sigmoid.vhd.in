@@ -2,7 +2,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-use work.const_package.all;
 library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;
 
@@ -11,15 +10,15 @@ use ieee_proposed.fixed_pkg.all;
 entity sigmoid is
 port (
     clk: in std_logic;
-    datain: in std_logic_vector (PARAM_WIDTH - 2 downto 0);
+    datain: in std_logic_vector (16 - 2 downto 0);
     validin: in std_logic;
-    dataout: out std_logic_vector (PARAM_WIDTH - 2 downto 0);
+    dataout: out std_logic_vector (16 - 2 downto 0);
     validout: out std_logic);
 end sigmoid;
 
 architecture Behavioural of sigmoid is
 
-signal latched_datain: std_logic_vector (PARAM_WIDTH - 2 downto 0);
+signal latched_datain: std_logic_vector (16 - 2 downto 0);
 
 begin
 

@@ -1,2 +1,2 @@
-#define DECIMALS 5
-#define FRACTIONS 10
+#define DECIMALS 7
+#define FRACTIONS 8

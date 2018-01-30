@@ -46,20 +46,46 @@ end vector_shifter;
 architecture Behavioral of vector_shifter is
     
     -- extra bit of valid flag
-    type register_array_t is array (nrows - 1 downto 0) of std_logic_vector (16 downto 0);
+    type register_array_t is array (nrows - 1 downto 0) of 
+        std_logic_vector (16 downto 0);
     
-    signal registers: register_array_t (nrows - 1 downto 0);
+    signal registers: register_array_t;
     -- multiplx the input signals to the registers
     -- between shifting and accepting input from matrix
-    signal data_signals: register_array_t (nrows - 1 downto 0);
+    signal data_signals: register_array_t;
     signal sel_signals: std_logic_vector (nrows - 1 downto 0);
-    signal data_shift: register_array_t (nrows - 1 downto 0);
-    signal data_input: register_array_t (nrows - 1 downto 0);
+    signal data_shift: register_array_t;
+    signal data_input: register_array_t;
 
     -- counter indicating which elements in the register
     -- we want to flush
     signal flush_counter: integer range nrows - 1 downto 0;
     signal flush_counter_next: integer range nrows - 1 downto 0;
+    
+    -- output sigmoid unit
+    component sigmoidfull is
+    port (
+        clk: in std_logic;
+        datain: in std_logic_vector (16 - 1 downto 0);
+        validin: in std_logic;
+        dataout: 
+            out std_logic_vector (16 - 1 downto 0);
+        validout: out std_logic);
+    end component sigmoidfull;
+
+    -- pipeline registers
+    component delay_buffer is
+        generic(
+            ncycles: integer;
+            width:   integer
+        );
+        port(
+            clk: in std_logic;
+            rst: in std_logic;
+            din: in std_logic_vector (width - 1 downto 0);
+            dout: out std_logic_vector (width - 1 downto 0)
+        );
+    end component delay_buffer;
 begin
 
 shiftgen:
@@ -93,10 +119,6 @@ begin
     end if;
 end process;
 
---TODO:
--- wire output to sigmoid unit
--- mux selection bit logic
-
 flush_counter_proc:
 process (clk, alrst) is
 begin
@@ -109,7 +131,7 @@ begin
     end if;
 end process;
 
-flush_counter_next <= 0 when (flush_counter = 0 and valid_in(nrows - 1) = '1') else
+flush_counter_next <= nrows - 1 when (valid_in(nrows - 1) = '1') else
                       flush_counter when (flush_counter = nrows - 1) else
                       flush_counter + 1;
 
@@ -117,5 +139,27 @@ muxsel_gen:
 for I in nrows - 1 downto 0 generate
     sel_signals (I) <= '1' when I > flush_counter else '0'; 
 end generate;
+
+-- output activation
+activate: sigmoidfull
+port map(
+    clk => clk,
+    datain => registers (nrows - 1)(15 downto 0),
+    validin => registers (nrows - 1) (16),
+    dataout => activated_out,
+    validout => valid_out 
+);
+
+unactivated: delay_buffer
+generic map (
+    ncycles => 1,
+    width => 16
+)
+port map(
+    clk => clk,
+    rst => alrst,
+    din => registers (nrows - 1)(15 downto 0),
+    dout => unactivated_out
+);
 
 end Behavioral;
