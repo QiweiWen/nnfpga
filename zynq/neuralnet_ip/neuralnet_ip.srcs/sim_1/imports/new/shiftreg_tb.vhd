@@ -35,7 +35,7 @@ architecture tb of tb_vector_shifter is
     signal activated_out   : std_logic_vector (15 downto 0);
     signal unactivated_out : std_logic_vector (15 downto 0);
 
-    constant TbPeriod : time := 1000 ns; -- EDIT Put right period here
+    constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
 
@@ -59,7 +59,19 @@ begin
     -- EDIT: Check that clk is really your main clock signal
     clk <= TbClock;
 
-    stimuli : process
+    stimuli : process is
+    procedure put_element  (
+        constant index: integer;
+        stuff: in std_logic_vector (15 downto 0)
+    ) is
+    begin
+        for I in 0 to nrows - 1 loop
+            valid_in (I) <= '0';
+        end loop;
+        valid_in (index) <= '1';
+        array_in (index) <= stuff;
+    end procedure;
+
     begin
         -- EDIT Adapt initialization as needed
         array_in <= (others => (others => '0'));
@@ -71,7 +83,29 @@ begin
         wait for 100 ns;
         alrst <= '1';
         wait for 100 ns;
-
+        put_element (0, x"0001");
+        wait for 100 ns;
+        put_element (1, x"0002");
+        wait for 100 ns;
+        put_element (2, x"0003");
+        wait for 100 ns;
+        put_element (3, x"0004");
+        wait for 100 ns;
+        put_element (4, x"0005");
+        wait for 100 ns;
+        valid_in <= (others => '0');
+        wait for 500 ns;
+        put_element (0, x"0005");
+        wait for 100 ns;
+        put_element (1, x"0004");
+        wait for 100 ns;
+        put_element (2, x"0003");
+        wait for 100 ns;
+        put_element (3, x"0002");
+        wait for 100 ns;
+        put_element (4, x"0001");
+        wait for 100 ns;
+        valid_in <= (others => '0');
         -- EDIT Add stimuli here
         wait for 100 * TbPeriod;
 

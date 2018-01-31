@@ -59,8 +59,8 @@ architecture Behavioral of vector_shifter is
 
     -- counter indicating which elements in the register
     -- we want to flush
-    signal flush_counter: integer range nrows - 1 downto 0;
-    signal flush_counter_next: integer range nrows - 1 downto 0;
+    signal flush_counter: integer range nrows downto 0;
+    signal flush_counter_next: integer range nrows downto 0;
     
     -- output sigmoid unit
     component sigmoidfull is
@@ -90,7 +90,7 @@ begin
 
 shiftgen:
 for I in nrows - 1 downto 1 generate
-    data_shift (I) <= data_shift (I - 1);
+    data_shift (I) <= registers (I - 1);
 end generate;
 data_shift (0) <= (others => '0');
 
@@ -102,7 +102,7 @@ end generate;
 
 muxgen:
 for I in nrows - 1 downto 0 generate
-    data_signals (I) <= data_shift(I) when sel_signals(I) = '1' else data_input(I);
+    data_signals (I) <= data_input(I) when (sel_signals(I) = '0') else data_shift(I);
 end generate;
 
 latching_proc:
@@ -114,7 +114,11 @@ begin
                 registers(I) <= (others => '0');
             end loop;
         else
-            registers <= data_signals;
+            for I in nrows - 1 downto 0 loop
+                if (sel_signals(I) = '1' or data_signals(I)(16) = '1') then
+                    registers(I) <= data_signals(I);
+                end if;
+            end loop;
         end if;
     end if;
 end process;
@@ -131,13 +135,13 @@ begin
     end if;
 end process;
 
-flush_counter_next <= nrows - 1 when (valid_in(nrows - 1) = '1') else
-                      flush_counter when (flush_counter = nrows - 1) else
+flush_counter_next <= 0 when (valid_in(nrows - 1) = '1') else
+                      flush_counter when (flush_counter = nrows) else
                       flush_counter + 1;
 
 muxsel_gen:
 for I in nrows - 1 downto 0 generate
-    sel_signals (I) <= '1' when I > flush_counter else '0'; 
+    sel_signals (I) <= '0' when (I < flush_counter or valid_in(I) = '1') else '1'; 
 end generate;
 
 -- output activation
