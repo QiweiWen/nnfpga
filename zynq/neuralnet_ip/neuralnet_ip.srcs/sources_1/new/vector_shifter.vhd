@@ -90,7 +90,7 @@ begin
 
 shiftgen:
 for I in nrows - 1 downto 1 generate
-    data_shift (I) <= registers (I - 1);
+    data_shift (I) <= registers (I - 1) when (I /= flush_counter) else (others => '0');
 end generate;
 data_shift (0) <= (others => '0');
 

@@ -93,10 +93,10 @@ begin
         wait for 100 ns;
         put_element (4, x"0005");
         wait for 100 ns;
-        valid_in <= (others => '0');
-        wait for 500 ns;
         put_element (0, x"0005");
         wait for 100 ns;
+        valid_in <= (others => '0');
+        wait for 500 ns;
         put_element (1, x"0004");
         wait for 100 ns;
         put_element (2, x"0003");
