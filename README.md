@@ -3,7 +3,7 @@ implementation of feedforward neural network in FPGA
 
 ## What is this?
 I'm trying to make a FPGA coprocessor that implements a simple feed-forward neural network on a Zedboard. Ideally the CPU will
-stream the initial weights, biases, training examples and correct output, and be able to collect the trained parameters from
+stream the biases, training examples and correct output, and be able to collect the trained parameters from
 the FPGA after some time.
 
 I'm hoping to achieve good parallelism (through pipelining) and scalability; that is, should I only manage to deploy a tiny
