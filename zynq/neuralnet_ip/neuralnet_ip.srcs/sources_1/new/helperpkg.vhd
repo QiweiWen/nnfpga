@@ -29,6 +29,6 @@ package helperpkg is
 end package;
 
 package body helperpkg is
-    constant PARAM_DEC: integer := 7;
+    constant PARAM_DEC: integer := 8;
     constant PARAM_FRC: integer := 8;
 end package body;
