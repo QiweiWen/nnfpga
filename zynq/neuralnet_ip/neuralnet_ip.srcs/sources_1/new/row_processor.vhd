@@ -113,8 +113,6 @@ signal col_ptr: integer range ncols - 1 downto 0;
 signal l1_re: std_logic;
 signal l1_dataout: std_logic_vector (15 downto 0);
 signal l1_validout: std_logic;
--- the state of the "finished" signal in the next cycle
-signal finished_next: std_logic;
 -- the intermediate product term
 signal product: std_logic_vector (15 downto 0);
 
@@ -180,20 +178,9 @@ begin
     end if;
 end process;
 
-finished_next <= '1' when (col_ptr = ncols - 1) else '0';
-finished_flag_proc:
-process (clk, alrst) is
-begin
-    if (rising_edge(clk)) then
-        if (alrst = '0') then
-            finished <= '0';
-        else
-            finished <= finished_next;
-        end if;
-    end if;
-end process;
+finished <= '1' when (col_ptr = ncols - 1) else '0' after 20 ns;
 
-validout <= l1_validout;
+validout <= l1_validout after 20 ns;
 product <= func_safe_mult (ve_datain_delayed, l1_dataout); 
 dataout <= product;
 

@@ -96,6 +96,7 @@ begin
     stimuli : process
         variable val: real;
     begin
+
         -- EDIT Adapt initialization as needed
         l1_streamin <= '0';
         l1_datain <= (others => '0');
@@ -116,7 +117,7 @@ begin
         end loop;
         l1_streamin <= '0';
         ve_validin <= '1';
-        for I in ncols downto 1 loop
+        for I in ncols * 2 downto 1 loop
             val := 2.0 + 0.1 * real(I); 
             ve_datain <= param_type(to_sfixed (val, PARAM_DEC - 1, -PARAM_FRC)); 
             wait for 100 ns;
