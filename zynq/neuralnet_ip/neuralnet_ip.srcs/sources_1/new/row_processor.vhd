@@ -173,6 +173,8 @@ begin
         else
             if (l1_validout = '1') then
                 col_ptr <= (col_ptr + 1) mod ncols;
+            else
+                col_ptr <= 0;
             end if;
         end if;
     end if;

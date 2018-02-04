@@ -56,6 +56,8 @@ architecture tb of tb_row_processor is
     signal latched_product: std_logic_vector (15 downto 0);
     signal latched_product_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
     signal latched_product_real: real;
+
+    signal final_element: std_logic_vector (15 downto 0);
 begin
     debug_proc:
     process (clk, alrst) is
@@ -63,9 +65,14 @@ begin
         if (rising_edge(clk)) then
             if (alrst = '0')  then
                 latched_product <= (others =>  '0');
+                final_element <= (others => '0');
             else
                 if (validout = '1') then
                     latched_product <= dataout;
+                end if;
+
+                if (finished = '1') then
+                    final_element <= dataout;
                 end if;
             end if;
         end if;
@@ -117,8 +124,16 @@ begin
         end loop;
         l1_streamin <= '0';
         ve_validin <= '1';
-        for I in ncols * 2 downto 1 loop
+        for I in ncols downto 1 loop
             val := 2.0 + 0.1 * real(I); 
+            ve_datain <= param_type(to_sfixed (val, PARAM_DEC - 1, -PARAM_FRC)); 
+            wait for 100 ns;
+        end loop;
+        ve_validin <= '0';
+        wait for 700 ns;
+        ve_validin <= '1';
+        for I in ncols downto 1 loop
+            val := 3.0 + 0.1 * real(I); 
             ve_datain <= param_type(to_sfixed (val, PARAM_DEC - 1, -PARAM_FRC)); 
             wait for 100 ns;
         end loop;
