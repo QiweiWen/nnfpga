@@ -178,9 +178,9 @@ begin
     end if;
 end process;
 
-finished <= '1' when (col_ptr = ncols - 1) else '0' after 20 ns;
+finished <= '1' when (col_ptr = ncols - 1) else '0';
 
-validout <= l1_validout after 20 ns;
+validout <= l1_validout;
 product <= func_safe_mult (ve_datain_delayed, l1_dataout); 
 dataout <= product;
 
