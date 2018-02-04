@@ -41,3 +41,7 @@ As the name suggests, this repository is based on an older one. I finished the s
 bogged down in the FPGA design. I tried out two completely silly designs in hardware and they,
 most shockingly, didn't work. By the time I realised my foolishness the repository was already 7 months old with almost 200
 commits, mostly made of crap. Starting a new repository removes some of the unease I get when I run "git log".
+
+## Plan going forward
+
+Implement forward propagation, get PS-PL communication going, verify circuit operation, move on to backprop

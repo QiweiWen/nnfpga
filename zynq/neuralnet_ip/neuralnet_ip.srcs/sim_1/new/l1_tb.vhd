@@ -32,7 +32,23 @@ architecture tb of tb_l1_cache is
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
 
+    signal latched_dataout: std_logic_vector (15 downto 0);
+
 begin
+    
+    debug_proc:
+    process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                latched_dataout <= (others => '0');
+            else
+                if (validout = '1') then
+                    latched_dataout <= dataout;
+                end if;
+            end if;
+        end if;
+    end process;
 
     dut : l1_cache
     port map (clk       => clk,
@@ -63,27 +79,25 @@ begin
         alrst <= '1';
         wait for 100 ns;
         streamin <= '1';
-        datain <= X"dead";
+        datain <= X"0001";
         wait for 100 ns;
-        datain <= X"dead";
+        datain <= X"0002";
         wait for 100 ns;
-        datain <= X"dead";
+        datain <= X"0003";
         wait for 100 ns;
-        datain <= X"dead";
+        datain <= X"0004";
         wait for 100 ns;
-        datain <= X"dead";
+        datain <= X"0005";
         wait for 100 ns;
-        datain <= X"dead";
+        datain <= X"0006";
         wait for 100 ns;
-        datain <= X"dead";
+        datain <= X"0007";
         wait for 100 ns;
-        datain <= X"dead";
+        datain <= X"0008";
         wait for 100 ns;
-        datain <= X"beef";
+        datain <= X"0009";
         wait for 100 ns;
-        datain <= X"beef";
-        wait for 100 ns;
-        datain <= X"beef";
+        datain <= X"000a";
         wait for 100 ns;
         streamin <= '0';
         streamout <= '1';

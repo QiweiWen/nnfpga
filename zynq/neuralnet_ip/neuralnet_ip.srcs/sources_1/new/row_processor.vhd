@@ -193,18 +193,7 @@ begin
     end if;
 end process;
 
-validout_flag_proc:
-process (clk, alrst) is
-begin
-    if (rising_edge(clk)) then
-        if (alrst = '0') then
-            validout <= '0';
-        else
-            validout <= l1_validout;  
-        end if;
-    end if;
-end process;
-
+validout <= l1_validout;
 product <= func_safe_mult (ve_datain_delayed, l1_dataout); 
 dataout <= product;
 
