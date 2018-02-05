@@ -125,6 +125,8 @@ architecture Behavioral of l2_cache is
      signal sig_weB :  std_logic;
      signal sig_addrA :  std_logic_vector(ADDRWIDTHA-1 downto 0);
      signal sig_addrB :  std_logic_vector(ADDRWIDTHB-1 downto 0);
+     signal sig_addrB_read : std_logic_vector(ADDRWIDTHB-1 downto 0);
+     signal sig_addrB_write : std_logic_vector(ADDRWIDTHB-1 downto 0);
      signal sig_diA :  std_logic_vector(WIDTHA-1 downto 0);
      signal sig_diB :  std_logic_vector(WIDTHB-1 downto 0);
      signal sig_doA :  std_logic_vector(WIDTHA-1 downto 0);
@@ -134,7 +136,6 @@ architecture Behavioral of l2_cache is
      signal last_streamin: std_logic;
      signal last_flushout: std_logic;
      signal addrB_rst: std_logic;
-     signal addrB_next: std_logic_vector(ADDRWIDTHB-1 downto 0);
 
      signal re_in: std_logic_vector (1 downto 0);
      signal re_out: std_logic_vector (1 downto 0);
@@ -174,35 +175,31 @@ begin
                                                   sig_addrA'length));
 
     -- sig_addrB generation logic
-    addrB_reset_proc:
+    sig_addrB <= sig_addrB_read when (flushout = '1') else sig_addrB_write; 
+
+    B_writeaddr_proc:
     process (clk, alrst) is
     begin
-        if (rising_edge (clk)) then
-            if (alrst = '0') then
-                last_streamin <= '0';
-                last_flushout <= '0';
+        if (rising_edge(clk)) then
+            if (alrst = '0' or streamin = '0') then
+                sig_addrB_write <= (others => '0');
             else
-                last_streamin <= streamin;
-                last_flushout <= flushout;
+                sig_addrB_write <= std_logic_vector
+                                      (to_unsigned((to_integer(unsigned(sig_addrB_write)) + 1), 
+                                       sig_addrB'length)); 
             end if;
         end if;
     end process;
-
-    addrB_rst <= '0' when ((streamin = '0' and last_streamin = '1') or
-                           (flushout = '0' and last_flushout = '1')) else '1';
-    addrB_next <= std_logic_vector
-                    (to_unsigned((to_integer(unsigned(sig_addrB)) + 1), 
-                                 sig_addrB'length)) 
-                  when (streamin = '1' or flushout = '1') else (others => '0'); 
-
-    addrB_gen_proc:
+    B_readaddr_proc:
     process (clk, alrst) is
     begin
-        if (rising_edge (clk)) then
-            if (alrst = '0' or addrB_rst = '0') then
-                sig_addrB <= (others => '0');
+        if (rising_edge(clk)) then
+            if (alrst = '0' or flushout = '0') then
+                sig_addrB_read <= (others => '0');
             else
-                sig_addrB <= addrB_next;
+                sig_addrB_read <= std_logic_vector
+                                      (to_unsigned((to_integer(unsigned(sig_addrB_read)) + 1), 
+                                       sig_addrB'length));
             end if;
         end if;
     end process;
