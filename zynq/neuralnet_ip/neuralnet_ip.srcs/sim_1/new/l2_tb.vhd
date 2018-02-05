@@ -46,7 +46,30 @@ architecture tb of tb_l2_cache is
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
 
+    --debug signals
+    signal latched_A: std_logic_vector (15 downto 0);
+    signal latched_B: std_logic_vector (63 downto 0);
+
 begin
+
+    debug_proc:
+    process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                latched_A <= (others => '0');
+                latched_B <= (others => '0');
+            else
+                if (validout_A = '1') then
+                    latched_A <= dataout_A;
+                end if;
+
+                if (validout_B = '1') then
+                    latched_B <= dataout_B;
+                end if;
+            end if;
+        end if;
+    end process;
 
     dut : l2_cache
     port map (clk        => clk,
@@ -94,9 +117,15 @@ begin
         datain_B <= X"ccccddddeeeeffff";
         wait for 100 ns;
         streamin <= '0';
+        flushout <= '1';
+        wait for 200 ns;
+        flushout <= '0';
         re_A <= '1';
         row_A <= 0;
         col_A <= 5;
+        wait for 100 ns;
+        row_A <= 0;
+        col_A <= 3;
         wait for 100 ns;
         re_A <= '0';
         we_A <= '1';
