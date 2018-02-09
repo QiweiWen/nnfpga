@@ -35,6 +35,8 @@ architecture Behavioral of param_feeder is
 signal sig_full: std_logic;
 -- how many words we've written to the row processor
 signal nwords_written: integer range ncols - 1 downto 0;
+
+signal pipeline_input: std_logic_vector (16 downto 0);
 -- latched signals to be forwarded next cycle
 signal validin_pipeline: std_logic;
 signal datain_pipeline: std_logic_vector (15 downto 0);
@@ -47,8 +49,11 @@ signal next_state: state_t;
 
 begin
 
-dataout <= datain when this_state = writing else (others => '0');
-validout <= validin when this_state = writing else '0';
+dataout <= datain when this_state = writing or slave_full = '1' else (others => '0');
+validout <= validin when this_state = writing or slave_full = '1' else '0';
+
+pipeline_input(16) <= validin when this_state = forwarding else '0';
+pipeline_input(15 downto 0) <= datain when this_state = forwarding else (others => '0');
 
 pipeline_proc:
 process (clk) is
@@ -57,9 +62,9 @@ begin
         if (alrst = '0') then
             datain_pipeline <= (others => '0'); 
             validin_pipeline <= '0';
-        elsif (this_state = forwarding) then
-            datain_pipeline <= datain; 
-            validin_pipeline <= validin;
+        else
+            datain_pipeline <= pipeline_input (15 downto 0); 
+            validin_pipeline <= pipeline_input (16);
         end if;
     end if;
 end process;
