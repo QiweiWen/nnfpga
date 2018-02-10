@@ -21,8 +21,6 @@ port (
     dataout: out std_logic_vector (15 downto 0);
     validout: out std_logic;
 -- flag passed to the last row feeder
--- use this signal from the top most unit to
--- drive reset
     full : out std_logic;
 -- flag passed from the next row feeder
     slave_full: in std_logic
@@ -47,13 +45,17 @@ type state_t is (forwarding, writing);
 signal this_state: state_t;
 signal next_state: state_t;
 
+signal do_write: std_logic;
+
 begin
 
-dataout <= datain when this_state = writing or slave_full = '1' else (others => '0');
-validout <= validin when this_state = writing or slave_full = '1' else '0';
+do_write <= '1' when this_state = writing or slave_full = '1'  else '0';
 
-pipeline_input(16) <= validin when this_state = forwarding else '0';
-pipeline_input(15 downto 0) <= datain when this_state = forwarding else (others => '0');
+dataout <= datain when do_write = '1' else (others => '0');
+validout <= validin when do_write = '1' else '0';
+
+pipeline_input(16) <= validin when do_write = '0' else '0';
+pipeline_input(15 downto 0) <= datain when do_write = '0' else (others => '0');
 
 pipeline_proc:
 process (clk) is
@@ -83,7 +85,7 @@ begin
     if (rising_edge (clk)) then
         if (alrst = '0') then
             nwords_written <= 0;
-        elsif (validin = '1' and this_state = writing) then
+        elsif (validin = '1' and do_write = '1') then
             nwords_written <= (nwords_written + 1) mod ncols;
         end if;
     end if;
