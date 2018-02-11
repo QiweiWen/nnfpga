@@ -10,8 +10,8 @@ entity tb_feeder_array is
 end tb_feeder_array;
 
 architecture tb of tb_feeder_array is
-    constant nrows: integer := 10;
-    constant ncols: integer := 10;
+    constant nrows: integer := 2;
+    constant ncols: integer := 2;
     
     component feeder_array
         generic (
@@ -43,8 +43,8 @@ begin
     process  (clk) is
     begin
         if (rising_edge(clk)) then
-            if (validout(7) = '1') then
-                debug <= dataout (7);
+            if (validout(0) = '1') then
+                debug <= dataout (0);
             end if;
         end if;
     end process;

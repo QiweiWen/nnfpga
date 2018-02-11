@@ -26,9 +26,28 @@ package helperpkg is
     constant PARAM_DEC: integer;
     constant PARAM_FRC: integer;
     type wordarr_t is array (integer range <>) of std_logic_vector (15 downto 0);
+    function log2( i : natural) return integer;
 end package;
 
 package body helperpkg is
     constant PARAM_DEC: integer := 8;
     constant PARAM_FRC: integer := 8;
+
+    function log2( i : natural) return integer is
+    variable temp    : integer := i;
+    variable ret_val : integer := 0; 
+    variable roundup: std_logic := '0';
+    begin					
+        while temp > 1 loop
+            if (temp mod 2 /= 0) then
+                roundup := '1';
+            end if;
+            ret_val := ret_val + 1;
+            temp    := temp / 2;     
+        end loop;
+        if (roundup = '1') then
+            ret_val := ret_val + 1;
+        end if;
+        return ret_val;
+    end function;
 end package body;

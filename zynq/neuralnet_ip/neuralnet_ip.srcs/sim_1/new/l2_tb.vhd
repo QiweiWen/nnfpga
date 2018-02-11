@@ -5,12 +5,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity tb_l2_cache is
-end tb_l2_cache;
+entity tb_l2_cache_weight is
+end tb_l2_cache_weight;
 
-architecture tb of tb_l2_cache is
+architecture tb of tb_l2_cache_weight is
 
-    component l2_cache
+    component l2_cache_weight
         port (clk        : in std_logic;
               alrst      : in std_logic;
               datain_B   : in std_logic_vector (63 downto 0);
@@ -71,7 +71,7 @@ begin
         end if;
     end process;
 
-    dut : l2_cache
+    dut : l2_cache_weight
     port map (clk        => clk,
               alrst      => alrst,
               datain_B   => datain_B,
@@ -118,7 +118,7 @@ begin
         wait for 100 ns;
         streamin <= '0';
         flushout <= '1';
-        wait for 200 ns;
+        wait for 500 ns;
         flushout <= '0';
         re_A <= '1';
         row_A <= 0;
@@ -146,7 +146,7 @@ end tb;
 
 -- Configuration block below is required by some simulators. Usually no need to edit.
 
-configuration cfg_tb_l2_cache of tb_l2_cache is
+configuration cfg_tb_l2_cache_weight of tb_l2_cache_weight is
     for tb
     end for;
-end cfg_tb_l2_cache;
+end cfg_tb_l2_cache_weight;

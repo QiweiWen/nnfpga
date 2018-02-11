@@ -13,12 +13,12 @@ architecture tb of tb_lfsr is
     component lfsr
         port (clk       : in std_logic;
               alrst     : in std_logic;
-              pseudornd : out std_logic_vector (15 downto 0));
+              pseudornd : out std_logic_vector (63 downto 0));
     end component;
 
     signal clk       : std_logic;
     signal alrst     : std_logic;
-    signal pseudornd : std_logic_vector (15 downto 0);
+    signal pseudornd : std_logic_vector (63 downto 0);
 
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';

@@ -11,6 +11,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
+use work.helperpkg.all;
+
 entity asymmetric_ram_2b is
     generic (
                 WIDTHA : integer := 8;
@@ -52,18 +54,6 @@ architecture behavioral of asymmetric_ram_2b is
             return R;
         end if;
     end;
-
-    function log2( i : natural) return integer is
-    variable temp    : integer := i;
-    variable ret_val : integer := 0; 
-    begin					
-        while temp > 1 loop
-            ret_val := ret_val + 1;
-            temp    := temp / 2;     
-        end loop;
-
-        return ret_val;
-    end function;
 
     constant minWIDTH : integer := min(WIDTHA,WIDTHB);
     constant maxWIDTH : integer := max(WIDTHA,WIDTHB);
