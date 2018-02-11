@@ -24,7 +24,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity l1_cache is
 generic(
-    ncols: integer := 10
+    nitems: integer := 10
 );
 port (
     clk: in std_logic;
@@ -40,9 +40,9 @@ port (
 end l1_cache;
 
 architecture Behavioral of l1_cache is
-    signal read_ptr: integer range ncols - 1 downto 0;
-    signal write_ptr: integer range ncols - 1 downto 0;
-    type memarray_t is array (ncols - 1 downto 0) of std_logic_vector (15 downto 0);
+    signal read_ptr: integer range nitems - 1 downto 0;
+    signal write_ptr: integer range nitems - 1 downto 0;
+    type memarray_t is array (nitems - 1 downto 0) of std_logic_vector (15 downto 0);
     signal memarray: memarray_t;
     signal blockram_out: std_logic_vector (15 downto 0);
 
@@ -70,7 +70,7 @@ begin
             read_ptr <= 0;
         else
             if (streamout = '1') then
-                read_ptr <= (read_ptr + 1) mod ncols;
+                read_ptr <= (read_ptr + 1) mod nitems;
             end if;
         end if;
     end if;
@@ -84,7 +84,7 @@ begin
             write_ptr <= 0;
         else
             if (streamin = '1') then
-                write_ptr <= (write_ptr + 1) mod ncols;
+                write_ptr <= (write_ptr + 1) mod nitems;
             end if;
         end if;
     end if;
