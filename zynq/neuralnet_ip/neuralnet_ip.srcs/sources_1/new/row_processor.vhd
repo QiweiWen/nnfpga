@@ -91,7 +91,7 @@ end component delay_buffer;
 -- used for holding row vector elements
 component l1_cache is
 generic(
-    ncols: integer := 10
+    nitems: integer := 10
 );
 port (
     clk: in std_logic;
@@ -123,7 +123,7 @@ l1_re <= ve_validin;
 
 weight_memory: l1_cache
 generic map(
-    ncols => ncols
+    nitems => ncols
 )
 port map(
     clk => clk,

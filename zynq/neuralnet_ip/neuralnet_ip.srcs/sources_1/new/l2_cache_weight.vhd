@@ -17,8 +17,8 @@ use ieee.numeric_std.all;
 
 entity l2_cache_weight is
     generic (
-        nrows: integer := 10;
-        ncols: integer := 10
+        nrows: integer := 3;
+        ncols: integer := 3
     );
     port (
         clk: in std_logic;
@@ -42,7 +42,7 @@ end l2_cache_weight;
 
 architecture Behavioral of l2_cache_weight is
 
-component l2_cache is
+component l2_cache_core is
     generic (
         nrows: integer := 10;
         ncols: integer := 10
@@ -65,11 +65,11 @@ component l2_cache is
         col_A: in integer range ncols - 1 downto 0;
         validout_A: out std_logic
     );
-end component l2_cache;
+end component l2_cache_core;
 
 begin
 
-    wrapped : l2_cache
+    wrapped : l2_cache_core
     generic map (nrows => nrows, ncols => ncols)
     port map (clk        => clk,
               alrst      => alrst,

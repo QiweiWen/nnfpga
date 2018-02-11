@@ -116,13 +116,15 @@ begin
         wait for 100 ns;
         datain_B <= X"ccccddddeeeeffff";
         wait for 100 ns;
+        datain_B <= X"1111222233334444";
+        wait for 100 ns;
         streamin <= '0';
         flushout <= '1';
         wait for 500 ns;
         flushout <= '0';
         re_A <= '1';
-        row_A <= 0;
-        col_A <= 5;
+        row_A <= 2;
+        col_A <= 2;
         wait for 100 ns;
         row_A <= 0;
         col_A <= 3;
@@ -131,8 +133,10 @@ begin
         we_A <= '1';
         datain_A <= X"abcd";
         wait for 100 ns;
+        flushout <= '1';
+        wait for 1000 ns;
         we_A <= '0';
-        
+        flushout <= '0';
 
         -- EDIT Add stimuli here
         wait for 100 * TbPeriod;

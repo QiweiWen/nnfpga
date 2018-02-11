@@ -46,7 +46,7 @@ entity l2_cache_bias is
 end l2_cache_bias;
 
 architecture Behavioral of l2_cache_bias is
-component l2_cache is
+component l2_cache_core is
     generic (
         nrows: integer := 10;
         ncols: integer := 10
@@ -69,10 +69,10 @@ component l2_cache is
         col_A: in integer range ncols - 1 downto 0;
         validout_A: out std_logic
     );
-end component l2_cache;
+end component l2_cache_core;
 begin
 
-    wrapped : l2_cache
+    wrapped : l2_cache_core
     generic map (nrows => nrows, ncols => 1)
     port map (clk        => clk,
               alrst      => alrst,
