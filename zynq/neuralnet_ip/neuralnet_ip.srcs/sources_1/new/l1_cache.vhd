@@ -67,10 +67,10 @@ process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
         if (alrst = '0') then
-            read_ptr <= 0;
+            read_ptr <= nitems - 1;
         else
             if (streamout = '1') then
-                read_ptr <= (read_ptr + 1) mod nitems;
+                read_ptr <= (read_ptr - 1) mod nitems;
             end if;
         end if;
     end if;
