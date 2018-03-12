@@ -66,7 +66,7 @@ read_addr_proc:
 process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
-        if (streamout = '0' or alrst = '0') then
+        if (alrst = '0') then
             read_ptr <= 0;
         else
             if (streamout = '1') then

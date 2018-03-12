@@ -101,7 +101,11 @@ begin
         wait for 100 ns;
         streamin <= '0';
         streamout <= '1';
-        wait for 1000 ns;
+        wait for 600 ns;
+        streamout <= '0';
+        wait for 1700 ns;
+        streamout <= '1';
+        wait for 2000 ns;
         streamout <= '0';
 
         -- EDIT Add stimuli here

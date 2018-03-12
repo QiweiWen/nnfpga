@@ -27,6 +27,7 @@ function func_safe_sum (
     variable B_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
     variable C_sfixed_full: sfixed (PARAM_DEC downto -PARAM_FRC); 
     variable C_stdvec_full: std_logic_vector (16 downto 0);
+    subtype  sum_result_type is std_logic_vector (16 downto 0);
     variable ret: std_logic_vector (15 downto 0);
 begin
     A_sfixed := to_sfixed (A, PARAM_DEC - 1, -PARAM_FRC);
