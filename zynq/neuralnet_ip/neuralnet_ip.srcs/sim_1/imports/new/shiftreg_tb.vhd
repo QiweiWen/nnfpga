@@ -18,21 +18,25 @@ architecture tb of tb_vector_shifter is
         generic(
             nrows: integer
         );
-        port (clk             : in std_logic;
-              alrst           : in std_logic;
-              array_in        : in wordarr_t (nrows - 1 downto 0);
-              valid_in        : in std_logic_vector (nrows - 1 downto 0);
-              valid_out       : out std_logic;
-              activated_out   : out std_logic_vector (15 downto 0);
-              unactivated_out : out std_logic_vector (15 downto 0));
+        port (
+            clk: in std_logic;
+            alrst: in std_logic;
+            array_in: in wordarr_t (nrows - 1 downto 0);
+            valid_in: in std_logic_vector (nrows - 1 downto 0); 
+            valid_out_sigmoid: out std_logic;
+            activated_out: out std_logic_vector (15 downto 0);
+            valid_out_unactivated: out std_logic;
+            unactivated_out: out std_logic_vector (15 downto 0)
+        );
     end component;
 
     signal clk             : std_logic;
     signal alrst           : std_logic;
     signal array_in        : wordarr_t (nrows - 1 downto 0);
     signal valid_in        : std_logic_vector (nrows - 1 downto 0);
-    signal valid_out       : std_logic;
+    signal valid_out_sigmoid       : std_logic;
     signal activated_out   : std_logic_vector (15 downto 0);
+    signal valid_out_unactivated: std_logic;
     signal unactivated_out : std_logic_vector (15 downto 0);
 
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
@@ -49,8 +53,9 @@ begin
               alrst           => alrst,
               array_in        => array_in,
               valid_in        => valid_in,
-              valid_out       => valid_out,
-              activated_out   => activated_out,
+              valid_out_sigmoid => valid_out_sigmoid,
+              activated_out => activated_out,
+              valid_out_unactivated => valid_out_unactivated,
               unactivated_out => unactivated_out);
 
     -- Clock generation

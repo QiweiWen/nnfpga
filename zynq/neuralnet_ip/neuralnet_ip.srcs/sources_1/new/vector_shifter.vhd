@@ -37,8 +37,9 @@ port (
     array_in: in wordarr_t (nrows - 1 downto 0);
     valid_in: in std_logic_vector (nrows - 1 downto 0); 
 -- serial output
-    valid_out: out std_logic;
+    valid_out_sigmoid: out std_logic;
     activated_out: out std_logic_vector (15 downto 0);
+    valid_out_unactivated: out std_logic;
     unactivated_out: out std_logic_vector (15 downto 0)
 );
 end vector_shifter;
@@ -151,19 +152,10 @@ port map(
     datain => registers (nrows - 1)(15 downto 0),
     validin => registers (nrows - 1) (16),
     dataout => activated_out,
-    validout => valid_out 
+    validout => valid_out_sigmoid 
 );
 
-unactivated: delay_buffer
-generic map (
-    ncycles => 1,
-    width => 16
-)
-port map(
-    clk => clk,
-    rst => alrst,
-    din => registers (nrows - 1)(15 downto 0),
-    dout => unactivated_out
-);
+unactivated_out <= registers (nrows - 1)(15 downto 0);
+valid_out_unactivated <= registers (nrows - 1) (16);
 
 end Behavioral;
