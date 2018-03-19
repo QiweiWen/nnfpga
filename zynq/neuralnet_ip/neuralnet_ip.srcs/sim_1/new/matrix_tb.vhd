@@ -43,12 +43,20 @@ architecture tb of tb_matrix is
     signal validout       : std_logic_vector (nrows - 1 downto 0);
     signal finished       : std_logic;
 
+    type   realarr is array (nrows - 1 downto 0) of real;
+    signal arrayout_real : realarr;
+
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
 
     subtype param_type is std_logic_vector (15 downto 0);
 begin
+    
+realgen:
+    for I in nrows - 1 downto 0 generate
+        arrayout_real(I) <= to_real (to_sfixed(arrayout(I), PARAM_DEC - 1, -PARAM_FRC)); 
+    end generate;
 
     dut : matrix
     generic map (ncols => ncols, nrows => nrows)
