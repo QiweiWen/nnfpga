@@ -79,9 +79,9 @@ end generate;
 
 wire_them_up:
 for I in nrows - 1 downto 0 generate
-    datain_array(I) <= datain when I = 0 else datafwd_array (I - 1); 
-    validin_array(I) <= validin when I = 0 else validfwd_array (I - 1);
-    slave_full_array(I) <= '1' when I = nrows - 1 else full_array (I + 1);
+    datain_array(I) <= datain when I = nrows - 1 else datafwd_array (I + 1); 
+    validin_array(I) <= validin when I = nrows - 1 else validfwd_array (I + 1);
+    slave_full_array(I) <= '1' when I = 0 else full_array (I - 1);
 end generate;
 
 end Behavioral;
