@@ -1,0 +1,2 @@
+Language File-Name                          IP                Library         File-Path                                                                                    
+VHDL,    fifo_generator_0_sim_netlist.vhdl, fifo_generator_0, xil_defaultlib, ../../../../neuralnet_ip.srcs/sources_1/ip/fifo_generator_0/fifo_generator_0_sim_netlist.vhdl
