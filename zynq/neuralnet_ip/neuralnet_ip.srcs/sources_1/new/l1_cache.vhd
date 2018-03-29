@@ -80,7 +80,7 @@ write_addr_proc:
 process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
-        if (streamin = '0' or alrst = '0') then
+        if (alrst = '0') then
             write_ptr <= 0;
         else
             if (streamin = '1') then
