@@ -11,11 +11,11 @@ working system on the Zynq PL (if I even make it that far), I can argue convinci
 if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
 ## Current Progress:
-26/03/2018:
+###29/03/2018:
 -------------
-sketched out a design that separates the forward prop and back prop logic into a consumer and producer logic separated by fixed-size
-FIFOs. FIFO depth == number of parallel training examples taken before blocking for software input.
 
-currently working on: 
-1. SIPO shift register for feeding parameter stream into conjugate matrix units
-2. FIFO buffer for storing unactivated matrix multiplication result
+Completed the transpose matrix. All components of the forward propagation unit is complete.
+Next step:
+1. Come up with a black box design of the forward propagation unit, work out all input and output
+   characteristics
+2. Implement it by connecting the lego bricks
