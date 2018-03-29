@@ -1,15 +1,15 @@
--- conjugate_matrix-vector product operation
+-- transpose_matrix-vector product operation
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.helperpkg.all;
 
-entity conjugate_matrix is
+entity transpose_matrix is
 generic (ncols: integer := 400;
          nrows: integer := 100);
 port (
     clk: in std_logic;
     alrst: in std_logic;
--- conjugate_matrix weight from l2 cache
+-- transpose_matrix weight from l2 cache
     datain_weight: in std_logic_vector (15 downto 0);
     validin_weight: in std_logic;
 -- input vector
@@ -21,9 +21,9 @@ port (
 -- this flags that an entire vector product has been computed
     finished: out std_logic
 );
-end conjugate_matrix;
+end transpose_matrix;
 
-architecture Behavioral of conjugate_matrix is
+architecture Behavioral of transpose_matrix is
 
 component row_processor is
 generic (
