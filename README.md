@@ -11,7 +11,7 @@ working system on the Zynq PL (if I even make it that far), I can argue convinci
 if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
 ## Current Progress:
-###29/03/2018:
+29/03/2018:
 -------------
 
 Completed the transpose matrix. All components of the forward propagation unit is complete.
