@@ -19,3 +19,8 @@ Next step:
 1. Come up with a black box design of the forward propagation unit, work out all input and output
    characteristics
 2. Implement it by connecting the lego bricks
+
+I got rid of the coregen FIFO. I followed Xilinx's tutorial on how to turn the IP into user-managed mode
+and add generics and it manages to synthesise, but there are all these VHDL files for synthesis and simulation
+and I'm not sure which ones I should or should not modify. I was worried they were going to cause problems
+down the line, especially with simulation, so I replaced it with a code example I found online.
