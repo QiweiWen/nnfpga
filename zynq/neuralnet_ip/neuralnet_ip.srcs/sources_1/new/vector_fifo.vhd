@@ -37,20 +37,6 @@ port (
 );
 end component std_fifo;
 
--- underlying fifo unit full and empty logic
-signal fifo_empty: std_logic;
-signal fifo_full:  std_logic;
-
--- how many vector elements in the current vector we have received
-signal nelems_wr: integer range veclen - 1 downto 0;
--- how many vector elements we have clocked out
-signal nelems_rd: integer range veclen - 1 downto 0;
--- how many vectors we now hold
-signal nvectors : integer range nvecs downto 0;
--- whether we should increment or decrement vector count
-signal nvectors_increment: std_logic;
-signal nvectors_decrement: std_logic;
-
 begin
 
 -- standard fifo port map
@@ -66,49 +52,8 @@ port map(
     datain => datain,
     readen => rden,
     dataout => dataout,
-    empty => fifo_empty,
-    full => fifo_full
+    empty => vector_empty,
+    full => vector_full
 );
-
--- element count logic
-elem_count_proc:
-process (clk, alrst) is
-begin
-    if (rising_edge (clk)) then
-        if (alrst = '0') then
-            nelems_rd <= 0;
-            nelems_wr <= 0;
-        else
-            if (wren = '1' and fifo_full = '0') then 
-                nelems_wr <= (nelems_wr + 1) mod (veclen);
-            end if;
-
-            if (rden = '1' and fifo_empty = '0') then
-                nelems_rd <= (nelems_rd + 1) mod (veclen);
-            end if;
-        end if;
-    end if;
-end process;
-
---vector count process
-nvectors_increment <= '1' when nelems_wr = veclen - 1 and wren = '1' else '0'; 
-nvectors_decrement <= '1' when nelems_rd = veclen - 1 and rden = '1' else '0'; 
-process (clk, alrst) is
-begin
-    if (rising_edge(clk)) then
-        if (alrst = '0') then
-            nvectors <= 0;
-        else
-            if (nvectors_increment = '1' and nvectors_decrement = '0') then
-                nvectors <= (nvectors + 1) mod (nvecs + 1);
-            elsif (nvectors_decrement = '1') then
-                nvectors <= (nvectors - 1) mod (nvecs + 1);
-            end if;
-        end if;
-    end if;
-end process;
-
-vector_empty <= '1' when (fifo_empty = '1' or nvectors = 0) else '0';
-vector_full  <= '1' when (fifo_full  = '1' or nvectors = nvecs) else '0'; 
 
 end Behavioral;
