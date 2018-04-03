@@ -39,6 +39,7 @@ port (
 -- serial output
     valid_out_sigmoid: out std_logic;
     activated_out: out std_logic_vector (15 downto 0);
+    sigmoidgrad_out: out std_logic_vector (15 downto 0);
     valid_out_unactivated: out std_logic;
     unactivated_out: out std_logic_vector (15 downto 0)
 );
@@ -73,6 +74,18 @@ architecture Behavioral of vector_shifter is
             out std_logic_vector (16 - 1 downto 0);
         validout: out std_logic);
     end component sigmoidfull;
+
+    -- output sigmoid gradient unit
+
+    component sigmoidgradfull is
+    port (
+        clk: in std_logic;
+        datain: in std_logic_vector (16 - 1 downto 0);
+        validin: in std_logic;
+        dataout: 
+            out std_logic_vector (16 - 1 downto 0);
+        validout: out std_logic);
+    end component sigmoidgradfull;
 
     -- pipeline registers
     component delay_buffer is
@@ -153,6 +166,16 @@ port map(
     validin => registers (nrows - 1) (16),
     dataout => activated_out,
     validout => valid_out_sigmoid 
+);
+
+-- sigmoid derivative storage for future use
+sigmadash: sigmoidgradfull
+port map(
+    clk => clk,
+    datain => registers (nrows - 1)(15 downto 0),
+    validin => registers (nrows - 1) (16),
+    dataout => sigmoidgrad_out,
+    validout => open 
 );
 
 unactivated_out <= registers (nrows - 1)(15 downto 0);

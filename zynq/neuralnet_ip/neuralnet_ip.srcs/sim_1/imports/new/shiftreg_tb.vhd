@@ -25,6 +25,7 @@ architecture tb of tb_vector_shifter is
             valid_in: in std_logic_vector (nrows - 1 downto 0); 
             valid_out_sigmoid: out std_logic;
             activated_out: out std_logic_vector (15 downto 0);
+            sigmoidgrad_out: out std_logic_vector (15 downto 0);
             valid_out_unactivated: out std_logic;
             unactivated_out: out std_logic_vector (15 downto 0)
         );
@@ -36,6 +37,7 @@ architecture tb of tb_vector_shifter is
     signal valid_in        : std_logic_vector (nrows - 1 downto 0);
     signal valid_out_sigmoid       : std_logic;
     signal activated_out   : std_logic_vector (15 downto 0);
+    signal sigmoidgrad_out :  std_logic_vector (15 downto 0);
     signal valid_out_unactivated: std_logic;
     signal unactivated_out : std_logic_vector (15 downto 0);
 
@@ -55,6 +57,7 @@ begin
               valid_in        => valid_in,
               valid_out_sigmoid => valid_out_sigmoid,
               activated_out => activated_out,
+              sigmoidgrad_out => sigmoidgrad_out,
               valid_out_unactivated => valid_out_unactivated,
               unactivated_out => unactivated_out);
 
@@ -100,8 +103,26 @@ begin
         wait for 100 ns;
         put_element (0, x"0005");
         wait for 100 ns;
-        valid_in <= (others => '0');
-        wait for 500 ns;
+        put_element (1, x"0004");
+        wait for 100 ns;
+        put_element (2, x"0003");
+        wait for 100 ns;
+        put_element (3, x"0002");
+        wait for 100 ns;
+        put_element (4, x"0001");
+        wait for 100 ns;
+        put_element (0, x"0001");
+        wait for 100 ns;
+        put_element (1, x"0002");
+        wait for 100 ns;
+        put_element (2, x"0003");
+        wait for 100 ns;
+        put_element (3, x"0004");
+        wait for 100 ns;
+        put_element (4, x"0005");
+        wait for 100 ns;
+        put_element (0, x"0005");
+        wait for 100 ns;
         put_element (1, x"0004");
         wait for 100 ns;
         put_element (2, x"0003");
