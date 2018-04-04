@@ -23,8 +23,11 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 package helperpkg is
+    -- bit depth of decimal and fractional parts of data
     constant PARAM_DEC: integer;
     constant PARAM_FRC: integer;
+    -- number of training examples we will handle in parallel
+    constant NTRAINING: integer;
     type wordarr_t is array (integer range <>) of std_logic_vector (15 downto 0);
     function log2( i : natural) return integer;
 end package;
@@ -32,6 +35,7 @@ end package;
 package body helperpkg is
     constant PARAM_DEC: integer := 8;
     constant PARAM_FRC: integer := 8;
+    constant NTRAINING: integer := 256;
 
     function log2( i : natural) return integer is
     variable temp    : integer := i;
