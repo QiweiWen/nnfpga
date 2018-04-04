@@ -19,25 +19,6 @@ end accumulator;
 
 architecture Behavioral of accumulator is
 
-function func_safe_sum (
-    A: std_logic_vector (15 downto 0);
-    B: std_logic_vector (15 downto 0)
-)return std_logic_vector is
-    variable A_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
-    variable B_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
-    variable C_sfixed_full: sfixed (PARAM_DEC downto -PARAM_FRC); 
-    variable C_stdvec_full: std_logic_vector (16 downto 0);
-    subtype  sum_result_type is std_logic_vector (16 downto 0);
-    variable ret: std_logic_vector (15 downto 0);
-begin
-    A_sfixed := to_sfixed (A, PARAM_DEC - 1, -PARAM_FRC);
-    B_sfixed := to_sfixed (B, PARAM_DEC - 1, -PARAM_FRC);
-    C_sfixed_full := A_sfixed + B_sfixed; 
-    C_stdvec_full := sum_result_type (C_sfixed_full);
-    ret := fun_add_truncate (C_stdvec_full);
-    return ret;
-end function;
-
 signal sig_sum: std_logic_vector (15 downto 0); 
 signal sig_validout: std_logic;
 

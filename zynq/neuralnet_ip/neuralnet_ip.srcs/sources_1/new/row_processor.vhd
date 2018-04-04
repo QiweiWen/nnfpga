@@ -55,25 +55,6 @@ end row_processor;
 
 architecture Behavioral of row_processor is
 
-function func_safe_mult (
-    A: std_logic_vector (15 downto 0);
-    B: std_logic_vector (15 downto 0)
-)return std_logic_vector is
-    variable A_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
-    variable B_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
-    variable C_sfixed_full: sfixed (2* PARAM_DEC - 1 downto -2* PARAM_FRC); 
-    variable C_stdvec_full: std_logic_vector (31 downto 0);
-    subtype  mult_result_type is std_logic_vector (31 downto 0); 
-    variable ret: std_logic_vector (15 downto 0);
-begin
-    A_sfixed := to_sfixed (A, PARAM_DEC - 1, -PARAM_FRC);
-    B_sfixed := to_sfixed (B, PARAM_DEC - 1, -PARAM_FRC);
-    C_sfixed_full := A_sfixed * B_sfixed; 
-    C_stdvec_full := mult_result_type (C_sfixed_full);
-    ret := fun_mul_truncate (C_stdvec_full);
-    return ret;
-end function;
-
 -- used to delay signals for alignment
 component delay_buffer is
     generic(
