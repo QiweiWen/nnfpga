@@ -1,38 +1,39 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 04.04.2018 17:19:29
--- Design Name: 
--- Module Name: forward_layer - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
+-- a single layer that covers matrix product, bias, activation
+-- and partial result storage
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 entity forward_layer is
---  Port ( );
+generic (ncols: integer := 400;
+         nrows: integer := 100);
+port(
+    clk: in std_logic;
+    alrst: in std_logic;
+-- l2 weight memory external interface
+    datain_weight: in std_logic_vector (15 downto 0);
+    validin_weight: in std_logic;
+-- l2 bias memory update channel 
+    datain_bias: in std_logic_vector (15 downto 0);
+    validin_bias: in std_logic;
+-- serial training input
+    datain_vector: in std_logic_vector (15 downto 0);
+    validin_vector: in std_logic;
+-- activated output fifo
+    sigmoid_empty: out std_logic;
+    sigmoid_data:  out std_logic;
+    sigmoid_rden:  in  std_logic;
+-- unactivated output fifo
+    unactivated_empty: out std_logic;
+    unactivated_data:  out std_logic;
+    unactivated_rden:  in  std_logic;
+-- sigmoid prime fifo
+    sigmoid_prime_empty: out std_logic;
+    sigmoid_prime_data:  out std_logic;
+    sigmoid_prime_rden:  in  std_logic;
+-- serial output to the next stage
+    dataout_vector: out std_logic_vector (15 downto 0);
+    validout_vector: out std_logic
+);
 end forward_layer;
 
 architecture Behavioral of forward_layer is
