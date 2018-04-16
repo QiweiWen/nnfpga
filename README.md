@@ -3,8 +3,8 @@ implementation of feedforward neural network in FPGA
 
 ## What is this?
 I'm trying to make a FPGA coprocessor that implements a simple feed-forward neural network on a Zedboard. Ideally the CPU will
-stream the training examples and correct output and be able to collect the trained parameters from
-the FPGA after some time.
+stream the training examples and correct output and be able to use the circuit to make predictions or, possibly, stream the trained
+weight and bias out of the FPGA into other systems.
 
 I'm hoping to achieve good parallelism (through pipelining) and scalability; that is, should I only manage to deploy a tiny
 working system on the Zynq PL (if I even make it that far), I can argue convincingly that the network can be made twice as large
@@ -12,7 +12,7 @@ if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
 16/04/2018:
 -------------
-The last handful of days have been chaotic. I found some time to read a few papers admist the drama and chaos and found a solution to the flow control problem.
+The last handful of days have been chaotic. I found some time to read a few papers amidst the drama and chaos and found a solution to the flow control problem.
 I've also redesigned most of the circuit, so I will begin what will amount to a rewrite of the entire hardware.
 
 1. The difference in data rate between modules is compensated using FIFOs backed by block ram. The number of training examples in parallel will be hard coded (e.g. 128, 256)
