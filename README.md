@@ -10,37 +10,27 @@ I'm hoping to achieve good parallelism (through pipelining) and scalability; tha
 working system on the Zynq PL (if I even make it that far), I can argue convincingly that the network can be made twice as large
 if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
-## Current Progress:
-06/04/2018:
+16/04/2018:
 -------------
-Had some thinking over about the algorithm.
+The last handful of days have been chaotic. I found some time to read a few papers admist the drama and chaos and found a solution to the flow control problem.
+I've also redesigned most of the circuit, so I will begin what will amount to a rewrite of the entire hardware.
 
-1. The number of training examples processed in parallel will be 128. A batch of training examples will be used for a number of iterations
-   until they are discarded and the next batch is streamed in from software. Derivatives are added together, the sum shifted 7 bits to the right
-   and multiplied with learning rate to avoid rounding error. Hopefully enough to avoid overfitting?
+1. The difference in data rate between modules is compensated using FIFOs backed by block ram. The number of training examples in parallel will be hard coded (e.g. 128, 256)
+so I will get rid of the custom FIFO I pulled from the interwebs.
 
-2. Split back propagation into two distinct operations: 
-   2.1. feeding error terms backwards and storing error terms in FIFO
-   2.2. reading error terms from FIFO and updating l2 cache content
+2. Column processors are inevitable if the performance is to be acceptible. Output PISO shift register is simply a cop-out, one that doesn't work at that. 
+I can be stupid as fuck sometimes.
+Rather than coming up with elaborate ways for row processors to stall, commit the sum of products to shift register and then to a vector FIFO to match the data rate between layers,
+it makes more sense to connect each row processor with its own word FIFO which feeds into column processors of the next layer.
 
-   Also, unactivated multiplication result doesn't need to go into FIFOs
+3. The l1 cache shouldn't be part of the row or column processor anymore, but rather should be shared between a column processor of the transpose matrix and a row processor of the
+forward propagation matrix. l1 cache units will remain unmodified while training is going on, the derivative sums will be commited to the l2 cache. While training, both ports of
+the block ram will be used for reading, one for the forward unit and one for the backward unit; after training, one port will be read, the content modified, and into the other port
+will be written the updated weight.
 
-3. It turns out I can't avoid having column processing elements after all! The output shift register can take input as frequently as every nrows cycles,
-   but row processing elements produce output every ncols cycles. That is, only if every layer has fewer neurons than the layer before it will 
-   forward propagation work without data hazard. 
-   
-   I hate myself now because I jumped right into implementation without thinking any of it through. Should have learnt the lesson from the previous
-   two attempts...
+It's just imperative that one works through the algorithm first and design the RTL accordingly when doing this sort of thing rather than jumping into the RTL only to find that
+some designs are unworkable. I should have learnt the lesson after the previous two attempts. I hope to god I got the gist of it right this time around.
 
 Immediate TODOs:
 
-1. write the read-update-write dual port blockram wrapper
-2. write the column processor and column-major matrix unit. For a given forward propagation matrix its parameter will come from
-   the SISO shift register (feeder\_array.vhd) if it is row-major, and the SIPO shift register (param\_sipo.vhd) if it is column major.
-   For a given transpose matrix, it is guaranteed to differ from the corresponding feed forward matrix in row/column order, and thus
-   can use the same shift register unit. The same parameter stream from l2 cache (row major, increasing order) can still be used, otherwise
-   I would have given up right about now...
-
-   So, there needs be four different kinds of matrixes: sipo-row-major, siso-row-major, sipo-column-major and siso-column-major. I think I need
-   to consider metaprogramming the HDL files to automate some things.
-
+write the TDP wrapper to support the aforementioned memory operations.
