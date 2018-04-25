@@ -10,8 +10,8 @@ entity true_dpram_sclk is
 	(	
 		data_a	: in std_logic_vector(width - 1 downto 0);
 		data_b	: in std_logic_vector(width - 1 downto 0);
-		addr_a	: in natural range 0 to depth - 1;
-		addr_b	: in natural range 0 to depth - 1;
+		addr_a	: in integer range 0 to depth - 1;
+		addr_b	: in integer range 0 to depth - 1;
 		we_a	: in std_logic;
 		we_b	: in std_logic;
 		clk		: in std_logic;
