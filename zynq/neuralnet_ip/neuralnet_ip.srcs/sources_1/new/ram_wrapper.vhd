@@ -35,7 +35,8 @@ port (
 -- update channel
     vin_c               : in std_logic; 
     din_c               : in std_logic_vector (15 downto 0);
-    wraddr_c            : in integer range 0 to depth - 1
+    wraddr_c            : in integer range 0 to depth - 1;
+    ack_c               : out std_logic
 );
 end ram_wrapper;
 
@@ -61,6 +62,19 @@ component true_dpram_sclk is
     );
 end component true_dpram_sclk;
 
+component delay_buffer is
+    generic(
+        ncycles: integer;
+        width:   integer
+    );
+    port(
+        clk: in std_logic;
+        rst: in std_logic;
+        din: in std_logic_vector (width - 1 downto 0);
+        dout: out std_logic_vector (width - 1 downto 0)
+    );
+end component delay_buffer;
+
 -- tdp signals, controlled by system state
 signal tdp_datain_a     : std_logic_vector (15 downto 0); 
 signal tdp_datain_b     : std_logic_vector (15 downto 0); 
@@ -71,9 +85,19 @@ signal tdp_we_b         : std_logic;
 signal tdp_addr_a       : integer range 0 to depth - 1;
 signal tdp_addr_b       : integer range 0 to depth - 1;
 
-type state_t is (do_read, do_update);
-signal this_state: state_t;
-signal next_state: state_t;
+-- C (update) channel addresses
+signal upd_addr_read    : integer range 0 to depth - 1;
+signal upd_addr_write   : integer range 0 to depth - 1;
+
+-- delayed vout signals
+signal vout_array       : std_logic_vector (1 downto 0);
+signal rden_array       : std_logic_vector (1 downto 0);
+
+-- update pipeline
+type address_pipeline_type is array (1 downto 0) of integer range 0 to depth - 1;
+signal upd_addr_pipeline: address_pipeline_type;
+signal upd_data_pipe_in : std_logic_vector (16 downto 0);
+signal upd_data_pipe_out : std_logic_vector (16 downto 0);
 
 begin
 
@@ -91,20 +115,27 @@ port map (
     q_b       => tdp_dataout_b
 );
 
--- state change process
-next_state <= do_read when update = '0' else do_update; 
-next_state_proc: process (clk, alrst)
-begin
-    if (rising_edge(clk)) then
-        if (alrst = '0') then
-            this_state <= do_read;
-        else
-            this_state <= next_state;
-        end if;
-    end if;
-end process;
+tdp_addr_a <= rdaddr_a when (update = '0') else upd_addr_read; 
+tdp_addr_b <= rdaddr_b when (update = '0') else upd_addr_write;
+dout_a     <= tdp_dataout_a when (update = '0') else (others => '0');
+dout_b     <= tdp_dataout_b when (update = '0') else (others => '0');
 
+vout_drive: delay_buffer
+generic map (ncycles => 2, width => 2)
+port map (
+    clk => clk,
+    rst => alrst,
+    din => rden_array,
+    dout => vout_array
+);
+rden_array(0) <= rden_a;
+rden_array(1) <= rden_b;
+vout_a        <= vout_array(0);
+vout_b        <= vout_array(1);
 
+-- TODO:
+-- put udp_addr_read, vin_c and din_c through 2 pipeline stages
+-- use pipeline output to drive port B in update mode
 
 
 end Behavioral;
