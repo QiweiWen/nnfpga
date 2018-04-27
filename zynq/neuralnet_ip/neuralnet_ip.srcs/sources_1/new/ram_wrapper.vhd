@@ -6,6 +6,9 @@
 -- 2. update mode
 --    One port used for reading, the other port used for writing modified
 --    data
+-- 
+-- 3. write-through mode:
+--    One port used for writing initial data
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -19,9 +22,12 @@ generic (
 port (
     clk                 : in std_logic;
     alrst               : in std_logic;
--- mode selection pin
--- low = read, high = update
+-- mode selection pins
+-- both low = read
+-- high = read-add-writeback
     update              : in std_logic;
+-- high = channel c write-through to port a
+    write               : in std_logic;
 -- read channel a
     rden_a              : in std_logic;
     rdaddr_a            : in integer range 0 to depth - 1; 
@@ -75,7 +81,7 @@ component delay_buffer is
     );
 end component delay_buffer;
 
--- tdp signals, controlled by system state
+-- tdp signals
 signal tdp_datain_a     : std_logic_vector (15 downto 0); 
 signal tdp_datain_b     : std_logic_vector (15 downto 0); 
 signal tdp_dataout_a    : std_logic_vector (15 downto 0); 
@@ -86,7 +92,6 @@ signal tdp_addr_a       : integer range 0 to depth - 1;
 signal tdp_addr_b       : integer range 0 to depth - 1;
 
 -- C (update) channel addresses
-signal upd_addr_read    : integer range 0 to depth - 1;
 signal upd_addr_write   : integer range 0 to depth - 1;
 
 -- delayed vout signals
@@ -94,10 +99,12 @@ signal vout_array       : std_logic_vector (1 downto 0);
 signal rden_array       : std_logic_vector (1 downto 0);
 
 -- update pipeline
-type address_pipeline_type is array (1 downto 0) of integer range 0 to depth - 1;
-signal upd_addr_pipeline: address_pipeline_type;
+signal upd_addr_pipeline: integer range 0 to depth - 1;
 signal upd_data_pipe_in : std_logic_vector (16 downto 0);
 signal upd_data_pipe_out : std_logic_vector (16 downto 0);
+
+-- writeback date
+signal upd_data_writeback: std_logic_vector (15 downto 0);
 
 begin
 
@@ -115,10 +122,10 @@ port map (
     q_b       => tdp_dataout_b
 );
 
-tdp_addr_a <= rdaddr_a when (update = '0') else upd_addr_read; 
-tdp_addr_b <= rdaddr_b when (update = '0') else upd_addr_write;
-dout_a     <= tdp_dataout_a when (update = '0') else (others => '0');
-dout_b     <= tdp_dataout_b when (update = '0') else (others => '0');
+tdp_addr_a <= rdaddr_a when (update = '0' and write = '0') else wraddr_c; 
+tdp_addr_b <= rdaddr_b when (tdp_we_b = '0') else upd_addr_write;
+dout_a     <= tdp_dataout_a; 
+dout_b     <= tdp_dataout_b;
 
 vout_drive: delay_buffer
 generic map (ncycles => 2, width => 2)
@@ -128,14 +135,50 @@ port map (
     din => rden_array,
     dout => vout_array
 );
-rden_array(0) <= rden_a;
-rden_array(1) <= rden_b;
+rden_array(0) <= '1' when rden_a = '1' and update = '0' and write = '0' else '0';
+rden_array(1) <= '1' when rden_b = '1' and update = '0' and write = '0' else '0';
 vout_a        <= vout_array(0);
 vout_b        <= vout_array(1);
 
--- TODO:
 -- put udp_addr_read, vin_c and din_c through 2 pipeline stages
+-- because read takes two cycles therefore writeback signals
+-- lag read signals by 2 cycles
 -- use pipeline output to drive port B in update mode
 
+write_addr_pipe:
+process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            upd_addr_pipeline <= 0; 
+        else
+            upd_addr_pipeline <= wraddr_c; 
+            upd_addr_write    <= upd_addr_pipeline;
+        end if;
+    end if;
+end process;
+
+
+upd_data_pipe_in (16) <= '1' when vin_c = '1' and update = '1' and write = '0' 
+                             else '0'; 
+upd_data_pipe_in (15 downto 0) <= din_c; 
+
+upd_data_pipe: delay_buffer
+generic map (ncycles => 2, width => 17)
+port map (
+    clk => clk,
+    rst => alrst,
+    din => upd_data_pipe_in,
+    dout => upd_data_pipe_out
+);
+
+upd_data_writeback <= func_safe_sum (upd_data_pipe_out (15 downto 0),
+                                                      tdp_dataout_a);
+tdp_we_a <= '1' when vin_c = '1' and write = '1' and update = '0' else '0';
+tdp_we_b <= upd_data_pipe_out (16);
+ack_c    <= tdp_we_b;
+
+tdp_datain_a <= din_c; 
+tdp_datain_b <= upd_data_writeback;
 
 end Behavioral;
