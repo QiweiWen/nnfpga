@@ -4,6 +4,14 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+library ieee_proposed;
+use ieee_proposed.fixed_pkg.all;
+
+use ieee.math_real.all;
+
+use work.helperpkg.all;
 
 entity tb_row_processor is
 end tb_row_processor;
@@ -84,11 +92,37 @@ architecture tb of tb_row_processor is
     signal wraddr_c : integer;
     signal ack_c    : std_logic;
 
+
+    signal debug_product_latch: real; 
+
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
+    
+    subtype param_type is std_logic_vector (15 downto 0);
 
 begin
+
+    debug:
+    process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                debug_product_latch <= 0.0; 
+            else
+                if (validout = '1') then
+                    debug_product_latch <= 
+                        to_real(to_sfixed(dataout, PARAM_DEC - 1, -PARAM_FRC));
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- connect row processor to channel A
+    rden_a <= l1_rden;
+    rdaddr_a <= l1_raddr;
+    l1_din  <= dout_a;
+    l1_vin  <= vout_a;
 
     dut_pe : row_processor
     generic map (ncols   => ncols)
@@ -133,13 +167,52 @@ begin
 
     stimuli : process
     begin
-        -- TODO: add initialisation
+        update <= '0';
+        write  <= '0';
+        rden_b <= '0';
+        rdaddr_b <= 0;
+        vin_c <= '0';
+        din_c <= (others => '0');
+        wraddr_c <= 0;
+
+        ve_validin <= '0';
+        ve_datain <= (others => '0');
 
         -- Reset generation
         alrst <= '0';
         wait for 100 ns;
         alrst <= '1';
         wait for 100 ns;
+
+        -- initial value
+        update <= '0';
+        write <= '1';
+        vin_c <= '1';
+        for i in 0 to ncols - 1 loop
+            wraddr_c <= i;
+            din_c <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC)); 
+            wait for 100 ns;
+        end loop;
+        write <= '0';
+        vin_c <= '0';
+        
+        -- multiplication test
+        ve_validin <= '1';
+        for i in 0 to 7 loop
+            ve_datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
+            wait for 100 ns;
+        end loop;
+
+        ve_validin <= '0';
+        wait for 500 ns;
+            
+        ve_validin <= '1';
+        for i in 0 to 1 loop
+            ve_datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
+            wait for 100 ns;
+        end loop;
+
+        ve_validin <= '0';
 
         wait;
     end process;
