@@ -25,12 +25,10 @@ port(
 -- vector input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
+    ready     : out std_logic;
 -- product terms output channel
     dataout: out std_logic_vector (15 downto 0);
     validout: out std_logic;
-    -- this flags that all the products that
-    -- will sum to a vector element have been computed
-    finished: out std_logic; 
 -- signals forwarded to the adjacent row processor down the line
     validfwd: out std_logic;
     datafwd: out std_logic_vector (15 downto 0)
@@ -53,16 +51,33 @@ component delay_buffer is
     );
 end component delay_buffer;
 
+component accumulator is
+port (
+    clk: in std_logic;
+    alrst: in std_logic;
+    datain: in std_logic_vector (15 downto 0);
+    validin: in std_logic;
+    lastone: in std_logic;
+    dataout: out std_logic_vector (15 downto 0);
+    validout: out std_logic
+);
+end component accumulator;
+
 signal ve_datain_delayed: std_logic_vector (15 downto 0);
 signal col_ptr: integer range 0 to ncols - 1; 
 -- the intermediate product term
 signal product: std_logic_vector (15 downto 0);
 signal sig_l1_raddr: integer range 0 to ncols - 1;
 
+signal lastone: std_logic;
+
 begin
 -- will read parameters from cache 
 -- as long as we are asked to compute stuff?
 l1_rden <= ve_validin;
+
+-- row processor is always ready to consume more vector elements
+ready <= '1';
 
 l1_raddr <= sig_l1_raddr;
 sig_l1_raddr_proc: 
@@ -119,10 +134,22 @@ begin
     end if;
 end process;
 
-finished <= '1' when (col_ptr = ncols - 1) else '0';
+--
+--validout <= l1_vin;
+--dataout <= product;
 
-validout <= l1_vin;
+lastone <= '1' when (col_ptr = ncols - 1) else '0';
 product <= func_safe_mult (ve_datain_delayed, l1_din); 
-dataout <= product;
+
+summing: accumulator
+port map(
+    clk => clk,
+    alrst => alrst,
+    datain => product,
+    validin => l1_vin,     
+    lastone => lastone,
+    dataout => dataout,
+    validout => validout
+);
 
 end Behavioral;

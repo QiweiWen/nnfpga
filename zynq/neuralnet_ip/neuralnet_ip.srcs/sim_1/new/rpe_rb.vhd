@@ -30,9 +30,9 @@ architecture tb of tb_row_processor is
               l1_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
               ve_validin : in std_logic;
+              ready      : out std_logic;
               dataout    : out std_logic_vector (15 downto 0);
               validout   : out std_logic;
-              finished   : out std_logic;
               validfwd   : out std_logic;
               datafwd    : out std_logic_vector (15 downto 0));
     end component;
@@ -72,7 +72,6 @@ architecture tb of tb_row_processor is
     signal ve_validin : std_logic;
     signal dataout    : std_logic_vector (15 downto 0);
     signal validout   : std_logic;
-    signal finished   : std_logic;
     signal validfwd   : std_logic;
     signal datafwd    : std_logic_vector (15 downto 0);
 
@@ -134,9 +133,9 @@ begin
               l1_vin     => l1_vin,
               ve_datain  => ve_datain,
               ve_validin => ve_validin,
+              ready      => open,
               dataout    => dataout,
               validout   => validout,
-              finished   => finished,
               validfwd   => validfwd,
               datafwd    => datafwd);
 
