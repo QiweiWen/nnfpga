@@ -57,12 +57,24 @@ signal ve_datain_delayed: std_logic_vector (15 downto 0);
 signal col_ptr: integer range 0 to ncols - 1; 
 -- the intermediate product term
 signal product: std_logic_vector (15 downto 0);
+signal l1_rdaddr: integer range 0 to ncols - 1;
 
 begin
 -- will read parameters from cache 
 -- as long as we are asked to compute stuff?
 l1_rden <= ve_validin;
-l1_raddr <= col_ptr;
+
+l1_rdaddr_proc: 
+process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            l1_rdaddr <= 0;
+        elsif (ve_validin = '1') then
+            l1_rdaddr <= (l1_rdaddr + 1) mod ncols;
+        end if;
+    end if;
+end process;
 
 -- pass stuff to the next PE down the line
 fwd_proc:
