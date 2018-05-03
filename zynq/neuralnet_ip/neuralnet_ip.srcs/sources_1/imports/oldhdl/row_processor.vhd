@@ -71,6 +71,8 @@ signal sig_l1_raddr: integer range 0 to ncols - 1;
 
 signal lastone: std_logic;
 
+signal accumulator_pipe: std_logic_vector (17 downto 0);
+
 begin
 -- will read parameters from cache 
 -- as long as we are asked to compute stuff?
@@ -134,20 +136,31 @@ begin
     end if;
 end process;
 
---
---validout <= l1_vin;
---dataout <= product;
-
 lastone <= '1' when (col_ptr = ncols - 1) else '0';
 product <= func_safe_mult (ve_datain_delayed, l1_din); 
+
+-- accumulator input pipeline
+accu_pipe: 
+process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            accumulator_pipe <= (others => '0');
+        else
+            accumulator_pipe(17) <= l1_vin; 
+            accumulator_pipe(16) <= lastone; 
+            accumulator_pipe(15 downto 0) <= product;
+        end if;
+    end if;
+end process;
 
 summing: accumulator
 port map(
     clk => clk,
     alrst => alrst,
-    datain => product,
-    validin => l1_vin,     
-    lastone => lastone,
+    datain => accumulator_pipe(15 downto 0),
+    validin => accumulator_pipe(17),     
+    lastone => accumulator_pipe(16), 
     dataout => dataout,
     validout => validout
 );
