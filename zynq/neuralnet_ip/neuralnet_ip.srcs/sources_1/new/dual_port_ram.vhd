@@ -30,8 +30,6 @@ architecture rtl of true_dpram_sclk is
 	-- Declare the RAM
 	shared variable ram : memory_t;
 
-    signal reg_a: std_logic_vector (width - 1 downto 0);
-    signal reg_b: std_logic_vector (width - 1 downto 0);
 
 begin
 
@@ -42,8 +40,7 @@ begin
 			if(we_a = '1') then
 				ram(addr_a) := data_a;
 			end if;
-			reg_a <= ram(addr_a);
-            q_a   <= reg_a;
+			q_a <= ram(addr_a);
 		end if;
 	end process;
 	
@@ -54,8 +51,7 @@ begin
 			if(we_b = '1') then
 				ram(addr_b) := data_b;
 			end if;
-			reg_b <= ram(addr_b);
-            q_b   <= reg_b;
+		    q_b <= ram(addr_b);
 		end if;
 	end process;
 end rtl;

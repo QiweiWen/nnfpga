@@ -128,7 +128,7 @@ dout_a     <= tdp_dataout_a;
 dout_b     <= tdp_dataout_b;
 
 vout_drive: delay_buffer
-generic map (ncycles => 2, width => 2)
+generic map (ncycles => 1, width => 2)
 port map (
     clk => clk,
     rst => alrst,
@@ -140,9 +140,9 @@ rden_array(1) <= '1' when rden_b = '1' and update = '0' and write = '0' else '0'
 vout_a        <= vout_array(0);
 vout_b        <= vout_array(1);
 
--- put udp_addr_read, vin_c and din_c through 2 pipeline stages
--- because read takes two cycles therefore writeback signals
--- lag read signals by 2 cycles
+-- put udp_addr_read, vin_c and din_c through a pipeline stage1
+-- because read takes one cycle therefore writeback signals
+-- lag read signals by 1 cycle
 -- use pipeline output to drive port B in update mode
 
 write_addr_pipe:
@@ -164,7 +164,7 @@ upd_data_pipe_in (16) <= '1' when vin_c = '1' and update = '1' and write = '0'
 upd_data_pipe_in (15 downto 0) <= din_c; 
 
 upd_data_pipe: delay_buffer
-generic map (ncycles => 2, width => 17)
+generic map (ncycles => 1, width => 17)
 port map (
     clk => clk,
     rst => alrst,

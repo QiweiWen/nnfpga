@@ -113,7 +113,7 @@ end process;
 vector_input_delay: delay_buffer
 generic map(
     width => 16,
-    ncycles => 2
+    ncycles => 1
 )
 port map (
     clk => clk,
