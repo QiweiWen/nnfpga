@@ -25,7 +25,7 @@ port(
 -- vector input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
-    ready     : out std_logic;
+    ve_req     : out std_logic;
 -- product terms output channel
     dataout: out std_logic_vector (15 downto 0);
     validout: out std_logic;
@@ -78,8 +78,8 @@ begin
 -- as long as we are asked to compute stuff?
 l1_rden <= ve_validin;
 
--- row processor is always ready to consume more vector elements
-ready <= '1';
+-- row processor is always ve_req to consume more vector elements
+ve_req <= '1';
 
 l1_raddr <= sig_l1_raddr;
 sig_l1_raddr_proc: 
