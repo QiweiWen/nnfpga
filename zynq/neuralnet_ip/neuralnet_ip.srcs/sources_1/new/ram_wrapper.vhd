@@ -152,8 +152,7 @@ begin
         if (alrst = '0') then
             upd_addr_pipeline <= 0; 
         else
-            upd_addr_pipeline <= wraddr_c; 
-            upd_addr_write    <= upd_addr_pipeline;
+            upd_addr_write    <= wraddr_c;
         end if;
     end if;
 end process;

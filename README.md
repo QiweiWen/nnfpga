@@ -10,13 +10,16 @@ I'm hoping to achieve good parallelism (through pipelining) and scalability; tha
 working system on the Zynq PL (if I even make it that far), I can argue convincingly that the network can be made twice as large
 if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
-## 27/04/2018
+## 03/05/2018
 --------------
 
-Progress has been slow, didn't have a chance to work on the project in the last few weeks. Recently finished the dual port ram wrapper
-that allows the kinds of access pattern required. The only gotcha is that there needs to be a blank cycle between read-update-write and
-read, which should be acceptible.
+Got row processor working with the new design, added column processor stub
 
-The algorithm is now clear, but implementation will be hard and debugging extremely difficult. Might be better to draw some schematics so
-as not to lose track of design decisions
+Removed block ram output register and verified that it had no impact on setup/hold slack at all.
 
+The critical path is truncating multiplication results back to 16 bits.
+
+Next step:
+
+Finish the two other basic modules, column processor and derivative unit. Start wiring everything up into a datapath and
+then work on the state machine.
