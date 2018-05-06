@@ -23,33 +23,35 @@ port(
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
     ve_req     : out std_logic;
--- synchronisation signals between adjacent column processors
-    -- when the last processor latches a vector element from the FIFO,
-    -- it pulses this signal
-    sync_in  : in std_logic; 
-    sync_out : out std_logic;
+-- partial result input from the last column processor
+    ivfwd: in std_logic; 
+    idfwd: in std_logic_vector (15 downto 0);
 -- (partial) result accumulation output to the next column processor
 -- or to the output FIFO
-    validfwd: out std_logic;
-    datafwd: out std_logic_vector (15 downto 0)
+    ovfwd: out std_logic;
+    odfwd: out std_logic_vector (15 downto 0)
 );
 end column_processor;
 
 architecture Behavioral of column_processor is
-
-signal sig_ve_req: std_logic;
+-- l1 (column weight) read address
+    signal sig_l1_raddr_curr: integer range 0 to nrows - 1;
+    signal sig_l1_raddr_next: integer range 0 to nrows - 1;
 begin
-    ve_req <= '1' when sync_in = '1' and sig_ve_req = '1' else '0'; 
-    sync_out_proc:
-    process (clk, alrst) is
-    begin
-        if (rising_edge(clk)) then
-            if (alrst = '0') then
-                sync_out <= '0';
-            else
-                sync_out <= ve_validin;
-            end if;
+
+l1_raddr_proc:
+process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            sig_l1_raddr_curr <= 0;
+        else
+            sig_l1_raddr_curr <= sig_l1_raddr_next;
         end if;
-    end process;
+    end if;
+end process;
+
+sig_l1_raddr_next <= (sig_l1_raddr_curr + 1) when sig_l1_raddr_curr /= 0 else 
+                     1                       when ve_validin = '1' else 0;
 
 end Behavioral;

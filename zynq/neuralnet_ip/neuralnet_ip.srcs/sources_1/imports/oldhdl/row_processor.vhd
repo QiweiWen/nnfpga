@@ -78,7 +78,7 @@ begin
 -- as long as we are asked to compute stuff?
 l1_rden <= ve_validin;
 
--- row processor is always ve_req to consume more vector elements
+-- row processor is always ready to consume more vector elements
 ve_req <= '1';
 
 l1_raddr <= sig_l1_raddr;
