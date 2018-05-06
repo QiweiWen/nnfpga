@@ -1,8 +1,8 @@
 // Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2015.4 (lin64) Build 1412921 Wed Nov 18 09:44:32 MST 2015
-// Date        : Sun May  6 20:13:30 2018
-// Host        : dave-MS-7A37 running 64-bit Ubuntu 17.10
+// Date        : Mon May  7 07:28:49 2018
+// Host        : dave-H110M-S2H running 64-bit Ubuntu 16.04.3 LTS
 // Command     : write_verilog -force -mode synth_stub
 //               /home/dave/workspace/nnfpga/zynq/neuralnet_ip/neuralnet_ip.srcs/sources_1/ip/xbip_multadd_0/xbip_multadd_0_stub.v
 // Design      : xbip_multadd_0
