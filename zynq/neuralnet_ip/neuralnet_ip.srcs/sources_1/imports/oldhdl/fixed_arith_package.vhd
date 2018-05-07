@@ -16,7 +16,7 @@ function fun_add_truncate (
 ) return std_logic_vector;
 
 function fun_mul_truncate (
-    datain: std_logic_vector(2*16 - 1 downto 0)
+    datain: std_logic_vector
 ) return std_logic_vector;
 
 function func_safe_sum (
@@ -67,7 +67,7 @@ begin
 end function;
 
 function fun_mul_truncate (
-    datain: std_logic_vector(2*16 - 1 downto 0)
+    datain: std_logic_vector
 ) return std_logic_vector is
     variable carry: std_logic;
     variable var_ret: std_logic_vector (16 - 1 downto 0);
@@ -75,11 +75,11 @@ function fun_mul_truncate (
     variable top_bit: std_logic;
     variable maxed: std_logic_vector (16 - 1 downto 0);
 begin
-    sign_bit := datain (2*16 - 1);
+    sign_bit := datain (datain'length - 1);
     top_bit  := datain (2*PARAM_FRC + PARAM_DEC - 1);
     --is the multiplication result too large?
     carry := '0';
-    for I in 2*PARAM_FRC + PARAM_DEC to 2*16 - 1 loop
+    for I in 2*PARAM_FRC + PARAM_DEC to datain'length - 1 loop
         if (datain(I) /= top_bit) then
             carry := '1';
         end if;

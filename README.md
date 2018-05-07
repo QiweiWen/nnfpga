@@ -10,16 +10,10 @@ I'm hoping to achieve good parallelism (through pipelining) and scalability; tha
 working system on the Zynq PL (if I even make it that far), I can argue convincingly that the network can be made twice as large
 if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
-## 03/05/2018
+## 07/05/2018
 --------------
 
-Got row processor working with the new design, added column processor stub
+Working on moving the fixed point truncation logic out of the critical path by accumulating full sums and only truncating at the output.
+Otherwise it'll be difficult to squeeze a block ram read and a multadd into one clock cycle.
 
-Removed block ram output register and verified that it had no impact on setup/hold slack at all.
-
-The critical path is truncating multiplication results back to 16 bits.
-
-Next step:
-
-Finish the two other basic modules, column processor and derivative unit. Start wiring everything up into a datapath and
-then work on the state machine.
+Done this for row processor
