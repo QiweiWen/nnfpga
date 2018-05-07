@@ -58,9 +58,8 @@ xbip_multadd_1 your_instance_name (
   .A(A),                // input wire [15 : 0] A
   .B(B),                // input wire [15 : 0] B
   .C(C),                // input wire [47 : 0] C
-  .PCIN(PCIN),          // input wire [47 : 0] PCIN
   .SUBTRACT(SUBTRACT),  // input wire SUBTRACT
-  .P(P),                // output wire [0 : 0] P
+  .P(P),                // output wire [47 : 0] P
   .PCOUT(PCOUT)        // output wire [47 : 0] PCOUT
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------

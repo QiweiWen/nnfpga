@@ -57,9 +57,8 @@ COMPONENT xbip_multadd_1
     A : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
     B : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
     C : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-    PCIN : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
     SUBTRACT : IN STD_LOGIC;
-    P : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    P : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
     PCOUT : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
   );
 END COMPONENT;
@@ -74,7 +73,6 @@ your_instance_name : xbip_multadd_1
     A => A,
     B => B,
     C => C,
-    PCIN => PCIN,
     SUBTRACT => SUBTRACT,
     P => P,
     PCOUT => PCOUT

@@ -60,9 +60,9 @@ ENTITY xbip_multadd_0 IS
   PORT (
     A : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
     B : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-    C : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    C : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
     SUBTRACT : IN STD_LOGIC;
-    P : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    P : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
     PCOUT : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
   );
 END xbip_multadd_0;
@@ -95,10 +95,10 @@ ARCHITECTURE xbip_multadd_0_arch OF xbip_multadd_0 IS
       SCLR : IN STD_LOGIC;
       A : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
       B : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-      C : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      C : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
       PCIN : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
       SUBTRACT : IN STD_LOGIC;
-      P : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+      P : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       PCOUT : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
     );
   END COMPONENT xbip_multadd_v3_0_8;
@@ -116,14 +116,14 @@ BEGIN
       C_XDEVICEFAMILY => "zynq",
       C_A_WIDTH => 16,
       C_B_WIDTH => 16,
-      C_C_WIDTH => 32,
+      C_C_WIDTH => 48,
       C_A_TYPE => 0,
       C_B_TYPE => 0,
       C_C_TYPE => 0,
       C_CE_OVERRIDES_SCLR => 0,
       C_AB_LATENCY => 0,
       C_C_LATENCY => 0,
-      C_OUT_HIGH => 0,
+      C_OUT_HIGH => 47,
       C_OUT_LOW => 0,
       C_USE_PCIN => 0,
       C_TEST_CORE => 0

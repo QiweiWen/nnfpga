@@ -61,9 +61,8 @@ ENTITY xbip_multadd_1 IS
     A : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
     B : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
     C : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-    PCIN : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
     SUBTRACT : IN STD_LOGIC;
-    P : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    P : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
     PCOUT : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
   );
 END xbip_multadd_1;
@@ -99,7 +98,7 @@ ARCHITECTURE xbip_multadd_1_arch OF xbip_multadd_1 IS
       C : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
       PCIN : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
       SUBTRACT : IN STD_LOGIC;
-      P : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+      P : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       PCOUT : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
     );
   END COMPONENT xbip_multadd_v3_0_8;
@@ -108,12 +107,11 @@ ARCHITECTURE xbip_multadd_1_arch OF xbip_multadd_1 IS
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF xbip_multadd_1_arch : ARCHITECTURE IS "xbip_multadd_1,xbip_multadd_v3_0_8,{}";
   ATTRIBUTE CORE_GENERATION_INFO : STRING;
-  ATTRIBUTE CORE_GENERATION_INFO OF xbip_multadd_1_arch: ARCHITECTURE IS "xbip_multadd_1,xbip_multadd_v3_0_8,{x_ipProduct=Vivado 2015.4,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=xbip_multadd,x_ipVersion=3.0,x_ipCoreRevision=8,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL,C_VERBOSITY=0,C_XDEVICEFAMILY=zynq,C_A_WIDTH=16,C_B_WIDTH=16,C_C_WIDTH=48,C_A_TYPE=0,C_B_TYPE=0,C_C_TYPE=0,C_CE_OVERRIDES_SCLR=0,C_AB_LATENCY=0,C_C_LATENCY=0,C_OUT_HIGH=0,C_OUT_LOW=0,C_USE_PCIN=1,C_TEST_CORE=0}";
+  ATTRIBUTE CORE_GENERATION_INFO OF xbip_multadd_1_arch: ARCHITECTURE IS "xbip_multadd_1,xbip_multadd_v3_0_8,{x_ipProduct=Vivado 2015.4,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=xbip_multadd,x_ipVersion=3.0,x_ipCoreRevision=8,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL,C_VERBOSITY=0,C_XDEVICEFAMILY=zynq,C_A_WIDTH=16,C_B_WIDTH=16,C_C_WIDTH=48,C_A_TYPE=0,C_B_TYPE=0,C_C_TYPE=0,C_CE_OVERRIDES_SCLR=0,C_AB_LATENCY=0,C_C_LATENCY=0,C_OUT_HIGH=47,C_OUT_LOW=0,C_USE_PCIN=0,C_TEST_CORE=0}";
   ATTRIBUTE X_INTERFACE_INFO : STRING;
   ATTRIBUTE X_INTERFACE_INFO OF A: SIGNAL IS "xilinx.com:signal:data:1.0 a_intf DATA";
   ATTRIBUTE X_INTERFACE_INFO OF B: SIGNAL IS "xilinx.com:signal:data:1.0 b_intf DATA";
   ATTRIBUTE X_INTERFACE_INFO OF C: SIGNAL IS "xilinx.com:signal:data:1.0 c_intf DATA";
-  ATTRIBUTE X_INTERFACE_INFO OF PCIN: SIGNAL IS "xilinx.com:signal:data:1.0 pcin_intf DATA";
   ATTRIBUTE X_INTERFACE_INFO OF SUBTRACT: SIGNAL IS "xilinx.com:signal:data:1.0 subtract_intf DATA";
   ATTRIBUTE X_INTERFACE_INFO OF P: SIGNAL IS "xilinx.com:signal:data:1.0 p_intf DATA";
   ATTRIBUTE X_INTERFACE_INFO OF PCOUT: SIGNAL IS "xilinx.com:signal:data:1.0 pcout_intf DATA";
@@ -131,9 +129,9 @@ BEGIN
       C_CE_OVERRIDES_SCLR => 0,
       C_AB_LATENCY => 0,
       C_C_LATENCY => 0,
-      C_OUT_HIGH => 0,
+      C_OUT_HIGH => 47,
       C_OUT_LOW => 0,
-      C_USE_PCIN => 1,
+      C_USE_PCIN => 0,
       C_TEST_CORE => 0
     )
     PORT MAP (
@@ -143,7 +141,7 @@ BEGIN
       A => A,
       B => B,
       C => C,
-      PCIN => PCIN,
+      PCIN => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 48)),
       SUBTRACT => SUBTRACT,
       P => P,
       PCOUT => PCOUT
