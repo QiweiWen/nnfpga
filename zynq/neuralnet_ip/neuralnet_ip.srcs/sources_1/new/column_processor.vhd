@@ -25,11 +25,11 @@ port(
     ve_req     : out std_logic;
 -- partial result input from the last column processor
     ivfwd: in std_logic; 
-    idfwd: in std_logic_vector (15 downto 0);
--- (partial) result accumulation output to the next column processor
--- or to the output FIFO
+    idfwd: in std_logic_vector (47 downto 0);
+-- partial result accumulation output to the next column processor
+-- or to be truncated and committed to the FIFO 
     ovfwd: out std_logic;
-    odfwd: out std_logic_vector (15 downto 0)
+    odfwd: out std_logic_vector (47 downto 0)
 );
 end column_processor;
 
@@ -52,6 +52,6 @@ begin
 end process;
 
 sig_l1_raddr_next <= (sig_l1_raddr_curr + 1) when sig_l1_raddr_curr /= 0 else 
-                     1                       when ve_validin = '1' else 0;
+                                           1 when ve_validin = '1' else 0;
 
 end Behavioral;

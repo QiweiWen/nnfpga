@@ -30,8 +30,10 @@ END component xbip_multadd_1;
 
 signal sig_A: std_logic_vector (15 downto 0);
 signal sig_B: std_logic_vector (15 downto 0);
+signal sig_C: std_logic_vector (47 downto 0);
 
 signal sig_fin: std_logic;
+signal sig_fin_latched: std_logic;
 
 -- current running sum
 signal curr_sum: std_logic_vector (47 downto 0);
@@ -48,7 +50,7 @@ xillinx_dsp_multadd: xbip_multadd_1
 port map (
     A => sig_A,
     B => sig_B,
-    C => curr_sum, 
+    C => sig_C, 
     subtract => '0',
     PCOUT => open,
     P => next_sum
@@ -76,6 +78,18 @@ begin
     end if;
 end process;
 
+sig_fin_latching: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            sig_fin_latched <= '0';
+        else    
+            sig_fin_latched <= sig_fin;
+        end if;
+    end if;
+end process;    
+
+sig_C <= curr_sum when sig_fin_latched = '0' else (others => '0');
 P <= fun_mul_truncate (curr_sum);
 
 end Behavioral;
