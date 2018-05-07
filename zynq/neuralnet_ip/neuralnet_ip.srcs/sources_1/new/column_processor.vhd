@@ -7,6 +7,38 @@ library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;
 use ieee.math_real.all;
 
+
+-- 07/05/2018: 
+-- the timing of this module is a little tricky
+-- in a typical clock cycle, the column processor accepts a partial
+-- sum from its neighbout, performs a multiplication-addition, and
+-- then forwards the new partial sum to its next neighbour.
+--
+-- for simplicity's sake, there is no buffering and all the required
+-- signals must arrive at the correct clock cycles for the sum to
+-- be correct.
+--
+-- the "vector element input channel" are the interface ports to the input
+-- FIFO. In backpropagation, the input FIFO is shared with the derivative
+-- unit. Furthermore, the input FIFO can become empty depending on the
+-- geometry of the matrixes, so ve_req ("vector element request") cannot
+-- always be satisfied immediately. ve_ack is connected to ve_req through
+-- combinational logic and notifies, in the same cycle as ve_req,
+-- the column processor of whether any data is incoming from the FIFO
+-- in the next clock cycle. In the next cycle after it pulses high,
+-- the next column processor down the line is notified through sync_in,
+-- thus initiating a read from its own FIFO.
+--
+-- The producer of the input FIFO is the preceding row processor, and
+-- the other consumer, in the case of back propagation, is the derivative
+-- unit. Both of these units in a given module lead the corresponding unit
+-- in the neighbour module by a clock cycle; therefore, a cycle after
+-- our FIFO becomes ready to read, the neighbour's FIFO should become
+-- ready to read as well.
+--
+-- This is one of those times when I'm 99% sure that the assumption is fine
+-- to make, but am still left with a sense of unease
+
 entity column_processor is
 generic (
     nrows: integer := 100
@@ -23,6 +55,10 @@ port(
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
     ve_req     : out std_logic;
+    ve_ack     : in std_logic; 
+-- synchronisation signals
+    osync:   out std_logic;
+    isync:   in std_logic;
 -- partial result input from the last column processor
     ivfwd: in std_logic; 
     idfwd: in std_logic_vector (47 downto 0);
