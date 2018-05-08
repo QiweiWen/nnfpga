@@ -41,7 +41,7 @@ package body helperpkg is
     variable temp    : integer := i;
     variable ret_val : integer := 0; 
     variable roundup: std_logic := '0';
-    begin					
+    begin                         
         while temp > 1 loop
             if (temp mod 2 /= 0) then
                 roundup := '1';

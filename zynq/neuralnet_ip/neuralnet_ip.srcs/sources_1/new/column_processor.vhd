@@ -28,16 +28,6 @@ use ieee.math_real.all;
 -- in the next clock cycle. In the next cycle after it pulses high,
 -- the next column processor down the line is notified through sync_in,
 -- thus initiating a read from its own FIFO.
---
--- The producer of the input FIFO is the preceding row processor, and
--- the other consumer, in the case of back propagation, is the derivative
--- unit. Both of these units in a given module lead the corresponding unit
--- in the neighbour module by a clock cycle; therefore, a cycle after
--- our FIFO becomes ready to read, the neighbour's FIFO should become
--- ready to read as well.
---
--- This is one of those times when I'm 99% sure that the assumption is fine
--- to make, but am still left with a sense of unease
 
 entity column_processor is
 generic (
