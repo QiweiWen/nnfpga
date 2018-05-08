@@ -1,10 +1,12 @@
+-- stolen from deathbylogic.com
+
 library ieee;
-use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
- 
-entity fwft_fifo is
+
+entity std_fifo is
 	generic (
-		constant data_width  : positive := 16;
+		constant data_width  : positive := 8;
 		constant fifo_depth	: positive := 256
 	);
 	port ( 
@@ -14,20 +16,34 @@ entity fwft_fifo is
 		datain	: in  std_logic_vector (data_width - 1 downto 0);
 		readen	: in  std_logic;
 		dataout	: out std_logic_vector (data_width - 1 downto 0);
-                ackout  : out std_logic;
+		ackout  : out std_logic;
+        validout: out std_logic;
 		empty	: out std_logic;
 		full	: out std_logic
 	);
-end fwft_fifo;
- 
-architecture behavioral of fwft_fifo is
+end std_fifo;
 
-    signal validout: std_logic;
+architecture behavioral of std_fifo is
+
+    signal validout_next: std_logic;
     signal sig_empty: std_logic;
+
 begin
-        validout <= '1' when sig_empty = '0' else '0';
-        ackout   <= '1' when validout = '1' and readen = '1' else '0';
-        empty <= sig_empty; 
+    -- delay readen and empty for one cycle to drive output valid flag
+    validout_next <= '1' when readen = '1' and sig_empty = '0' else '0';
+    ackout <= validout_next;
+    vout_proc: process (clk, rst)
+    begin
+        if (rising_edge(clk)) then
+            if (rst = '0') then
+                validout <= '0';
+            else
+                validout <= validout_next;
+            end if;
+        end if;
+    end process;
+    
+    empty <= sig_empty;
 	-- memory pointer process
 	fifo_proc : process (clk)
 		type fifo_memory is array (0 to fifo_depth - 1) of std_logic_vector (data_width - 1 downto 0);
@@ -46,10 +62,13 @@ begin
 				looped := false;
 				
 				full  <= '0';
-				sig_empty <= '1';
+				sig_empty <=  '1';
 			else
 				if (readen = '1') then
 					if ((looped = true) or (head /= tail)) then
+						-- update data output
+						dataout <= memory(tail);
+						
 						-- update tail pointer as needed
 						if (tail = fifo_depth - 1) then
 							tail := 0;
@@ -58,6 +77,8 @@ begin
 						else
 							tail := tail + 1;
 						end if;
+						
+						
 					end if;
 				end if;
 				
@@ -77,22 +98,19 @@ begin
 					end if;
 				end if;
 				
-				-- update data output
-				dataout <= memory(tail);
-				
-				-- update sig_empty and full flags
+				-- update empty and full flags
 				if (head = tail) then
 					if looped then
 						full <= '1';
 					else
-						sig_empty <= '1';
+						sig_empty <=  '1';
 					end if;
 				else
-					sig_empty	<= '0';
+					sig_empty <=  '0';
 					full	<= '0';
 				end if;
 			end if;
 		end if;
 	end process;
-	
-end behavioral;
+		
+end Behavioral;
