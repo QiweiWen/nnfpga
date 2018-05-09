@@ -50,21 +50,63 @@ port(
     osync:   out std_logic;
     isync:   in std_logic;
 -- partial result input from the last column processor
-    ivfwd: in std_logic; 
     idfwd: in std_logic_vector (47 downto 0);
 -- partial result accumulation output to the next column processor
 -- or to be truncated and committed to the FIFO 
-    ovfwd: out std_logic;
     odfwd: out std_logic_vector (47 downto 0)
 );
 end column_processor;
 
 architecture Behavioral of column_processor is
--- l1 (column weight) read address
     signal sig_l1_raddr_curr: integer range 0 to nrows - 1;
     signal sig_l1_raddr_next: integer range 0 to nrows - 1;
+
+    component multadd is
+        port (A : in std_logic_vector (15 downto 0);
+              B : in std_logic_vector (15 downto 0);
+              C : in std_logic_vector (47 downto 0);
+              P : out std_logic_vector (47 downto 0));
+    end component multadd;
+    
+    -- we latch a vector element and compute a partial
+    -- product vector
+    signal vector_element: std_logic_vector (15 downto 0);
+
+    signal sig_ve_req: std_logic; 
+
+    signal odfwd_next: std_logic_vector (47 downto 0);
+    signal sig_A: std_logic_vector (15 downto 0);
 begin
 
+-- FIFO read synchronisation
+sig_ve_req <= '1' when sig_l1_raddr_curr = 0 else '0';
+ve_req <= '1' when sig_ve_req = '1' and isync = '1' else '0';
+
+osync_proc: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            osync <= '0';
+        else
+            osync <= ve_ack;
+        end if;
+    end if;
+end process;
+
+-- vector element latching
+ve_latch: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            vector_element <= (others => '0');
+        elsif ve_validin = '1' then
+            vector_element <= ve_datain;
+        end if;
+    end if;
+end process;
+
+-- l1 (column weight) read address
+-- latches at 0 until FIFO becomes ready to read
 l1_raddr_proc:
 process (clk, alrst) is
 begin
@@ -78,6 +120,32 @@ begin
 end process;
 
 sig_l1_raddr_next <= (sig_l1_raddr_curr + 1) when sig_l1_raddr_curr /= 0 else 
-                                           1 when ve_validin = '1' else 0;
+                                           1 when ve_ack = '1' else 0;
+
+l1_rden <= '1' when sig_l1_rdaddr_curr /= 0 else
+           '1' when ve_ack = '1' else '0';
+
+sig_A <= ve_datain when ve_validin = '1' else vector_element;
+
+-- core of the computation
+do_mult_sum: multadd
+port map(
+    A => sig_A,
+    B => l1_dout,
+    C => idfwd,
+    P => odfwd_next
+);
+
+partial_sum_forwarding: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            odfwd <= (others => '0');
+        else
+            odfwd <= odfwd_next;
+        end if;
+    end if;
+end process;
+
 
 end Behavioral;
