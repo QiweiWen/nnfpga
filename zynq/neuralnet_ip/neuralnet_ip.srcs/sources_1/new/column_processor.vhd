@@ -11,7 +11,7 @@ use ieee.math_real.all;
 -- 07/05/2018: 
 -- the timing of this module is a little tricky
 -- in a typical clock cycle, the column processor accepts a partial
--- sum from its neighbout, performs a multiplication-addition, and
+-- sum from its neighbour, performs a multiplication-addition, and
 -- then forwards the new partial sum to its next neighbour.
 --
 -- for simplicity's sake, there is no buffering and all the required
@@ -50,9 +50,11 @@ port(
     osync:   out std_logic;
     isync:   in std_logic;
 -- partial result input from the last column processor
+    ivfwd: in std_logic;
     idfwd: in std_logic_vector (47 downto 0);
 -- partial result accumulation output to the next column processor
 -- or to be truncated and committed to the FIFO 
+    ovfwd: out std_logic;
     odfwd: out std_logic_vector (47 downto 0)
 );
 end column_processor;
@@ -75,6 +77,7 @@ architecture Behavioral of column_processor is
     signal sig_ve_req: std_logic; 
 
     signal odfwd_next: std_logic_vector (47 downto 0);
+    signal ovfwd_next: std_logic;
     signal sig_A: std_logic_vector (15 downto 0);
 begin
 
@@ -122,7 +125,7 @@ end process;
 sig_l1_raddr_next <= (sig_l1_raddr_curr + 1) when sig_l1_raddr_curr /= 0 else 
                                            1 when ve_ack = '1' else 0;
 
-l1_rden <= '1' when sig_l1_rdaddr_curr /= 0 else
+l1_rden <= '1' when sig_l1_raddr_curr /= 0 else
            '1' when ve_ack = '1' else '0';
 
 sig_A <= ve_datain when ve_validin = '1' else vector_element;
@@ -131,18 +134,22 @@ sig_A <= ve_datain when ve_validin = '1' else vector_element;
 do_mult_sum: multadd
 port map(
     A => sig_A,
-    B => l1_dout,
+    B => l1_din,
     C => idfwd,
     P => odfwd_next
 );
+
+ovfwd_next <= '1' when ivfwd = '1' and l1_vin = '1' and ve_validin = '1' else '0';
 
 partial_sum_forwarding: process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
         if (alrst = '0') then
             odfwd <= (others => '0');
+            ovfwd <= '0';
         else
             odfwd <= odfwd_next;
+            ovfwd <= ovfwd_next;
         end if;
     end if;
 end process;

@@ -10,10 +10,30 @@ I'm hoping to achieve good parallelism (through pipelining) and scalability; tha
 working system on the Zynq PL (if I even make it that far), I can argue convincingly that the network can be made twice as large
 if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
-## 07/05/2018
+## 09/05/2018
 --------------
 
-Working on moving the fixed point truncation logic out of the critical path by accumulating full sums and only truncating at the output.
-Otherwise it'll be difficult to squeeze a block ram read and a multadd into one clock cycle.
+After spending some time building up the scaffolding around the column processing unit I finally put the design together into a
+VHDL module.
 
-Done this for row processor
+Column processors are the result of an alternative systolic array mapping to the row processor method, whereby parameters are fed
+into each processing element in parallel offset by one cycle between neighbours.
+
+
+input vector     [   ]
+----> element    [   ]
+                 [   ]
+
+                 [   ]
+       ---->     [   ]
+                 [   ]
+
+                 [   ]
+            ---->[   ]
+                 [   ]
+
+Partial sums are calculated in each column processor, passed to its neighbour and accumulated to be output serially in the last unit.
+
+I decided on a "best-effort" approach, that is, all signals are assumed to arrive at the expected clock cycle, which I think is a
+reasonable assumption to make after thinking about it carefully. The column processor performs neither buffering nor keeping track
+of states where on input arrives but not the other.
