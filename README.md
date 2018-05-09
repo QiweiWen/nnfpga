@@ -20,15 +20,15 @@ Column processors are the result of an alternative systolic array mapping to the
 into each processing element in parallel offset by one cycle between neighbours.
 
 
-input vector     [   ]
-----> element    [   ]
-                 [   ]
-
-                 [   ]
+    ve. element  [   ]  --->  (eventually) serial output
+    ---->        [   ]
+                 [   ] <--|
+                          |  partial sums
+                 [   ] ---|
        ---->     [   ]
-                 [   ]
-
-                 [   ]
+                 [   ] <--|
+                          |  partial sums
+                 [   ] ---|
             ---->[   ]
                  [   ]
 
