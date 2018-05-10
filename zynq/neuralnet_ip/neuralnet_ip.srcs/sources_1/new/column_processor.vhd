@@ -51,11 +51,11 @@ port(
     isync:   in std_logic;
 -- partial result input from the last column processor
     ivfwd: in std_logic;
-    idfwd: in std_logic_vector (47 downto 0);
+    idfwd: in std_logic_vector (31 downto 0);
 -- partial result accumulation output to the next column processor
 -- or to be truncated and committed to the FIFO 
     ovfwd: out std_logic;
-    odfwd: out std_logic_vector (47 downto 0)
+    odfwd: out std_logic_vector (31 downto 0)
 );
 end column_processor;
 
@@ -63,23 +63,25 @@ architecture Behavioral of column_processor is
     signal sig_l1_raddr_curr: integer range 0 to nrows - 1;
     signal sig_l1_raddr_next: integer range 0 to nrows - 1;
 
-    component multadd is
-        port (A : in std_logic_vector (15 downto 0);
-              B : in std_logic_vector (15 downto 0);
-              C : in std_logic_vector (47 downto 0);
-              P : out std_logic_vector (47 downto 0));
-    end component multadd;
-    
     -- we latch a vector element and compute a partial
     -- product vector
     signal vector_element: std_logic_vector (15 downto 0);
 
     signal sig_ve_req: std_logic; 
 
-    signal odfwd_next: std_logic_vector (47 downto 0);
+    signal odfwd_next: std_logic_vector (31 downto 0);
     signal ovfwd_next: std_logic;
     signal sig_A: std_logic_vector (15 downto 0);
     signal sig_ve_ack_last: std_logic;
+
+    signal sig_product: std_logic_vector (31 downto 0);
+    signal sig_product_latched: std_logic_vector (31 downto 0);
+    subtype product_type is std_logic_vector (31 downto 0);
+    subtype fullsum_type is std_logic_vector (32 downto 0);
+    signal full_sum: fullsum_type;
+
+    signal product_valid: std_logic;
+    signal product_valid_next: std_logic;
 begin
 
 -- latch the status of ve_ack in the last cycle
@@ -142,17 +144,31 @@ l1_rden <= '1' when sig_l1_raddr_curr /= 0 else
            '1' when ve_ack = '1' else '0';
 
 sig_A <= ve_datain when ve_validin = '1' else vector_element;
+-- sig_B === l1_din
 
--- core of the computation
-do_mult_sum: multadd
-port map(
-    A => sig_A,
-    B => l1_din,
-    C => idfwd,
-    P => odfwd_next
-);
+sig_product <= product_type (to_sfixed (sig_A, PARAM_DEC - 1, -PARAM_FRC) *
+                             to_sfixed (l1_din, PARAM_DEC - 1, -PARAM_FRC));
 
-ovfwd_next <= '1' when ivfwd = '1' and l1_vin = '1' and (sig_ve_ack_last = '0' or ve_validin = '1') else '0';
+sum_product_align: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            sig_product_latched <= (others => '0');
+            product_valid <= '0';
+        else
+            sig_product_latched <= sig_product;
+            product_valid <= product_valid_next;
+        end if;
+    end if;
+end process;
+
+product_valid_next <= '1' when l1_vin = '1' and (sig_ve_ack_last = '0' or ve_validin = '1') else '0';
+                   
+full_sum   <= fullsum_type (to_sfixed (idfwd,               2*PARAM_DEC - 1, -2*PARAM_FRC) +
+                            to_sfixed (sig_product_latched, 2*PARAM_DEC - 1, -2*PARAM_FRC));
+
+odfwd_next <= fun_add_truncate(full_sum);
+ovfwd_next <= '1' when product_valid = '1' and ivfwd = '1' else '0';
 
 partial_sum_forwarding: process (clk, alrst) is
 begin
