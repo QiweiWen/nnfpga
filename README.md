@@ -36,4 +36,4 @@ Partial sums are calculated in each column processor, passed to its neighbour an
 
 I decided on a "best-effort" approach, that is, all signals are assumed to arrive at the expected clock cycle, which I think is a
 reasonable assumption to make after thinking about it carefully. The column processor performs neither buffering nor keeping track
-of states where on input arrives but not the other.
+of states in the case where one input arrives but not the other.
