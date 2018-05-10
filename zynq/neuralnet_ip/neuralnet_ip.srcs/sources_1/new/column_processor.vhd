@@ -79,7 +79,20 @@ architecture Behavioral of column_processor is
     signal odfwd_next: std_logic_vector (47 downto 0);
     signal ovfwd_next: std_logic;
     signal sig_A: std_logic_vector (15 downto 0);
+    signal sig_ve_ack_last: std_logic;
 begin
+
+-- latch the status of ve_ack in the last cycle
+ve_ack_latch: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            sig_ve_ack_last <= '0';
+        else
+            sig_ve_ack_last <= ve_ack; 
+        end if;
+    end if;
+end process;
 
 -- FIFO read synchronisation
 sig_ve_req <= '1' when sig_l1_raddr_curr = 0 else '0';
@@ -139,7 +152,7 @@ port map(
     P => odfwd_next
 );
 
-ovfwd_next <= '1' when ivfwd = '1' and l1_vin = '1' and ve_validin = '1' else '0';
+ovfwd_next <= '1' when ivfwd = '1' and l1_vin = '1' and (sig_ve_ack_last = '0' or ve_validin = '1') else '0';
 
 partial_sum_forwarding: process (clk, alrst) is
 begin
