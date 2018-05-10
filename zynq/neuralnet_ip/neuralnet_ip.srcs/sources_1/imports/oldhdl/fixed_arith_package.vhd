@@ -7,12 +7,11 @@ use work.helperpkg.all;
 
 package nn_arith_package is
 
--- truncate a longer sfixed value to
--- 16 long in a manner that is
+-- truncate a longer sfixed value in a manner that is
 -- safe for neural nets, i.e. setting to
 -- max in case carry bits exist
 function fun_add_truncate (
-    datain: std_logic_vector(16 downto 0)
+    datain: std_logic_vector
 ) return std_logic_vector;
 
 function fun_mul_truncate (
@@ -35,31 +34,31 @@ end package;
 package body nn_arith_package is 
 
 function fun_add_truncate (
-    datain: std_logic_vector(16 downto 0)
+    datain: std_logic_vector
 ) return std_logic_vector is
     variable carry:  std_logic;
-    variable var_ret: std_logic_vector (16 - 1 downto 0);
+    variable var_ret: std_logic_vector (datain'length - 1 - 1 downto 0);
     variable sign_bit: std_logic;
     variable top_bit: std_logic;
-    variable maxed: std_logic_vector (16 - 1 downto 0);
+    variable maxed: std_logic_vector (datain'length - 1 - 1 downto 0);
 begin
-    sign_bit := datain (16);
-    top_bit := datain (16 - 1);
+    sign_bit := datain (datain'length - 1);
+    top_bit := datain (datain'length - 1 - 1);
     if (sign_bit = top_bit) then
         carry := '0';
     else
         carry := '1';
     end if;
     
-    maxed (16 - 1) := sign_bit; 
+    maxed (datain'length - 1 - 1) := sign_bit; 
     if (sign_bit = '1') then
-        maxed (16 - 2 downto 0) := (others => '0');
+        maxed (datain'length - 1 - 2 downto 0) := (others => '0');
     else
-        maxed (16 - 2 downto 0) := (others => '1');
+        maxed (datain'length - 1 - 2 downto 0) := (others => '1');
     end if;
 
     if (carry = '0') then
-        var_ret := datain (16 - 1 downto 0);
+        var_ret := datain (datain'length - 1 - 1 downto 0);
     else
         var_ret := maxed; 
     end if;
