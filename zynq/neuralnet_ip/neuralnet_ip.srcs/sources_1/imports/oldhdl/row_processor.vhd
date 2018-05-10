@@ -51,27 +51,24 @@ component delay_buffer is
     );
 end component delay_buffer;
 
-component accumulator is
+component multaccu is
 port (
     clk: in std_logic;
     alrst: in std_logic;
-    datain: in std_logic_vector (15 downto 0);
-    validin: in std_logic;
-    lastone: in std_logic;
-    dataout: out std_logic_vector (15 downto 0);
-    validout: out std_logic
+    A : in std_logic_vector (15 downto 0);
+    B : in std_logic_vector (15 downto 0);
+    vin : in std_logic;
+    fin : in std_logic;
+    P : out std_logic_vector (15 downto 0);
+    vout: out std_logic
 );
-end component accumulator;
+end component multaccu;
 
 signal ve_datain_delayed: std_logic_vector (15 downto 0);
 signal col_ptr: integer range 0 to ncols - 1; 
--- the intermediate product term
-signal product: std_logic_vector (15 downto 0);
 signal sig_l1_raddr: integer range 0 to ncols - 1;
 
 signal lastone: std_logic;
-
-signal accumulator_pipe: std_logic_vector (17 downto 0);
 
 begin
 -- will read parameters from cache 
@@ -137,32 +134,17 @@ begin
 end process;
 
 lastone <= '1' when (col_ptr = ncols - 1) else '0';
-product <= func_safe_mult (ve_datain_delayed, l1_din); 
 
--- accumulator input pipeline
-accu_pipe: 
-process (clk, alrst) is
-begin
-    if (rising_edge(clk)) then
-        if (alrst = '0') then
-            accumulator_pipe <= (others => '0');
-        else
-            accumulator_pipe(17) <= l1_vin; 
-            accumulator_pipe(16) <= lastone; 
-            accumulator_pipe(15 downto 0) <= product;
-        end if;
-    end if;
-end process;
-
-summing: accumulator
+summing: multaccu
 port map(
     clk => clk,
     alrst => alrst,
-    datain => accumulator_pipe(15 downto 0),
-    validin => accumulator_pipe(17),     
-    lastone => accumulator_pipe(16), 
-    dataout => dataout,
-    validout => validout
+    A => ve_datain_delayed,
+    B => l1_din,
+    vin => l1_vin,
+    fin => lastone,
+    P   => dataout,
+    vout => validout
 );
 
 end Behavioral;
