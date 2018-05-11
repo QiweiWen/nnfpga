@@ -137,8 +137,9 @@ begin
     end if;
 end process;
 
-sig_l1_raddr_next <= (sig_l1_raddr_curr + 1) when sig_l1_raddr_curr /= 0 else 
-                                           1 when ve_ack = '1' else 0;
+l1_raddr <= sig_l1_raddr_curr;
+sig_l1_raddr_next <= (sig_l1_raddr_curr + 1) mod nrows when sig_l1_raddr_curr /= 0 else 
+                                                     1 when ve_ack = '1' else 0;
 
 l1_rden <= '1' when sig_l1_raddr_curr /= 0 else
            '1' when ve_ack = '1' else '0';

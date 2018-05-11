@@ -3,70 +3,94 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="cfg_tb_row_processor_behav.wdb" id="1">
+      <db_ref path="cfg_tb_column_processor_behav.wdb" id="1">
          <top_modules>
             <top_module name="helperpkg" />
             <top_module name="nn_arith_package" />
-            <top_module name="tb_row_processor" />
+            <top_module name="tb_column_processor" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="642240000fs"></ZoomStartTime>
-      <ZoomEndTime time="2788240001fs"></ZoomEndTime>
-      <Cursor1Time time="4000000000fs"></Cursor1Time>
+      <ZoomStartTime time="1415843202fs"></ZoomStartTime>
+      <ZoomEndTime time="4516831360fs"></ZoomEndTime>
+      <Cursor1Time time="1452155000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="13" />
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/clk">
+   <WVObjectSize size="19" />
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/alrst">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/alrst">
       <obj_property name="ElementShortName">alrst</obj_property>
       <obj_property name="ObjectShortName">alrst</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/l1_rden">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/l1_rden">
       <obj_property name="ElementShortName">l1_rden</obj_property>
       <obj_property name="ObjectShortName">l1_rden</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_row_processor/l1_raddr">
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_column_processor/l1_raddr">
       <obj_property name="ElementShortName">l1_raddr</obj_property>
       <obj_property name="ObjectShortName">l1_raddr</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/l1_din">
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/l1_din">
       <obj_property name="ElementShortName">l1_din[15:0]</obj_property>
       <obj_property name="ObjectShortName">l1_din[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/l1_vin">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/l1_vin">
       <obj_property name="ElementShortName">l1_vin</obj_property>
       <obj_property name="ObjectShortName">l1_vin</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/ve_datain">
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/ve_datain">
       <obj_property name="ElementShortName">ve_datain[15:0]</obj_property>
       <obj_property name="ObjectShortName">ve_datain[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/ve_validin">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ve_validin">
       <obj_property name="ElementShortName">ve_validin</obj_property>
       <obj_property name="ObjectShortName">ve_validin</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/dataout">
-      <obj_property name="ElementShortName">dataout[15:0]</obj_property>
-      <obj_property name="ObjectShortName">dataout[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ve_req">
+      <obj_property name="ElementShortName">ve_req</obj_property>
+      <obj_property name="ObjectShortName">ve_req</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/validout">
-      <obj_property name="ElementShortName">validout</obj_property>
-      <obj_property name="ObjectShortName">validout</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ve_ack">
+      <obj_property name="ElementShortName">ve_ack</obj_property>
+      <obj_property name="ObjectShortName">ve_ack</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/validfwd">
-      <obj_property name="ElementShortName">validfwd</obj_property>
-      <obj_property name="ObjectShortName">validfwd</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/osync">
+      <obj_property name="ElementShortName">osync</obj_property>
+      <obj_property name="ObjectShortName">osync</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/datafwd">
-      <obj_property name="ElementShortName">datafwd[15:0]</obj_property>
-      <obj_property name="ObjectShortName">datafwd[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/isync">
+      <obj_property name="ElementShortName">isync</obj_property>
+      <obj_property name="ObjectShortName">isync</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_row_processor/debug_product_latch">
-      <obj_property name="ElementShortName">debug_product_latch</obj_property>
-      <obj_property name="ObjectShortName">debug_product_latch</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ivfwd">
+      <obj_property name="ElementShortName">ivfwd</obj_property>
+      <obj_property name="ObjectShortName">ivfwd</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/idfwd">
+      <obj_property name="ElementShortName">idfwd[31:0]</obj_property>
+      <obj_property name="ObjectShortName">idfwd[31:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ovfwd">
+      <obj_property name="ElementShortName">ovfwd</obj_property>
+      <obj_property name="ObjectShortName">ovfwd</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/odfwd">
+      <obj_property name="ElementShortName">odfwd[31:0]</obj_property>
+      <obj_property name="ObjectShortName">odfwd[31:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/TbClock">
+      <obj_property name="ElementShortName">TbClock</obj_property>
+      <obj_property name="ObjectShortName">TbClock</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/TbSimEnded">
+      <obj_property name="ElementShortName">TbSimEnded</obj_property>
+      <obj_property name="ObjectShortName">TbSimEnded</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_column_processor/latched_partial_sum">
+      <obj_property name="ElementShortName">latched_partial_sum</obj_property>
+      <obj_property name="ObjectShortName">latched_partial_sum</obj_property>
    </wvobject>
 </wave_config>
