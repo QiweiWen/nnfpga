@@ -19,6 +19,7 @@ architecture tb of tb_cpe_massive is
     constant nrows: integer := 5;
     constant dfifo: integer := 256;
     constant fifo_rate: integer := 15;
+    constant ncols: integer := 3;
 
     component fifo_cpe_bundle
         generic (nrows: integer; dfifo: integer);
@@ -34,18 +35,22 @@ architecture tb of tb_cpe_massive is
               ovfwd   : out std_logic;
               odfwd   : out std_logic_vector (31 downto 0));
     end component;
+    
+    type std_logic_arr is array (ncols - 1 downto 0) of std_logic;
+    type std_logic_v16_arr is array (ncols - 1 downto 0) of std_logic_vector(15 downto 0);
+    type std_logic_v32_arr is array (ncols - 1 downto 0) of std_logic_vector(31 downto 0);
 
     signal clk     : std_logic;
     signal alrst   : std_logic;
-    signal writeen : std_logic;
-    signal datain  : std_logic_vector (15 downto 0);
-    signal full    : std_logic;
-    signal osync   : std_logic;
-    signal isync   : std_logic := '1';
-    signal ivfwd   : std_logic := '1';
-    signal idfwd   : std_logic_vector (31 downto 0) := X"00010000";
-    signal ovfwd   : std_logic;
-    signal odfwd   : std_logic_vector (31 downto 0);
+    signal writeen : std_logic_arr;
+    signal datain  : std_logic_v16_arr;
+    signal full    : std_logic_arr;
+    signal osync   : std_logic_arr;
+    signal isync   : std_logic_arr;
+    signal ivfwd   : std_logic_arr;
+    signal idfwd   : std_logic_v32_arr;
+    signal ovfwd   : std_logic_arr;
+    signal odfwd   : std_logic_v32_arr;
 
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
@@ -54,35 +59,42 @@ architecture tb of tb_cpe_massive is
     signal latched_partial_sum: real;
 
 begin
+    dutgen:
+    for I in ncols - 1 downto 0 generate 
+        dut : fifo_cpe_bundle
+        generic map (nrows => nrows, dfifo => dfifo)
+        port map (clk     => clk,
+                  alrst   => alrst,
+                  writeen => writeen(I),
+                  datain  => datain(I),
+                  full    => full(I),
+                  osync   => osync(I),
+                  isync   => isync(I),
+                  ivfwd   => ivfwd(I),
+                  idfwd   => idfwd(I),
+                  ovfwd   => ovfwd(I),
+                  odfwd   => odfwd(I));
+    
+        isync(I) <= '1' when I = 0 else osync(I - 1); 
+        ivfwd(I) <= '1' when I = 0 else ovfwd(I - 1);
+        idfwd(I) <= (others => '0') when I = 0 else odfwd(I - 1);
+  
+    end generate;
 
     debug:
     process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                latched_partial_sum <= 0.0; 
+                latched_partial_sum <= -42.0; 
             else
-                if (ovfwd = '1') then
+                if (ovfwd(ncols - 1) = '1') then
                     latched_partial_sum <= 
-                        to_real(to_sfixed(odfwd, 2*PARAM_DEC - 1, -2*PARAM_FRC));
+                        to_real(to_sfixed(odfwd(ncols - 1), 2*PARAM_DEC - 1, -2*PARAM_FRC));
                 end if;
             end if;
         end if;
     end process;
-
-    dut : fifo_cpe_bundle
-    generic map (nrows => nrows, dfifo => dfifo)
-    port map (clk     => clk,
-              alrst   => alrst,
-              writeen => writeen,
-              datain  => datain,
-              full    => full,
-              osync   => osync,
-              isync   => isync,
-              ivfwd   => ivfwd,
-              idfwd   => idfwd,
-              ovfwd   => ovfwd,
-              odfwd   => odfwd);
 
     TbClock <= not TbClock after TbPeriod/2 when TbSimEnded /= '1' else '0';
 
@@ -100,24 +112,21 @@ begin
 
     fifo_populate: process (clk, alrst)
         variable cycle: integer;
-        variable data: integer;
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
                 cycle := 0;
-                data := 0;
             else
                 cycle := (cycle + 1) mod fifo_rate;
             end if;
-            
-            if (cycle = fifo_rate - 1) then
-                writeen <= '1'; 
-                datain <= std_logic_vector (to_unsigned(data, 8)) & X"00";
-                data := (data + 1) mod 128;
-            else
-                writeen <= '0'; 
-            end if;
-
+            for I in ncols - 1 downto 0 loop   
+                if ((cycle + I) mod fifo_rate = fifo_rate - 1) then
+                    writeen(I) <= '1'; 
+                    datain(I) <= std_logic_vector (to_unsigned(I, 8)) & X"00";
+                else
+                    writeen(I) <= '0'; 
+                end if;
+            end loop;
         end if;
     end process;
 
