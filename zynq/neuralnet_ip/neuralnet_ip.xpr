@@ -126,12 +126,14 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/multadd.vhd">
         <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/new/multaccu.vhd">
         <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -182,6 +184,7 @@
       </File>
       <File Path="$PSRCDIR/sim_1/new/multaccu_tb.vhd">
         <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -192,9 +195,21 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sim_1/new/fifo_cpe_bundle.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="simulation"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sim_1/new/massive_cpe_tb.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="cfg_tb_column_processor"/>
+        <Option Name="TopModule" Val="cfg_tb_cpe_massive"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
         <Option Name="SrcSet" Val="sources_1"/>
         <Option Name="XSimWcfgFile" Val="$PPRDIR/cfg_tb_l2_cache_behav.wcfg"/>
@@ -205,6 +220,7 @@
     <FileSet Name="xbip_multadd_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/xbip_multadd_0">
       <File Path="$PSRCDIR/sources_1/ip/xbip_multadd_0/xbip_multadd_0.xci">
         <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -218,6 +234,7 @@
     <FileSet Name="xbip_multadd_1" Type="BlockSrcs" RelSrcDir="$PSRCDIR/xbip_multadd_1">
       <File Path="$PSRCDIR/sources_1/ip/xbip_multadd_1/xbip_multadd_1.xci">
         <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>

@@ -3,94 +3,200 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="cfg_tb_column_processor_behav.wdb" id="1">
+      <db_ref path="cfg_tb_cpe_massive_behav.wdb" id="1">
          <top_modules>
             <top_module name="helperpkg" />
             <top_module name="nn_arith_package" />
-            <top_module name="tb_column_processor" />
+            <top_module name="tb_cpe_massive" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1415843202fs"></ZoomStartTime>
-      <ZoomEndTime time="4516831360fs"></ZoomEndTime>
-      <Cursor1Time time="1452155000fs"></Cursor1Time>
+      <ZoomStartTime time="2927400000fs"></ZoomStartTime>
+      <ZoomEndTime time="5187400001fs"></ZoomEndTime>
+      <Cursor1Time time="3191400000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="19" />
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/clk">
+   <WVObjectSize size="39" />
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/alrst">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/alrst">
       <obj_property name="ElementShortName">alrst</obj_property>
       <obj_property name="ObjectShortName">alrst</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/l1_rden">
-      <obj_property name="ElementShortName">l1_rden</obj_property>
-      <obj_property name="ObjectShortName">l1_rden</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/writeen">
+      <obj_property name="ElementShortName">writeen</obj_property>
+      <obj_property name="ObjectShortName">writeen</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_column_processor/l1_raddr">
-      <obj_property name="ElementShortName">l1_raddr</obj_property>
-      <obj_property name="ObjectShortName">l1_raddr</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/datain">
+      <obj_property name="ElementShortName">datain[15:0]</obj_property>
+      <obj_property name="ObjectShortName">datain[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/l1_din">
-      <obj_property name="ElementShortName">l1_din[15:0]</obj_property>
-      <obj_property name="ObjectShortName">l1_din[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/full">
+      <obj_property name="ElementShortName">full</obj_property>
+      <obj_property name="ObjectShortName">full</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/l1_vin">
-      <obj_property name="ElementShortName">l1_vin</obj_property>
-      <obj_property name="ObjectShortName">l1_vin</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/ve_datain">
-      <obj_property name="ElementShortName">ve_datain[15:0]</obj_property>
-      <obj_property name="ObjectShortName">ve_datain[15:0]</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ve_validin">
-      <obj_property name="ElementShortName">ve_validin</obj_property>
-      <obj_property name="ObjectShortName">ve_validin</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ve_req">
-      <obj_property name="ElementShortName">ve_req</obj_property>
-      <obj_property name="ObjectShortName">ve_req</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ve_ack">
-      <obj_property name="ElementShortName">ve_ack</obj_property>
-      <obj_property name="ObjectShortName">ve_ack</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/osync">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/osync">
       <obj_property name="ElementShortName">osync</obj_property>
       <obj_property name="ObjectShortName">osync</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/isync">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/isync">
       <obj_property name="ElementShortName">isync</obj_property>
       <obj_property name="ObjectShortName">isync</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ivfwd">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/ivfwd">
       <obj_property name="ElementShortName">ivfwd</obj_property>
       <obj_property name="ObjectShortName">ivfwd</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/idfwd">
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/idfwd">
       <obj_property name="ElementShortName">idfwd[31:0]</obj_property>
       <obj_property name="ObjectShortName">idfwd[31:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/ovfwd">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/ovfwd">
       <obj_property name="ElementShortName">ovfwd</obj_property>
       <obj_property name="ObjectShortName">ovfwd</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_column_processor/odfwd">
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/odfwd">
       <obj_property name="ElementShortName">odfwd[31:0]</obj_property>
       <obj_property name="ObjectShortName">odfwd[31:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/TbClock">
-      <obj_property name="ElementShortName">TbClock</obj_property>
-      <obj_property name="ObjectShortName">TbClock</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_column_processor/TbSimEnded">
-      <obj_property name="ElementShortName">TbSimEnded</obj_property>
-      <obj_property name="ObjectShortName">TbSimEnded</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_column_processor/latched_partial_sum">
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_cpe_massive/latched_partial_sum">
       <obj_property name="ElementShortName">latched_partial_sum</obj_property>
       <obj_property name="ObjectShortName">latched_partial_sum</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/l1_rden">
+      <obj_property name="ElementShortName">l1_rden</obj_property>
+      <obj_property name="ObjectShortName">l1_rden</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_cpe_massive/dut/cpe_port_map/l1_raddr">
+      <obj_property name="ElementShortName">l1_raddr</obj_property>
+      <obj_property name="ObjectShortName">l1_raddr</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/l1_din">
+      <obj_property name="ElementShortName">l1_din[15:0]</obj_property>
+      <obj_property name="ObjectShortName">l1_din[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/l1_vin">
+      <obj_property name="ElementShortName">l1_vin</obj_property>
+      <obj_property name="ObjectShortName">l1_vin</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/ve_datain">
+      <obj_property name="ElementShortName">ve_datain[15:0]</obj_property>
+      <obj_property name="ObjectShortName">ve_datain[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/ve_validin">
+      <obj_property name="ElementShortName">ve_validin</obj_property>
+      <obj_property name="ObjectShortName">ve_validin</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/ve_req">
+      <obj_property name="ElementShortName">ve_req</obj_property>
+      <obj_property name="ObjectShortName">ve_req</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/ve_ack">
+      <obj_property name="ElementShortName">ve_ack</obj_property>
+      <obj_property name="ObjectShortName">ve_ack</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/osync">
+      <obj_property name="ElementShortName">osync</obj_property>
+      <obj_property name="ObjectShortName">osync</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/isync">
+      <obj_property name="ElementShortName">isync</obj_property>
+      <obj_property name="ObjectShortName">isync</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/ivfwd">
+      <obj_property name="ElementShortName">ivfwd</obj_property>
+      <obj_property name="ObjectShortName">ivfwd</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/idfwd">
+      <obj_property name="ElementShortName">idfwd[31:0]</obj_property>
+      <obj_property name="ObjectShortName">idfwd[31:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/ovfwd">
+      <obj_property name="ElementShortName">ovfwd</obj_property>
+      <obj_property name="ObjectShortName">ovfwd</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/odfwd">
+      <obj_property name="ElementShortName">odfwd[31:0]</obj_property>
+      <obj_property name="ObjectShortName">odfwd[31:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_cpe_massive/dut/cpe_port_map/sig_l1_raddr_curr">
+      <obj_property name="ElementShortName">sig_l1_raddr_curr</obj_property>
+      <obj_property name="ObjectShortName">sig_l1_raddr_curr</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_cpe_massive/dut/cpe_port_map/sig_l1_raddr_next">
+      <obj_property name="ElementShortName">sig_l1_raddr_next</obj_property>
+      <obj_property name="ObjectShortName">sig_l1_raddr_next</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/vector_element">
+      <obj_property name="ElementShortName">vector_element[15:0]</obj_property>
+      <obj_property name="ObjectShortName">vector_element[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/sig_ve_req">
+      <obj_property name="ElementShortName">sig_ve_req</obj_property>
+      <obj_property name="ObjectShortName">sig_ve_req</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/odfwd_next">
+      <obj_property name="ElementShortName">odfwd_next[31:0]</obj_property>
+      <obj_property name="ObjectShortName">odfwd_next[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/ovfwd_next">
+      <obj_property name="ElementShortName">ovfwd_next</obj_property>
+      <obj_property name="ObjectShortName">ovfwd_next</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/sig_A">
+      <obj_property name="ElementShortName">sig_A[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_A[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/sig_ve_ack_last">
+      <obj_property name="ElementShortName">sig_ve_ack_last</obj_property>
+      <obj_property name="ObjectShortName">sig_ve_ack_last</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/sig_product">
+      <obj_property name="ElementShortName">sig_product[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_product[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/sig_product_latched">
+      <obj_property name="ElementShortName">sig_product_latched[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_product_latched[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/dut/cpe_port_map/full_sum">
+      <obj_property name="ElementShortName">full_sum[32:0]</obj_property>
+      <obj_property name="ObjectShortName">full_sum[32:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/product_valid">
+      <obj_property name="ElementShortName">product_valid</obj_property>
+      <obj_property name="ObjectShortName">product_valid</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/dut/cpe_port_map/product_valid_next">
+      <obj_property name="ElementShortName">product_valid_next</obj_property>
+      <obj_property name="ObjectShortName">product_valid_next</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
 </wave_config>

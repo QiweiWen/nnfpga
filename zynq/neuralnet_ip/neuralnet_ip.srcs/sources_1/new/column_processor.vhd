@@ -7,28 +7,6 @@ library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;
 use ieee.math_real.all;
 
-
--- 07/05/2018: 
--- the timing of this module is a little tricky
--- in a typical clock cycle, the column processor accepts a partial
--- sum from its neighbour, performs a multiplication-addition, and
--- then forwards the new partial sum to its next neighbour.
---
--- for simplicity's sake, there is no buffering and all the required
--- signals must arrive at the correct clock cycles for the sum to
--- be correct.
---
--- the "vector element input channel" are the interface ports to the input
--- FIFO. In backpropagation, the input FIFO is shared with the derivative
--- unit. Furthermore, the input FIFO can become empty depending on the
--- geometry of the matrixes, so ve_req ("vector element request") cannot
--- always be satisfied immediately. ve_ack is connected to ve_req through
--- combinational logic and notifies, in the same cycle as ve_req,
--- the column processor of whether any data is incoming from the FIFO
--- in the next clock cycle. In the next cycle after it pulses high,
--- the next column processor down the line is notified through sync_in,
--- thus initiating a read from its own FIFO.
-
 entity column_processor is
 generic (
     nrows: integer := 100

@@ -50,9 +50,9 @@ architecture tb of tb_column_processor is
     signal ve_req     : std_logic;
     signal ve_ack     : std_logic;
     signal osync      : std_logic;
-    signal isync      : std_logic;
-    signal ivfwd      : std_logic;
-    signal idfwd      : std_logic_vector (31 downto 0);
+    signal isync      : std_logic := '1';
+    signal ivfwd      : std_logic := '1';
+    signal idfwd      : std_logic_vector (31 downto 0) := (others => '0');
     signal ovfwd      : std_logic;
     signal odfwd      : std_logic_vector (31 downto 0);
 
@@ -91,6 +91,8 @@ begin
             ve_validin <= ve_req;
             if (ve_req = '1') then
                 ve_datain <= X"0200";
+            else
+                ve_datain <= X"0000";
             end if;
         end if;
     end process;
@@ -123,18 +125,11 @@ begin
 
     stimuli : process
     begin
-        -- EDIT Adapt initialization as needed
-        isync <= '1';
-        ivfwd <= '1';
-        idfwd <= (others => '0');
-
         -- Reset generation
         -- EDIT: Check that alrst is really your reset signal
         alrst <= '0';
         wait for 100 ns;
         alrst <= '1';
-        wait for 10000 ns;
-
         wait;
     end process;
 
