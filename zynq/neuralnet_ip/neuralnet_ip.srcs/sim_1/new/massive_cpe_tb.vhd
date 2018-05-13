@@ -22,7 +22,7 @@ architecture tb of tb_cpe_massive is
     constant ncols: integer := 3;
 
     component fifo_cpe_bundle
-        generic (nrows: integer; dfifo: integer);
+        generic (nrows: integer; dfifo: integer; offset: integer := 0);
         port (clk     : in std_logic;
               alrst   : in std_logic;
               writeen : in std_logic;
@@ -62,7 +62,7 @@ begin
     dutgen:
     for I in ncols - 1 downto 0 generate 
         dut : fifo_cpe_bundle
-        generic map (nrows => nrows, dfifo => dfifo)
+        generic map (nrows => nrows, dfifo => dfifo, offset => I)
         port map (clk     => clk,
                   alrst   => alrst,
                   writeen => writeen(I),
