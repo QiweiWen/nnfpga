@@ -10,30 +10,17 @@ I'm hoping to achieve good parallelism (through pipelining) and scalability; tha
 working system on the Zynq PL (if I even make it that far), I can argue convincingly that the network can be made twice as large
 if I had twice the resource in LUTs, FFs, block rams and DSP slices.
 
-## 09/05/2018
+## 13/05/2018
 --------------
 
-After spending some time building up the scaffolding around the column processing unit I finally put the design together into a
-VHDL module.
+Verified column processing element operation with two testbenches, one of which only supplies stimuli and the other connects three column processors in series so I could verify the timing of input FIFO reading, weight memory reading and input partial sum addition. Works pretty well, but much trickier than the row processor, and therefore leaves me with a lingering sense of unease.
 
-Column processors are the result of an alternative systolic array mapping to the row processor method, whereby parameters are fed
-into each processing element in parallel offset by one cycle between neighbours.
+I spent some time away from the code editor to think through some other areas that have received less thinking through: weight and bias derivative computation.
 
+With a row-major j\*i forward propagation stage, the corresponding backward propagation is column-major. The derivate matrix of the stage being the outer product of delta input and last layer activated output, I propose that the delta vector, which comes from a row-major stage and is therefore distributed across j-many FIFOs, be fed in parallel into j derivative units. Meanwhile the last layer activated output, which comes from a column-major forward propagation stage, is concentrated in one big FIFO buffer. It is therefore fed serially through the first derivative unit at a step per cycle.
 
-    ve. element  [   ]  --->  (eventually) serial output
-    ---->        [   ]
-                 [   ] <--|
-                          |  partial sums
-                 [   ] ---|
-       ---->     [   ]
-                 [   ] <--|
-                          |  partial sums
-                 [   ] ---|
-            ---->[   ]
-                 [   ]
+Vice-versa for a column-major j\*i stage, with i derivative units and the input characteristics of dL and a(L - 1) reversed, dL being serial because it comes from a column-major stage and a(L-1) being parallel because it came from a row-major forward propagation stage.
 
-Partial sums are calculated in each column processor, passed to its neighbour and accumulated to be output serially in the last unit.
+The design of the derivative unit is now clear. As for bias, the derivative is just dL, much less tricky than I feared.
 
-I decided on a "best-effort" approach, that is, all signals are assumed to arrive at the expected clock cycle, which I think is a
-reasonable assumption to make after thinking about it carefully. The column processor performs neither buffering nor keeping track
-of states in the case where one input arrives but not the other.
+I think something resembling a working system is in its infancy.
