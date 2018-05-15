@@ -28,7 +28,7 @@ architecture rtl of true_dpram_sclk is
 	type memory_t is array(depth - 1 downto 0) of word_t;
 	
 	-- Declare the RAM
-	shared variable ram : memory_t;
+	shared variable ram : memory_t := (others => (others => '0'));
 
     signal reg_a: std_logic_vector (width - 1 downto 0);
     signal reg_b: std_logic_vector (width - 1 downto 0);

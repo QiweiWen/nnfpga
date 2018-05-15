@@ -1,4 +1,6 @@
 -- stolen from deathbylogic.com
+-- re-wrote because it was shit
+-- mate, stop writing tutorials
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -27,8 +29,33 @@ architecture behavioral of std_fifo is
 
     signal validout_next: std_logic;
     signal sig_empty: std_logic;
+    signal sig_full: std_logic;
     signal validout_pipe: std_logic;
-    signal dataout_reg: std_logic_vector (data_width - 1 downto 0);
+
+    component true_dpram_sclk is
+        generic (
+            width: integer := 16;
+            depth: integer := 128
+        );
+        port 
+        (	
+            data_a	: in std_logic_vector(width - 1 downto 0);
+            data_b	: in std_logic_vector(width - 1 downto 0);
+            addr_a	: in integer range 0 to depth - 1;
+            addr_b	: in integer range 0 to depth - 1;
+            we_a	: in std_logic;
+            we_b	: in std_logic;
+            clk		: in std_logic;
+            q_a		: out std_logic_vector(width - 1 downto 0);
+            q_b		: out std_logic_vector(width - 1 downto 0)
+        );
+        
+    end component true_dpram_sclk;
+
+    signal rdptr: integer range 0 to fifo_depth - 1;
+    signal wrptr: integer range 0 to fifo_depth - 1;
+    signal size: integer range 0 to fifo_depth - 1;
+
 begin
     -- delay readen and empty for two cycles to drive output valid flag
     validout_next <= '1' when readen = '1' and sig_empty = '0' else '0';
@@ -47,74 +74,53 @@ begin
     end process;
     
     empty <= sig_empty;
-	-- memory pointer process
-	fifo_proc : process (clk)
-		type fifo_memory is array (0 to fifo_depth - 1) of std_logic_vector (data_width - 1 downto 0);
-		variable memory : fifo_memory;
-		
-		variable head : natural range 0 to fifo_depth - 1;
-		variable tail : natural range 0 to fifo_depth - 1;
-		
-		variable looped : boolean;
-	begin
-		if rising_edge(clk) then
-			if rst = '0' then
-				head := 0;
-				tail := 0;
-				
-				looped := false;
-				
-				full  <= '0';
-				sig_empty <=  '1';
-			else
-                dataout <= dataout_reg;
-				if (readen = '1') then
-					if ((looped = true) or (head /= tail)) then
-						-- update data output
-						dataout_reg <= memory(tail);
-						
-						-- update tail pointer as needed
-						if (tail = fifo_depth - 1) then
-							tail := 0;
-							
-							looped := false;
-						else
-							tail := tail + 1;
-						end if;
-						
-						
-					end if;
-				end if;
-				
-				if (writeen = '1') then
-					if ((looped = false) or (head /= tail)) then
-						-- write data to memory
-						memory(head) := datain;
-						
-						-- increment head pointer as needed
-						if (head = fifo_depth - 1) then
-							head := 0;
-							
-							looped := true;
-						else
-							head := head + 1;
-						end if;
-					end if;
-				end if;
-				
-				-- update empty and full flags
-				if (head = tail) then
-					if looped then
-						full <= '1';
-					else
-						sig_empty <=  '1';
-					end if;
-				else
-					sig_empty <=  '0';
-					full	<= '0';
-				end if;
-			end if;
-		end if;
-	end process;
+    full  <= sig_full;
+    sig_empty <= '1' when size = 0 else '0';
+    sig_full      <= '1' when size = fifo_depth else '0';
+
+    capacity_proc: process (clk, rst) is
+        variable written: std_logic;
+        variable read: std_logic;
+    begin
+        if (rising_edge(clk)) then
+            if (rst = '0') then
+                rdptr <= 0;
+                wrptr <= 0;
+            else
+                written := '0';
+                read    := '0';
+                if (sig_empty = '0' and readen = '1') then
+                    rdptr <= (rdptr + 1) mod fifo_depth;
+                    read := '1';
+                end if;
+
+                if (sig_full = '0' and writeen = '1') then
+                    wrptr <= (wrptr + 1) mod fifo_depth;
+                    written := '1';
+                end if;
+
+                if (written = '1' and read = '0') then
+                    size <= (size + 1) mod (fifo_depth + 1);
+                elsif (written = '0' and read = '1') then
+                    size <= (size - 1) mod (fifo_depth + 1);
+                end if;
+
+            end if;
+        end if;
+    end process;
+    
+    memory_module: true_dpram_sclk
+    generic map (width => data_width, depth => fifo_depth)
+    port map(
+        data_a => datain,
+        data_b => (others => '0'), 
+        addr_a => rdptr,
+        addr_b => 0,
+        we_a   => writeen,
+        we_b   => '0',
+        clk    => clk,
+        q_a    => dataout,
+        q_b    => open
+    );
 		
 end Behavioral;
