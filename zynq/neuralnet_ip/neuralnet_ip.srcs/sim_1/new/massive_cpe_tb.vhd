@@ -18,7 +18,7 @@ architecture tb of tb_cpe_massive is
     
     constant nrows: integer := 5;
     constant dfifo: integer := 256;
-    constant fifo_rate: integer := 15;
+    constant fifo_rate: integer := 5;
     constant ncols: integer := 3;
 
     component fifo_cpe_bundle

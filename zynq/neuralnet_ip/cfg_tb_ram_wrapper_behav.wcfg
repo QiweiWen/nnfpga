@@ -12,11 +12,11 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="3040000000fs"></ZoomStartTime>
-      <ZoomEndTime time="4192000001fs"></ZoomEndTime>
-      <Cursor1Time time="3148000000fs"></Cursor1Time>
+      <ZoomStartTime time="2620080000fs"></ZoomStartTime>
+      <ZoomEndTime time="3693080001fs"></ZoomEndTime>
+      <Cursor1Time time="6000000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="15" />
+   <WVObjectSize size="16" />
    <wvobject db_ref_id="1" type="logic" fp_name="/tb_cpe_massive/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -76,5 +76,9 @@
    <wvobject db_ref_id="1" type="array" fp_name="/tb_cpe_massive/\dutgen(2)\/dut/l1_din">
       <obj_property name="ElementShortName">l1_din[15:0]</obj_property>
       <obj_property name="ObjectShortName">l1_din[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_cpe_massive/\dutgen(2)\/dut/fifo_port_map/size">
+      <obj_property name="ElementShortName">size</obj_property>
+      <obj_property name="ObjectShortName">size</obj_property>
    </wvobject>
 </wave_config>
