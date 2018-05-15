@@ -27,9 +27,10 @@ architecture behavioral of std_fifo is
 
     signal validout_next: std_logic;
     signal sig_empty: std_logic;
-
+    signal validout_pipe: std_logic;
+    signal dataout_reg: std_logic_vector (data_width - 1 downto 0);
 begin
-    -- delay readen and empty for one cycle to drive output valid flag
+    -- delay readen and empty for two cycles to drive output valid flag
     validout_next <= '1' when readen = '1' and sig_empty = '0' else '0';
     ackout <= validout_next;
     vout_proc: process (clk, rst)
@@ -37,8 +38,10 @@ begin
         if (rising_edge(clk)) then
             if (rst = '0') then
                 validout <= '0';
+                validout_pipe <= '0';
             else
-                validout <= validout_next;
+                validout_pipe <= validout_next;
+                validout <= validout_pipe;
             end if;
         end if;
     end process;
@@ -64,10 +67,11 @@ begin
 				full  <= '0';
 				sig_empty <=  '1';
 			else
+                dataout <= dataout_reg;
 				if (readen = '1') then
 					if ((looped = true) or (head /= tail)) then
 						-- update data output
-						dataout <= memory(tail);
+						dataout_reg <= memory(tail);
 						
 						-- update tail pointer as needed
 						if (tail = fifo_depth - 1) then

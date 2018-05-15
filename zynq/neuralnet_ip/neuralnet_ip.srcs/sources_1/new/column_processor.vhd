@@ -141,7 +141,7 @@ begin
     end if;
 end process;
 
-product_valid_next <= '1' when l1_vin = '1' and (sig_ve_ack_last = '0' or ve_validin = '1') else '0';
+product_valid_next <= l1_vin;
                    
 full_sum   <= fullsum_type (to_sfixed (idfwd,               2*PARAM_DEC - 1, -2*PARAM_FRC) +
                             to_sfixed (sig_product_latched, 2*PARAM_DEC - 1, -2*PARAM_FRC));

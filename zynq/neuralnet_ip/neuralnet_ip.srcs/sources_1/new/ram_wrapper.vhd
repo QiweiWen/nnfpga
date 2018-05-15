@@ -55,16 +55,16 @@ component true_dpram_sclk is
         depth: integer := 128
     );
     port 
-    (     
-            data_a     : in std_logic_vector(width - 1 downto 0);
-            data_b     : in std_logic_vector(width - 1 downto 0);
-            addr_a     : in integer range 0 to depth - 1;
-            addr_b     : in integer range 0 to depth - 1;
-            we_a     : in std_logic;
-            we_b     : in std_logic;
-            clk          : in std_logic;
-            q_a          : out std_logic_vector(width - 1 downto 0);
-            q_b          : out std_logic_vector(width - 1 downto 0)
+    (	
+            data_a	: in std_logic_vector(width - 1 downto 0);
+            data_b	: in std_logic_vector(width - 1 downto 0);
+            addr_a	: in integer range 0 to depth - 1;
+            addr_b	: in integer range 0 to depth - 1;
+            we_a	: in std_logic;
+            we_b	: in std_logic;
+            clk		: in std_logic;
+            q_a		: out std_logic_vector(width - 1 downto 0);
+            q_b		: out std_logic_vector(width - 1 downto 0)
     );
 end component true_dpram_sclk;
 
@@ -128,7 +128,7 @@ dout_a     <= tdp_dataout_a;
 dout_b     <= tdp_dataout_b;
 
 vout_drive: delay_buffer
-generic map (ncycles => 1, width => 2)
+generic map (ncycles => 2, width => 2)
 port map (
     clk => clk,
     rst => alrst,
@@ -140,9 +140,9 @@ rden_array(1) <= '1' when rden_b = '1' and update = '0' and write = '0' else '0'
 vout_a        <= vout_array(0);
 vout_b        <= vout_array(1);
 
--- put udp_addr_read, vin_c and din_c through a pipeline stage1
--- because read takes one cycle therefore writeback signals
--- lag read signals by 1 cycle
+-- put udp_addr_read, vin_c and din_c through 2 pipeline stages
+-- because read takes two cycles therefore writeback signals
+-- lag read signals by 2 cycles
 -- use pipeline output to drive port B in update mode
 
 write_addr_pipe:
@@ -152,7 +152,8 @@ begin
         if (alrst = '0') then
             upd_addr_pipeline <= 0; 
         else
-            upd_addr_write    <= wraddr_c;
+            upd_addr_pipeline <= wraddr_c; 
+            upd_addr_write    <= upd_addr_pipeline;
         end if;
     end if;
 end process;
@@ -163,7 +164,7 @@ upd_data_pipe_in (16) <= '1' when vin_c = '1' and update = '1' and write = '0'
 upd_data_pipe_in (15 downto 0) <= din_c; 
 
 upd_data_pipe: delay_buffer
-generic map (ncycles => 1, width => 17)
+generic map (ncycles => 2, width => 17)
 port map (
     clk => clk,
     rst => alrst,

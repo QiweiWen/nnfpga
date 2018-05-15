@@ -8,7 +8,7 @@ use ieee_proposed.fixed_pkg.all;
 use ieee.math_real.all;
 -- simulation only module to ease testbench design
 entity fifo_cpe_bundle is
-    generic (nrows: integer; dfifo: integer; offset: integer := 0);
+    generic (nrows: integer := 100; dfifo: integer := 128; offset: integer := 0);
     port (
         clk: in std_logic;
         alrst: in std_logic;
@@ -74,6 +74,9 @@ architecture Behavioral of fifo_cpe_bundle is
     signal ve_req: std_logic;
     signal ve_ack: std_logic;
 
+    signal l1_din_next: std_logic_vector (15 downto 0);
+    signal l1_vin_next: std_logic; 
+
     -- fifo signals
     signal empty: std_logic;
     signal readen: std_logic;
@@ -83,10 +86,12 @@ begin
     fake_memory: process (clk) is
     begin
         if (rising_edge (clk)) then
-            l1_vin <= l1_rden;
+            l1_vin_next <= l1_rden;
             if (l1_rden = '1') then
-                l1_din <= std_logic_vector (to_unsigned((l1_raddr + offset) mod nrows, 8)) & X"00";
+                l1_din_next <= std_logic_vector (to_unsigned((l1_raddr + offset) mod nrows, 8)) & X"00";
             end if;
+            l1_vin <= l1_vin_next;
+            l1_din <= l1_din_next;
         end if;
     end process;
     
