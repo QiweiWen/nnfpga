@@ -31,7 +31,7 @@ architecture tb of tb_row_processor is
               ve_datain  : in std_logic_vector (15 downto 0);
               ve_validin : in std_logic;
               ve_req      : out std_logic;
-              dataout    : out std_logic_vector (15 downto 0);
+              dataout    : out std_logic_vector (31 downto 0);
               validout   : out std_logic;
               validfwd   : out std_logic;
               datafwd    : out std_logic_vector (15 downto 0));
@@ -70,7 +70,7 @@ architecture tb of tb_row_processor is
     signal l1_vin     : std_logic;
     signal ve_datain  : std_logic_vector (15 downto 0);
     signal ve_validin : std_logic;
-    signal dataout    : std_logic_vector (15 downto 0);
+    signal dataout    : std_logic_vector (31 downto 0);
     signal validout   : std_logic;
     signal validfwd   : std_logic;
     signal datafwd    : std_logic_vector (15 downto 0);
@@ -111,7 +111,7 @@ begin
             else
                 if (validout = '1') then
                     debug_product_latch <= 
-                        to_real(to_sfixed(dataout, PARAM_DEC - 1, -PARAM_FRC));
+                        to_real(to_sfixed(dataout, 2*PARAM_DEC - 1, -2*PARAM_FRC));
                 end if;
             end if;
         end if;

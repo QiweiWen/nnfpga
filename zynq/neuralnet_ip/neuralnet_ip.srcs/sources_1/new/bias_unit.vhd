@@ -1,38 +1,21 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 15.05.2018 11:01:15
--- Design Name: 
--- Module Name: bias_unit - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+use work.helperpkg.all;
+use work.nn_arith_package.all;
+library ieee_proposed;
+use ieee_proposed.fixed_pkg.all;
+use ieee.math_real.all;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
+-- single bias unit for forward propagation row processors
 entity bias_unit is
---  Port ( );
+port (
+    clk: in std_logic;
+    alrst: in std_logic;
+    unbiased: in std_logic_vector (15 downto 0);
+    biased : out std_logic_vector (15 downto 0)
+);
 end bias_unit;
 
 architecture Behavioral of bias_unit is

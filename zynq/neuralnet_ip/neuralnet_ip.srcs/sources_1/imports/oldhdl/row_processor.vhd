@@ -27,7 +27,7 @@ port(
     ve_validin: in std_logic;
     ve_req     : out std_logic;
 -- product terms output channel
-    dataout: out std_logic_vector (15 downto 0);
+    dataout: out std_logic_vector (31 downto 0);
     validout: out std_logic;
 -- signals forwarded to the adjacent row processor down the line
     validfwd: out std_logic;
@@ -58,7 +58,7 @@ port (
     datain: in std_logic_vector (31 downto 0);
     validin: in std_logic;
     lastone: in std_logic;
-    dataout: out std_logic_vector (15 downto 0);
+    dataout: out std_logic_vector (31 downto 0);
     validout: out std_logic
 );
 end component accumulator;

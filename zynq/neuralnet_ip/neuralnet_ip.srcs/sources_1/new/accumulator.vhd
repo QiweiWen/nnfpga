@@ -12,7 +12,7 @@ port (
     datain: in std_logic_vector (31 downto 0);
     validin: in std_logic;
     lastone: in std_logic;
-    dataout: out std_logic_vector (15 downto 0);
+    dataout: out std_logic_vector (31 downto 0);
     validout: out std_logic
 );
 end accumulator;
@@ -21,9 +21,6 @@ architecture Behavioral of accumulator is
 
 signal sig_sum: std_logic_vector (31 downto 0); 
 signal sig_validout: std_logic;
-
-signal sig_sum_truncate: std_logic_vector (15 downto 0);
-signal validout_delayed: std_logic;
 
 begin
 
@@ -61,17 +58,7 @@ begin
     end if;
 end process;
 
-outputproc: process (clk, alrst) is
-begin
-    if (rising_edge(clk)) then
-        if (alrst = '0') then
-            validout <= '0';
-            dataout <= (others => '0');
-        else
-            validout <= sig_validout;
-            dataout <= fun_mul_truncate (sig_sum);
-        end if;
-    end if;
-end process;
+validout <= sig_validout;
+dataout <= sig_sum;
 
 end Behavioral;
