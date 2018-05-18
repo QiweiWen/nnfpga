@@ -23,7 +23,9 @@ reducing the demand for block ram. Processing elements are written in such a way
 training is preferred over batch training and the pipeline does not stall even as the weight and bias memory and registers are being partially overwritten,
 trading accuracy for performance.
 
-## 16/05/2018
+## 18/05/2018
 --------------
 
-Realised timing was bad, added block ram output register back in; realised timing was still shit, found out that the FIFO I stole from the internet was garbage, so I re-wrote it. Made adjustments everywhere for the increased FIFO and block ram latency and verified correct operation again, varied FIFO data rate to test full/empty cases, all good.
+Each matrix (forward and backward) will incur roughly nrows + ncols latency. A respectably large network will easily have latency of thousands of cycles. If only a few hundred training examples run in parallel, that means the hardware utilisation will be rather low. The number of parallel training examples, however, affects the FIFO size, which quickly scales past the 4.9 megs available to Zedboard.
+
+Thinking of dynamic allocation (never deallocation; data rate never changes, between a fast stage and a slow stage the demand for temporary FIFO storage only ever increases) of fixed-size block ram chunks through a simple page table. Probably will bring FIFO latency to three or more cycles because either associative lookup or a block ram based page table will be its own pipeline stage.
