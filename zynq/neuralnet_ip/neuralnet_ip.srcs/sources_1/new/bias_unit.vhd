@@ -56,9 +56,7 @@ begin
                 vout_pipe <= vin;
                 vout <= vout_pipe;
                 unbiased_trunc <= fun_mul_truncate (unbiased);
-                full_biased := sum_type(to_sfixed(bias_register, PARAM_DEC - 1, -PARAM_FRC) + 
-                                        to_sfixed(unbiased_trunc,PARAM_DEC - 1, -PARAM_FRC));  
-                biased <= fun_add_truncate (full_biased);
+                biased <= func_safe_sum (bias_register, unbiased_trunc);
             end if;
         end if;
     end process;
