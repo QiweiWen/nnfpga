@@ -33,5 +33,5 @@ Thinking of dynamic allocation (never deallocation; data rate never changes, bet
 
 **21/05/2018**
 
-Now that I've given up batch upgrade, the block ram wrapper needs updating because with a single dual-port ram there's no way to support two parallel read and a write in the same cycle.
+Now that I've given up batch update, the block ram wrapper needs changing because with a single dual-port ram there's no way to support two parallel read and a write in the same cycle.
 Solution: share write data and address buses between two block rams to double the number of read ports.
