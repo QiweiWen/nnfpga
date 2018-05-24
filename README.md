@@ -35,3 +35,11 @@ Thinking of dynamic allocation (never deallocation; data rate never changes, bet
 
 Now that I've given up batch update, the block ram wrapper needs changing because with a single dual-port ram there's no way to support two parallel read and a write in the same cycle.
 Solution: share write data and address buses between two block rams to double the number of read ports.
+
+**24/05/2018**
+
+ram\_wrapper.vhd previously tried to map 4 memory operations to 2 ports: forward propagation read, backward propagation read, memory update read and memory update write. This was alright thanks to batch update, but now all 4 will have to happen in one cycle. I previously thought slightly tweaking ram\_wrapper would do, but realised that even with two block rams it still doesn't work, because there are only two read ports and a write ports.
+
+The solution is to economise read operations of the derivative unit and the backprop systolic array processor into one operation: the row/col processor reads the memory, puts it into a small temporary storage FIFO, and the derivative unit reads previously stored weights in its own time. This applies only to weight matrix rows/columns; the bias is alright: there only ever need be two reads and a write in a cycle, so a naive implementation is fine.
+
+r.e. dynamic allocation and page table: no, no, no, no a million no's. The number of block ram ports is going to be massive because each individual row processor has its own output FIFO. The performance will be eye-watering. Just use a flip-flop based register to pass data from a slow stage to a fast stage to halve the FIFO block ram usage and leave it at that.

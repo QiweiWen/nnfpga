@@ -37,27 +37,30 @@ architecture tb of tb_row_processor is
               datafwd    : out std_logic_vector (15 downto 0));
     end component;
 
-    component ram_wrapper
+    component three_port_ram is
         generic (
+            width: integer := 16;
             depth: integer := 128
         );
-        port (clk      : in std_logic;
-              alrst    : in std_logic;
-              update   : in std_logic;
-              write    : in std_logic;
-              rden_a   : in std_logic;
-              rdaddr_a : in integer;
-              dout_a   : out std_logic_vector (15 downto 0);
-              vout_a   : out std_logic;
-              rden_b   : in std_logic;
-              rdaddr_b : in integer;
-              dout_b   : out std_logic_vector (15 downto 0);
-              vout_b   : out std_logic;
-              vin_c    : in std_logic;
-              din_c    : in std_logic_vector (15 downto 0);
-              wraddr_c : in integer;
-              ack_c    : out std_logic);
-    end component;
+        port (
+            clk: in std_logic;
+            alrst: in std_logic;
+            -- read port A
+            re_a: in std_logic;
+            addr_a: in integer range 0 to depth - 1;
+            vout_a: out std_logic;
+            dout_a: out std_logic_vector (width - 1 downto 0); 
+            -- read port B
+            re_b: in std_logic;
+            addr_b: in integer range 0 to depth - 1;
+            vout_b: out std_logic;
+            dout_b: out std_logic_vector (width - 1 downto 0); 
+            -- write port C
+            addr_c: in integer range 0 to depth - 1;
+            vin_c: in std_logic;
+            din_c: in std_logic_vector (width - 1 downto 0)
+        );
+    end component three_port_ram;
     
     constant ncols : integer := 5; 
     
@@ -76,21 +79,18 @@ architecture tb of tb_row_processor is
     signal datafwd    : std_logic_vector (15 downto 0);
 
     -- l1 cache signals
-    signal update   : std_logic;
-    signal write    : std_logic;
-    signal rden_a   : std_logic;
-    signal rdaddr_a : integer;
-    signal dout_a   : std_logic_vector (15 downto 0);
-    signal vout_a   : std_logic;
-    signal rden_b   : std_logic;
-    signal rdaddr_b : integer;
-    signal dout_b   : std_logic_vector (15 downto 0);
-    signal vout_b   : std_logic;
-    signal vin_c    : std_logic;
-    signal din_c    : std_logic_vector (15 downto 0);
-    signal wraddr_c : integer;
-    signal ack_c    : std_logic;
-
+    signal re_a: std_logic;
+    signal addr_a: integer range 0 to ncols - 1;
+    signal vout_a: std_logic;
+    signal dout_a: std_logic_vector (16 - 1 downto 0); 
+    signal re_b: std_logic;
+    signal addr_b: integer range 0 to ncols - 1;
+    signal vout_b: std_logic;
+    signal dout_b: std_logic_vector (16 - 1 downto 0); 
+    signal addr_c: integer range 0 to ncols - 1;
+    signal vin_c: std_logic;
+    signal din_c: std_logic_vector (16 - 1 downto 0);
+    
 
     signal debug_product_latch: real; 
 
@@ -118,8 +118,8 @@ begin
     end process;
 
     -- connect row processor to channel A
-    rden_a <= l1_rden;
-    rdaddr_a <= l1_raddr;
+    re_a <= l1_rden;
+    addr_a <= l1_raddr;
     l1_din  <= dout_a;
     l1_vin  <= vout_a;
 
@@ -139,24 +139,26 @@ begin
               validfwd   => validfwd,
               datafwd    => datafwd);
 
-    dut_ram : ram_wrapper
+    dut_ram : three_port_ram 
     generic map (depth => ncols)
-    port map (clk      => clk,
-              alrst    => alrst,
-              update   => update,
-              write    => write,
-              rden_a   => rden_a,
-              rdaddr_a => rdaddr_a,
-              dout_a   => dout_a,
-              vout_a   => vout_a,
-              rden_b   => rden_b,
-              rdaddr_b => rdaddr_b,
-              dout_b   => dout_b,
-              vout_b   => vout_b,
-              vin_c    => vin_c,
-              din_c    => din_c,
-              wraddr_c => wraddr_c,
-              ack_c    => ack_c);
+    port map (
+        clk => clk,
+        alrst => alrst,
+        -- read port A
+        re_a => re_a,
+        addr_a => addr_a,
+        vout_a => vout_a,
+        dout_a => dout_a,
+        -- read port B
+        re_b => re_b,
+        addr_b => addr_b,
+        vout_b => vout_b,
+        dout_b => dout_b,
+        -- write port C
+        addr_c => addr_c,
+        vin_c => vin_c,
+        din_c => din_c 
+    );
 
     -- Clock generation
     TbClock <= not TbClock after TbPeriod/2 when TbSimEnded /= '1' else '0';
@@ -166,13 +168,11 @@ begin
 
     stimuli : process
     begin
-        update <= '0';
-        write  <= '0';
-        rden_b <= '0';
-        rdaddr_b <= 0;
+        re_b <= '0';
+        addr_b <= 0;
         vin_c <= '0';
         din_c <= (others => '0');
-        wraddr_c <= 0;
+        addr_c <= 0;
 
         ve_validin <= '0';
         ve_datain <= (others => '0');
@@ -184,15 +184,12 @@ begin
         wait for 100 ns;
 
         -- initial value
-        update <= '0';
-        write <= '1';
         vin_c <= '1';
         for i in 0 to ncols - 1 loop
-            wraddr_c <= i;
+            addr_c <= i;
             din_c <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC)); 
             wait for 100 ns;
         end loop;
-        write <= '0';
         vin_c <= '0';
         
         -- multiplication test
