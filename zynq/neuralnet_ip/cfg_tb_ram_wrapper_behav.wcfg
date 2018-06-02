@@ -3,66 +3,54 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="cfg_tb_bias_unit_behav.wdb" id="1">
+      <db_ref path="cfg_tb_bias_vector_behav.wdb" id="1">
          <top_modules>
             <top_module name="helperpkg" />
             <top_module name="nn_arith_package" />
-            <top_module name="tb_bias_unit" />
+            <top_module name="tb_bias_vector" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="105833333fs"></ZoomStartTime>
-      <ZoomEndTime time="1178833334fs"></ZoomEndTime>
-      <Cursor1Time time="1000000000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="2226000001fs"></ZoomEndTime>
+      <Cursor1Time time="500000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="12" />
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_unit/clk">
+   <WVObjectSize size="9" />
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_unit/alrst">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/alrst">
       <obj_property name="ElementShortName">alrst</obj_property>
       <obj_property name="ObjectShortName">alrst</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_unit/unbiased">
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_vector/unbiased">
       <obj_property name="ElementShortName">unbiased[31:0]</obj_property>
       <obj_property name="ObjectShortName">unbiased[31:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_unit/vin">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/vin">
       <obj_property name="ElementShortName">vin</obj_property>
       <obj_property name="ObjectShortName">vin</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_unit/biased">
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_vector/biased">
       <obj_property name="ElementShortName">biased[15:0]</obj_property>
       <obj_property name="ObjectShortName">biased[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_unit/vout">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/vout">
       <obj_property name="ElementShortName">vout</obj_property>
       <obj_property name="ObjectShortName">vout</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_unit/updated">
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_vector/updated">
       <obj_property name="ElementShortName">updated[15:0]</obj_property>
       <obj_property name="ObjectShortName">updated[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_unit/uvin">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/uvin">
       <obj_property name="ElementShortName">uvin</obj_property>
       <obj_property name="ObjectShortName">uvin</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_unit/TbClock">
-      <obj_property name="ElementShortName">TbClock</obj_property>
-      <obj_property name="ObjectShortName">TbClock</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_unit/TbSimEnded">
-      <obj_property name="ElementShortName">TbSimEnded</obj_property>
-      <obj_property name="ObjectShortName">TbSimEnded</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_bias_unit/latched_debug_output">
-      <obj_property name="ElementShortName">latched_debug_output</obj_property>
-      <obj_property name="ObjectShortName">latched_debug_output</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_bias_unit/TbPeriod">
-      <obj_property name="ElementShortName">TbPeriod</obj_property>
-      <obj_property name="ObjectShortName">TbPeriod</obj_property>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_bias_vector/latched_biased">
+      <obj_property name="ElementShortName">latched_biased</obj_property>
+      <obj_property name="ObjectShortName">latched_biased</obj_property>
    </wvobject>
 </wave_config>

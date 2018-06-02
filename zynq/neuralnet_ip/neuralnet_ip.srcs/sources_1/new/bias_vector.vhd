@@ -11,6 +11,7 @@ entity bias_vector is
 generic (nrows: integer := 100);
 port (
     clk: in std_logic;
+    alrst: in std_logic; 
 -- product vector from column vectors
     unbiased: in std_logic_vector (31 downto 0);
     vin:  in std_logic;
@@ -115,7 +116,7 @@ validout_align: process (clk, alrst) is
         end if;
     end process;
 
-biased <= fun_safe_sum (unbiased_delayed, fp_rdata);
+biased <= func_safe_sum (unbiased_delayed, fp_rdata);
 
 memaddr_proc: process (clk, alrst) is
     begin
