@@ -111,11 +111,12 @@ begin
         if (rising_edge (clk)) then
             if (alrst = '0') then
                 prod_full <= (others => '0'); 
-                validout <= (others => '0');
+                validout <= '0';
                 dataout <= (others => '0');
             else
                 validout <= prod_valid;
-                prod_full <= full_prod_t (A * B); 
+                prod_full <= full_prod_t (to_sfixed(A, PARAM_DEC - 1, -PARAM_FRC) * 
+                                          to_sfixed(B, PARAM_DEC - 1, -PARAM_FRC)); 
                 dataout <= fun_mul_truncate (prod_full);
             end if;
         end if;
@@ -138,7 +139,7 @@ begin
 
 -- state transition process;
     stat_proc: 
-    process (clk, alsrt) is
+    process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
@@ -155,63 +156,58 @@ begin
     B <= s_latched when this_state = wait_p else s_din;
 
     output_proc:
-    process (clk, alrst, this_state, p_vin, s_vin, wptr) is
+    process (this_state, p_vin, s_vin, wptr) is
     begin
-        if (rising_edge (clk) and alrst = '0') then
-            p_ren <= '1';
-            s_ren <= '1';
-        else
-            case this_state is
-                when init =>
-                    if (p_vin = '1' and s_vin = '1') then
-                        s_ren <= '0';
-                        p_ren <= '1';
-                        next_state <= stream;
-                    elsif (p_vin = '1') then
-                        p_ren <= '0';
-                        s_ren <= '1';
-                        next_state <= wait_s;
-                    elsif (s_vin = '1') then
-                        p_ren <= '1';
-                        s_ren <= '0';
-                        next_state <= wait_p;
-                    else
-                        p_ren <= '1';
-                        s_ren <= '1';
-                        next_state <= init;
-                    end if;
-                when wait_p =>
-                    if (p_vin = '1') then
-                        p_ren <= '1';
-                        s_ren <= '0';
-                        next_state <= stream;
-                    else
-                        p_ren <= '1';
-                        s_ren <= '0';
-                        next_state <= wait_p; 
-                    end if;
-                when wait_s =>
-                    if (s_vin = '1') then
-                        s_ren <= '1';
-                        p_ren <= '0';
-                        next_state <= stream;
-                    else
-                        s_ren <= '1';
-                        p_ren <= '0';
-                        next_state <= wait_s; 
-                    end if;
-                when stream =>
-                    if (wptr = 0) then
-                        s_ren <= '1';
-                        p_ren <= '1';
-                        next_state <= init;
-                    else
-                        s_ren <= '1';
-                        p_ren <= '0';
-                        next_state <= stream;
-                    end if;
-            end case;
-        end if;
+        case this_state is
+            when init =>
+                if (p_vin = '1' and s_vin = '1') then
+                    s_ren <= '0';
+                    p_ren <= '1';
+                    next_state <= stream;
+                elsif (p_vin = '1') then
+                    p_ren <= '0';
+                    s_ren <= '1';
+                    next_state <= wait_s;
+                elsif (s_vin = '1') then
+                    p_ren <= '1';
+                    s_ren <= '0';
+                    next_state <= wait_p;
+                else
+                    p_ren <= '1';
+                    s_ren <= '1';
+                    next_state <= init;
+                end if;
+            when wait_p =>
+                if (p_vin = '1') then
+                    p_ren <= '1';
+                    s_ren <= '0';
+                    next_state <= stream;
+                else
+                    p_ren <= '1';
+                    s_ren <= '0';
+                    next_state <= wait_p; 
+                end if;
+            when wait_s =>
+                if (s_vin = '1') then
+                    s_ren <= '1';
+                    p_ren <= '0';
+                    next_state <= stream;
+                else
+                    s_ren <= '1';
+                    p_ren <= '0';
+                    next_state <= wait_s; 
+                end if;
+            when stream =>
+                if (wptr = 0) then
+                    s_ren <= '1';
+                    p_ren <= '1';
+                    next_state <= init;
+                else
+                    s_ren <= '1';
+                    p_ren <= '0';
+                    next_state <= stream;
+                end if;
+        end case;
     end process;
 
 
