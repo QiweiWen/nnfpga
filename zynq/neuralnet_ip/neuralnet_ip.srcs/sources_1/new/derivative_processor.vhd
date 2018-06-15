@@ -55,12 +55,26 @@ architecture Behavioral of derivative_processor is
     -- both parallel and serial sides must survive starvation initially
     -- (when they come from dL fifos)
     -- but not gaps once the flow of parameters starts
+    --
+    -- when starvation happens, we stop reading from the input FIFO 
+    -- that was not starving us, latch the already-read result for future use,
+    -- and wait for the starving channel to be ready
     type state_t is (init, wait_p, wait_s, stream);
     signal this_state: state_t;
     signal next_state: state_t;
     -- multiplication results
     subtype full_prod_t is std_logic_vector (31 downto 0);
     signal prod_full: std_logic_vector (31 downto 0); 
+    -- whether the product will be valid
+    signal prod_valid: std_logic;
+    -- latched multiplicand/multiplier when one of the two interfaces
+    -- was starved
+    signal p_latched: std_logic_vector (15 downto 0);
+    signal s_latched: std_logic_vector (15 downto 0);
+    -- signals to be multiplied
+    signal A: std_logic_vector (15 downto 0);
+    signal B: std_logic_vector (15 downto 0);
+
 begin
 -- serial data forwarding
     fwd_proc:
@@ -91,8 +105,6 @@ begin
     end process;
 
 -- product stream generation
--- TODO: add validout pipeline registers
---       etc etc multiply, truncate, etc
     mult_proc:
     process (clk, alrst) is
     begin
@@ -102,7 +114,24 @@ begin
                 validout <= (others => '0');
                 dataout <= (others => '0');
             else
+                validout <= prod_valid;
+                prod_full <= full_prod_t (A * B); 
+                dataout <= fun_mul_truncate (prod_full);
+            end if;
+        end if;
+    end process;
 
+-- multiplicant latching process
+    mult_latch_proc:
+    process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                p_latched <= (others => '0');
+                s_latched <= (others => '0');
+            else
+                p_latched <= p_din;
+                s_latched <= s_din;
             end if;
         end if;
     end process;
@@ -119,8 +148,12 @@ begin
             end if;
         end if;
     end process;
-
+    
 -- output logic;
+    prod_valid <= '1' when next_state = stream else '0';
+    A <= p_latched when this_state = wait_s else p_din; 
+    B <= s_latched when this_state = wait_p else s_din;
+
     output_proc:
     process (clk, alrst, this_state, p_vin, s_vin, wptr) is
     begin

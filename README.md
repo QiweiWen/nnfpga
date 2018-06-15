@@ -43,3 +43,14 @@ ram\_wrapper.vhd previously tried to map 4 memory operations to 2 ports: forward
 The solution is to economise read operations of the derivative unit and the backprop systolic array processor into one operation: the row/col processor reads the memory, puts it into a small temporary storage FIFO, and the derivative unit reads previously stored weights in its own time. This applies only to weight matrix rows/columns; the bias is alright: there only ever need be two reads and a write in a cycle, so a naive implementation is fine.
 
 r.e. dynamic allocation and page table: no, no, no, no a million no's. The number of block ram ports is going to be massive because each individual row processor has its own output FIFO. The performance will be eye-watering. Just use a flip-flop based register to pass data from a slow stage to a fast stage to halve the FIFO block ram usage and leave it at that.
+
+**15/06/2018**
+
+Finished writing the derivative unit, have not yet tested. I've tended to avoid explicit finite state machines but in this case I found it inevitable.
+
+The tricky thing about derivative units is that they are connected in parallel with backprop systolic array processors and must share the delta-L input
+from the last backprop stage. Depending on the row- or column-major orders of the forward matrix, delta-L either appears on the serial side or the parallel side
+of the derivative unit. Delta-L must be shared between the two processing elements, meaning that a generic derivative unit implementation must be able to
+survive starvation (initially) on both the serial and parallel channels.
+
+This is all very tricky and must be thoroughly verified in testbenches with the derivative units appearing either by themselves or connected in series. 
