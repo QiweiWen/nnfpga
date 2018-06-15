@@ -3,54 +3,128 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="cfg_tb_bias_vector_behav.wdb" id="1">
+      <db_ref path="cfg_tb_derivative_processor_behav.wdb" id="1">
          <top_modules>
             <top_module name="helperpkg" />
             <top_module name="nn_arith_package" />
-            <top_module name="tb_bias_vector" />
+            <top_module name="tb_derivative_processor" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="2226000001fs"></ZoomEndTime>
-      <Cursor1Time time="500000fs"></Cursor1Time>
+      <ZoomStartTime time="151613000fs"></ZoomStartTime>
+      <ZoomEndTime time="1297613001fs"></ZoomEndTime>
+      <Cursor1Time time="130000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="9" />
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/clk">
+   <WVObjectSize size="26" />
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/alrst">
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/alrst">
       <obj_property name="ElementShortName">alrst</obj_property>
       <obj_property name="ObjectShortName">alrst</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_vector/unbiased">
-      <obj_property name="ElementShortName">unbiased[31:0]</obj_property>
-      <obj_property name="ObjectShortName">unbiased[31:0]</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_derivative_processor/p_din">
+      <obj_property name="ElementShortName">p_din[15:0]</obj_property>
+      <obj_property name="ObjectShortName">p_din[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/vin">
-      <obj_property name="ElementShortName">vin</obj_property>
-      <obj_property name="ObjectShortName">vin</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/p_vin">
+      <obj_property name="ElementShortName">p_vin</obj_property>
+      <obj_property name="ObjectShortName">p_vin</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_vector/biased">
-      <obj_property name="ElementShortName">biased[15:0]</obj_property>
-      <obj_property name="ObjectShortName">biased[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/p_ren">
+      <obj_property name="ElementShortName">p_ren</obj_property>
+      <obj_property name="ObjectShortName">p_ren</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/vout">
-      <obj_property name="ElementShortName">vout</obj_property>
-      <obj_property name="ObjectShortName">vout</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_derivative_processor/s_din">
+      <obj_property name="ElementShortName">s_din[15:0]</obj_property>
+      <obj_property name="ObjectShortName">s_din[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_bias_vector/updated">
-      <obj_property name="ElementShortName">updated[15:0]</obj_property>
-      <obj_property name="ObjectShortName">updated[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/s_vin">
+      <obj_property name="ElementShortName">s_vin</obj_property>
+      <obj_property name="ObjectShortName">s_vin</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_bias_vector/uvin">
-      <obj_property name="ElementShortName">uvin</obj_property>
-      <obj_property name="ObjectShortName">uvin</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/s_ren">
+      <obj_property name="ElementShortName">s_ren</obj_property>
+      <obj_property name="ObjectShortName">s_ren</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_bias_vector/latched_biased">
-      <obj_property name="ElementShortName">latched_biased</obj_property>
-      <obj_property name="ObjectShortName">latched_biased</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_derivative_processor/s_dfwd">
+      <obj_property name="ElementShortName">s_dfwd[15:0]</obj_property>
+      <obj_property name="ObjectShortName">s_dfwd[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/s_vfwd">
+      <obj_property name="ElementShortName">s_vfwd</obj_property>
+      <obj_property name="ObjectShortName">s_vfwd</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_derivative_processor/dataout">
+      <obj_property name="ElementShortName">dataout[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dataout[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/validout">
+      <obj_property name="ElementShortName">validout</obj_property>
+      <obj_property name="ObjectShortName">validout</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/TbClock">
+      <obj_property name="ElementShortName">TbClock</obj_property>
+      <obj_property name="ObjectShortName">TbClock</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/TbSimEnded">
+      <obj_property name="ElementShortName">TbSimEnded</obj_property>
+      <obj_property name="ObjectShortName">TbSimEnded</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/starve_p">
+      <obj_property name="ElementShortName">starve_p</obj_property>
+      <obj_property name="ObjectShortName">starve_p</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/tb_derivative_processor/starve_s">
+      <obj_property name="ElementShortName">starve_s</obj_property>
+      <obj_property name="ObjectShortName">starve_s</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_derivative_processor/next_p">
+      <obj_property name="ElementShortName">next_p</obj_property>
+      <obj_property name="ObjectShortName">next_p</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_derivative_processor/next_s">
+      <obj_property name="ElementShortName">next_s</obj_property>
+      <obj_property name="ObjectShortName">next_s</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_derivative_processor/width">
+      <obj_property name="ElementShortName">width</obj_property>
+      <obj_property name="ObjectShortName">width</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_derivative_processor/TbPeriod">
+      <obj_property name="ElementShortName">TbPeriod</obj_property>
+      <obj_property name="ObjectShortName">TbPeriod</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_derivative_processor/latched_product">
+      <obj_property name="ElementShortName">latched_product</obj_property>
+      <obj_property name="ObjectShortName">latched_product</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_derivative_processor/dut/prod_full">
+      <obj_property name="ElementShortName">prod_full[31:0]</obj_property>
+      <obj_property name="ObjectShortName">prod_full[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_derivative_processor/dut/A">
+      <obj_property name="ElementShortName">A[15:0]</obj_property>
+      <obj_property name="ObjectShortName">A[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/tb_derivative_processor/dut/B">
+      <obj_property name="ElementShortName">B[15:0]</obj_property>
+      <obj_property name="ObjectShortName">B[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_derivative_processor/dut/this_state">
+      <obj_property name="ElementShortName">this_state</obj_property>
+      <obj_property name="ObjectShortName">this_state</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/tb_derivative_processor/dut/next_state">
+      <obj_property name="ElementShortName">next_state</obj_property>
+      <obj_property name="ObjectShortName">next_state</obj_property>
    </wvobject>
 </wave_config>

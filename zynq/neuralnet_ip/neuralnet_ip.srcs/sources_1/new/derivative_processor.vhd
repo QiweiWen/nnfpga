@@ -5,7 +5,6 @@ use work.nn_arith_package.all;
 library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;
 
-
 --
 -- A derivative processor computes one of the rows or columns of the
 -- weight derivative matrix. A backprop stage has as many derivative units
@@ -67,6 +66,7 @@ architecture Behavioral of derivative_processor is
     signal prod_full: std_logic_vector (31 downto 0); 
     -- whether the product will be valid
     signal prod_valid: std_logic;
+    signal validout_pipe: std_logic;
     -- latched multiplicand/multiplier when one of the two interfaces
     -- was starved
     signal p_latched: std_logic_vector (15 downto 0);
@@ -114,7 +114,8 @@ begin
                 validout <= '0';
                 dataout <= (others => '0');
             else
-                validout <= prod_valid;
+                validout <= validout_pipe;
+                validout_pipe <= prod_valid;
                 prod_full <= full_prod_t (to_sfixed(A, PARAM_DEC - 1, -PARAM_FRC) * 
                                           to_sfixed(B, PARAM_DEC - 1, -PARAM_FRC)); 
                 dataout <= fun_mul_truncate (prod_full);
