@@ -131,8 +131,12 @@ begin
                 p_latched <= (others => '0');
                 s_latched <= (others => '0');
             else
-                p_latched <= p_din;
-                s_latched <= s_din;
+                if (p_vin = '1') then
+                    p_latched <= p_din;
+                end if;
+                if (s_vin = '1') then
+                    s_latched <= s_din;
+                end if;
             end if;
         end if;
     end process;
@@ -152,7 +156,7 @@ begin
     
 -- output logic;
     prod_valid <= '1' when next_state = stream else '0';
-    A <= p_latched when this_state = wait_s else p_din; 
+    A <= p_din when p_vin = '1' else p_latched; 
     B <= s_latched when this_state = wait_p else s_din;
 
     output_proc:
@@ -161,8 +165,8 @@ begin
         case this_state is
             when init =>
                 if (p_vin = '1' and s_vin = '1') then
-                    s_ren <= '0';
-                    p_ren <= '1';
+                    s_ren <= '1';
+                    p_ren <= '0';
                     next_state <= stream;
                 elsif (p_vin = '1') then
                     p_ren <= '0';
@@ -179,8 +183,8 @@ begin
                 end if;
             when wait_p =>
                 if (p_vin = '1') then
-                    p_ren <= '1';
-                    s_ren <= '0';
+                    p_ren <= '0';
+                    s_ren <= '1';
                     next_state <= stream;
                 else
                     p_ren <= '1';
