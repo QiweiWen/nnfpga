@@ -54,3 +54,7 @@ of the derivative unit. Delta-L must be shared between the two processing elemen
 survive starvation (initially) on both the serial and parallel channels.
 
 This is all very tricky and must be thoroughly verified in testbenches with the derivative units appearing either by themselves or connected in series. 
+
+**18/06/2018**
+
+I'm being silly, completely forgot that FIFO latency is 2 cycles. Need to rewrite derivative unit.

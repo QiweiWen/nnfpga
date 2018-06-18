@@ -134,6 +134,11 @@ begin
             wait for 100 ns;
         end loop;
 
+        -- starved on serial input side
+        alrst <= '0';
+        wait for 100 ns;
+        alrst <= '1';
+
         wait;
     end process;
 
