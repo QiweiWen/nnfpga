@@ -19,6 +19,7 @@ architecture tb of tb_derivative_processor is
               p_din    : in std_logic_vector (15 downto 0);
               p_vin    : in std_logic;
               p_ren    : out std_logic;
+              p_ack    : in std_logic;
               s_din    : in std_logic_vector (15 downto 0);
               s_vin    : in std_logic;
               s_ren    : out std_logic;
@@ -33,6 +34,7 @@ architecture tb of tb_derivative_processor is
     signal p_din    : std_logic_vector (15 downto 0);
     signal p_vin    : std_logic;
     signal p_ren    : std_logic;
+    signal p_ack    : std_logic;
     signal s_din    : std_logic_vector (15 downto 0);
     signal s_vin    : std_logic;
     signal s_ren    : std_logic;
@@ -96,6 +98,8 @@ begin
             end if;
         end if;
     end process;
+    -- there's always stuff
+    p_ack <= p_ren;
 
     dut : derivative_processor
     generic map (width => width)
@@ -104,6 +108,7 @@ begin
               p_din    => p_din,
               p_vin    => p_vin,
               p_ren    => p_ren,
+              p_ack    => p_ack,
               s_din    => s_din,
               s_vin    => s_vin,
               s_ren    => s_ren,
@@ -133,11 +138,6 @@ begin
             next_s <= real(i);
             wait for 100 ns;
         end loop;
-
-        -- starved on serial input side
-        alrst <= '0';
-        wait for 100 ns;
-        alrst <= '1';
 
         wait;
     end process;
