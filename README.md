@@ -18,43 +18,29 @@ processor in a serial manner. Allowing for the difference in data rate because o
 one type of systolic array processor can be said to be identical to the input pattern of the other, allowing them to be combined to form a multi-layer
 network.
 
+Backpropagation is handled in a pretty similar way. A backprop systolic array processor shares the weight memory of a forward processor. The two
+are of different types as a row in a matrix becomes a column in its transpose matrix.
+
+<pre>
+<code>
+                Row PE                             Col PE
+                ()   ----  {weight block ram} ---- []
+                ^                                  ^
+                last stage activated output        last stage delta
+                        
+                        <b>Figure 1</b>
+
+
+                1 2 3   <---- forward matrix rows      1 4 7 1
+                4 5 6                                  2 5 8 2
+                7 8 9                                  3 6 9 3
+                1 2 3                                  ^
+                                                       transpose matrix columns
+                        <b>Figure 2</b>
+</code>
+</pre>
+
 I observe that rows in the forward-propagation matrix are columns in the backwards-propagation matrix, allowing the dual port weight memory to be shared,
 reducing the demand for block ram. Processing elements are written in such a way that they can be implemented either using DSP slices or in fabric. On-line
 training is preferred over batch training and the pipeline does not stall even as the weight and bias memory and registers are being partially overwritten,
 trading accuracy for performance.
-
-## Project Blog
-----------------
-**18/05/2018**
-
-Each matrix (forward and backward) will incur roughly nrows + ncols latency. A respectably large network will easily have latency of thousands of cycles. If only a few hundred training examples run in parallel, that means the hardware utilisation will be rather low. The number of parallel training examples, however, affects the FIFO size, which quickly scales past the 4.9 megs available to Zedboard.
-
-Thinking of dynamic allocation (never deallocation; data rate never changes, between a fast stage and a slow stage the demand for temporary FIFO storage only ever increases) of fixed-size block ram chunks through a simple page table. Probably will bring FIFO latency to three or more cycles because either associative lookup or a block ram based page table will be its own pipeline stage.
-
-**21/05/2018**
-
-Now that I've given up batch update, the block ram wrapper needs changing because with a single dual-port ram there's no way to support two parallel read and a write in the same cycle.
-Solution: share write data and address buses between two block rams to double the number of read ports.
-
-**24/05/2018**
-
-ram\_wrapper.vhd previously tried to map 4 memory operations to 2 ports: forward propagation read, backward propagation read, memory update read and memory update write. This was alright thanks to batch update, but now all 4 will have to happen in one cycle. I previously thought slightly tweaking ram\_wrapper would do, but realised that even with two block rams it still doesn't work, because there are only two read ports and a write ports.
-
-The solution is to economise read operations of the derivative unit and the backprop systolic array processor into one operation: the row/col processor reads the memory, puts it into a small temporary storage FIFO, and the derivative unit reads previously stored weights in its own time. This applies only to weight matrix rows/columns; the bias is alright: there only ever need be two reads and a write in a cycle, so a naive implementation is fine.
-
-r.e. dynamic allocation and page table: no, no, no, no a million no's. The number of block ram ports is going to be massive because each individual row processor has its own output FIFO. The performance will be eye-watering. Just use a flip-flop based register to pass data from a slow stage to a fast stage to halve the FIFO block ram usage and leave it at that.
-
-**15/06/2018**
-
-Finished writing the derivative unit, have not yet tested. I've tended to avoid explicit finite state machines but in this case I found it inevitable.
-
-The tricky thing about derivative units is that they are connected in parallel with backprop systolic array processors and must share the delta-L input
-from the last backprop stage. Depending on the row- or column-major orders of the forward matrix, delta-L either appears on the serial side or the parallel side
-of the derivative unit. Delta-L must be shared between the two processing elements, meaning that a generic derivative unit implementation must be able to
-survive starvation (initially) on both the serial and parallel channels.
-
-This is all very tricky and must be thoroughly verified in testbenches with the derivative units appearing either by themselves or connected in series. 
-
-**18/06/2018**
-
-I'm being silly, completely forgot that FIFO latency is 2 cycles. Need to rewrite derivative unit.
