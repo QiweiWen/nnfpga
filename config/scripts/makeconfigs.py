@@ -13,3 +13,5 @@ bash_config = os.path.join (os.getcwd(), os.pardir, "include", "config.sh")
 with open (bash_config, "w") as f:
     for k, v in cfg.configs:
         f.write ("%s=%s\n" % (k,v))
+
+# make VHDL module file
