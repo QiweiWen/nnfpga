@@ -1,6 +1,6 @@
 configs = [
-    ("DECIMALS"      , "7"),
-    ("FRACTIONS"     , "8"),
-    ("LEARN_RATE"   , "0.1"),
-    ("DFIFO"        , "256")
+    ("DECIMALS"      , "7", "PARAM_DEC", "integer"),
+    ("FRACTIONS"     , "8", "PARAM_FRC", "integer"),
+    ("LEARN_RATE"   , "0.1", None      , "real"),
+    ("DFIFO"        , "256", None      , "integer")
 ]

@@ -28,8 +28,10 @@ function func_safe_mult (
     B: std_logic_vector (15 downto 0)
 )return std_logic_vector;
 
-end package;
+type wordarr_t is array (integer range <>) of std_logic_vector (15 downto 0);
+function log2( i : natural) return integer;
 
+end package;
 
 package body nn_arith_package is 
 
@@ -136,6 +138,24 @@ begin
     C_stdvec_full := mult_result_type (C_sfixed_full);
     ret := fun_mul_truncate (C_stdvec_full);
     return ret;
+end function;
+
+function log2( i : natural) return integer is
+variable temp    : integer := i;
+variable ret_val : integer := 0; 
+variable roundup: std_logic := '0';
+begin                         
+    while temp > 1 loop
+        if (temp mod 2 /= 0) then
+            roundup := '1';
+        end if;
+        ret_val := ret_val + 1;
+        temp    := temp / 2;     
+    end loop;
+    if (roundup = '1') then
+        ret_val := ret_val + 1;
+    end if;
+    return ret_val;
 end function;
 
 
