@@ -1,0 +1,8 @@
+20/06/2018
+-------------
+Design adjustments needed:
+
+1. make three_port_ram collision tolerant by changing read to write when there's r/w collision
+2. add additional row and col processor output for when the multiplier and multiplicant is valid
+   to make up for FIFO latency
+3. add ve_ack to row processor to make up for memory latency

@@ -47,6 +47,8 @@ architecture Behavioral of three_port_ram is
     end component true_dpram_sclk;
     
     signal re_a_pipe, re_b_pipe: std_logic;
+    signal r1_colliding: std_logic;
+    signal r2_colliding: std_logic;
 begin
 -- delay re to drive vout
     vout_proc: process (clk, alrst) is
@@ -71,11 +73,11 @@ begin
 ram_1: true_dpram_sclk
     generic map (width => width, depth => depth)
     port map (
-        data_a => (others => '0'),
+        data_a => din_c,
         data_b => din_c,
         addr_a => addr_a,
         addr_b => addr_c,
-        we_a   => '0',
+        we_a   => r1_colliding,
         we_b   => vin_c,
         clk    => clk,
         q_a    => dout_a,
@@ -85,15 +87,20 @@ ram_1: true_dpram_sclk
 ram_2: true_dpram_sclk
     generic map (width => width, depth => depth)
     port map (
-        data_a => (others => '0'),
+        data_a => din_c,
         data_b => din_c,
         addr_a => addr_b,
         addr_b => addr_c,
-        we_a   => '0',
+        we_a   => r2_colliding,
         we_b   => vin_c,
         clk    => clk,
         q_a    => dout_b,
         q_b    => open
     );
+
+-- collision avoidance logic
+r1_colliding <= '1' when addr_a = addr_c and vin_c = '1' else '0'; 
+r2_colliding <= '1' when addr_b = addr_c and vin_c = '1' else '0';
+
 
 end Behavioral;

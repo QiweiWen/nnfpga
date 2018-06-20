@@ -25,11 +25,12 @@ port(
 -- vector input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
+    ve_ack     : in std_logic;
     ve_req     : out std_logic;
 -- product terms output channel
     dataout: out std_logic_vector (31 downto 0);
     validout: out std_logic;
--- signals forwarded to the adjacent row processor down the line
+-- vector input forwarded to the adjacent row processor down the line
     validfwd: out std_logic;
     datafwd: out std_logic_vector (15 downto 0)
 );
@@ -77,7 +78,7 @@ signal accumulator_pipe: std_logic_vector (33 downto 0);
 begin
 -- will read parameters from cache 
 -- as long as we are asked to compute stuff?
-l1_rden <= ve_validin;
+l1_rden <= ve_ack;
 
 -- row processor is always ready to consume more vector elements
 ve_req <= '1';
@@ -89,7 +90,7 @@ begin
     if (rising_edge(clk)) then
         if (alrst = '0') then
             sig_l1_raddr <= 0;
-        elsif (ve_validin = '1') then
+        elsif (ve_ack = '1') then
             sig_l1_raddr <= (sig_l1_raddr + 1) mod ncols;
         end if;
     end if;
@@ -110,19 +111,6 @@ begin
     end if;
 end process;
 
--- delay vector input to make up for l1 cache latency
-vector_input_delay: delay_buffer
-generic map(
-    width => 16,
-    ncycles => 2 
-)
-port map (
-    clk => clk,
-    rst => alrst,
-    din => ve_datain, 
-    dout => ve_datain_delayed
-);
-
 colptr_proc:
 process (clk, alrst) is
 begin
@@ -138,7 +126,7 @@ begin
 end process;
 
 lastone <= '1' when (col_ptr = ncols - 1) else '0';
-product <= product_type (to_sfixed(ve_datain_delayed, PARAM_DEC - 1, -PARAM_FRC) * 
+product <= product_type (to_sfixed(ve_datain, PARAM_DEC - 1, -PARAM_FRC) * 
                          to_sfixed(l1_din,            PARAM_DEC - 1, -PARAM_FRC));
 
 -- accumulator input pipeline

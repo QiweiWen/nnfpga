@@ -30,12 +30,33 @@ architecture tb of tb_row_processor is
               l1_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
               ve_validin : in std_logic;
+              ve_ack     : in std_logic;
               ve_req      : out std_logic;
               dataout    : out std_logic_vector (31 downto 0);
               validout   : out std_logic;
               validfwd   : out std_logic;
               datafwd    : out std_logic_vector (15 downto 0));
     end component;
+    
+    constant data_width : integer := 16;
+    component std_fifo is
+        generic (
+            constant data_width  : positive := 8;
+            constant fifo_depth	: positive := 256
+        );
+        port ( 
+            clk		: in  std_logic;
+            rst		: in  std_logic;
+            writeen	: in  std_logic;
+            datain	: in  std_logic_vector (data_width - 1 downto 0);
+            readen	: in  std_logic;
+            dataout	: out std_logic_vector (data_width - 1 downto 0);
+            ackout  : out std_logic;
+            validout: out std_logic;
+            empty	: out std_logic;
+            full	: out std_logic
+        );
+    end component std_fifo;
 
     component three_port_ram is
         generic (
@@ -73,6 +94,8 @@ architecture tb of tb_row_processor is
     signal l1_vin     : std_logic;
     signal ve_datain  : std_logic_vector (15 downto 0);
     signal ve_validin : std_logic;
+    signal ve_req     : std_logic;
+    signal ve_ack     : std_logic;
     signal dataout    : std_logic_vector (31 downto 0);
     signal validout   : std_logic;
     signal validfwd   : std_logic;
@@ -90,6 +113,17 @@ architecture tb of tb_row_processor is
     signal addr_c: integer range 0 to ncols - 1;
     signal vin_c: std_logic;
     signal din_c: std_logic_vector (16 - 1 downto 0);
+
+    --fifo signals
+    signal writeen	:   std_logic;
+    signal datain	:   std_logic_vector (data_width - 1 downto 0);
+    signal readen	:   std_logic;
+    signal fifo_dataout	:  std_logic_vector (data_width - 1 downto 0);
+    signal ackout  :  std_logic;
+    signal fifo_validout:  std_logic;
+    signal empty	:  std_logic;
+    signal full	:  std_logic;
+
     
 
     signal debug_product_latch: real; 
@@ -123,6 +157,25 @@ begin
     l1_din  <= dout_a;
     l1_vin  <= vout_a;
 
+    ve_ack <= ackout;
+    readen <= ve_req;
+    ve_datain <= fifo_dataout;
+    ve_validin <= fifo_validout;
+
+    dut_fifo: std_fifo
+    generic map (data_width => 16)
+    port map (
+        clk		 => clk		,
+        rst		 => alrst		,
+        writeen	 => writeen	,
+        datain	 => datain	,
+        readen	 => readen	,
+        dataout	 => fifo_dataout	,
+        ackout   => ackout  ,
+        validout => fifo_validout,
+        empty	 => empty	,
+        full	 => full);
+
     dut_pe : row_processor
     generic map (ncols   => ncols)
     port map (clk        => clk,
@@ -133,7 +186,8 @@ begin
               l1_vin     => l1_vin,
               ve_datain  => ve_datain,
               ve_validin => ve_validin,
-              ve_req      => open,
+              ve_ack     => ve_ack,
+              ve_req     => ve_req,
               dataout    => dataout,
               validout   => validout,
               validfwd   => validfwd,
@@ -174,9 +228,6 @@ begin
         din_c <= (others => '0');
         addr_c <= 0;
 
-        ve_validin <= '0';
-        ve_datain <= (others => '0');
-
         -- Reset generation
         alrst <= '0';
         wait for 100 ns;
@@ -193,22 +244,22 @@ begin
         vin_c <= '0';
         
         -- multiplication test
-        ve_validin <= '1';
+        writeen <= '1';
         for i in 0 to 7 loop
-            ve_datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
+            datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
             wait for 100 ns;
         end loop;
 
-        ve_validin <= '0';
+        writeen <= '0';
         wait for 500 ns;
             
-        ve_validin <= '1';
+        writeen <= '1';
         for i in 0 to 1 loop
-            ve_datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
+            datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
             wait for 100 ns;
         end loop;
 
-        ve_validin <= '0';
+        writeen <= '0';
 
         wait;
     end process;
