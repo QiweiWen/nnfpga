@@ -44,12 +44,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../c/sigmoidgen/vhdl/sigmoid.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/sources_1/new/delay_buffer.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -74,12 +68,6 @@
         <FileInfo>
           <Attr Name="ImportPath" Val="$PPRDIR/../oldhdl/sigmoidgradfull.vhd"/>
           <Attr Name="ImportTime" Val="1516497999"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../c/sigmoidgen/vhdl/sigmoidgrad.vhd">
-        <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -130,12 +118,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/new/silly_test.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/sources_1/new/bias_vector.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -162,6 +144,22 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/tcol_processor.vhd">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/imports/vhdl/sigmoidgrad.vhd">
+        <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../metaprogramming/sigmoidgen/vhdl/sigmoidgrad.vhd"/>
+          <Attr Name="ImportTime" Val="1529495774"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/imports/vhdl/sigmoid.vhd">
+        <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../metaprogramming/sigmoidgen/vhdl/sigmoid.vhd"/>
+          <Attr Name="ImportTime" Val="1529495774"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>

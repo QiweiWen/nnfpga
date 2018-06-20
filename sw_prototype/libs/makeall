@@ -1,0 +1,9 @@
+#!/bin/bash
+
+tgt=$1
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
+for stuff in `ls "$SCRIPTPATH"`; do
+    dir="$SCRIPTPATH/$stuff"
+    [ -d $dir ] && make -C $dir $tgt
+done

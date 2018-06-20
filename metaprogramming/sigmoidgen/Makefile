@@ -10,6 +10,7 @@ HDLS=vhdl/sigmoid.vhd vhdl/sigmoidgrad.vhd
 all: ${HDLS}
 
 ${HDLS}: sigmoidgen
+	@chmod a+x tools/espresso
 	cd scripts && ./vhdlgen.sh
 
 sigmoidgen: ${OBJECTS}

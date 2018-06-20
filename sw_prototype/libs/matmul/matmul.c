@@ -1,4 +1,3 @@
-#include <config/config.h>
 #include <stdio.h>
 #include <string.h>
 #include "matmul.h"
