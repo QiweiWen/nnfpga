@@ -15,15 +15,11 @@ function fun_add_truncate (
 ) return std_logic_vector;
 
 function fun_mul_truncate (
-    datain: std_logic_vector
+    datain: std_logic_vector;
+    zeropt: integer
 ) return std_logic_vector;
 
 function func_safe_sum (
-    A: std_logic_vector (15 downto 0);
-    B: std_logic_vector (15 downto 0)
-)return std_logic_vector;
-
-function func_safe_mult (
     A: std_logic_vector (15 downto 0);
     B: std_logic_vector (15 downto 0)
 )return std_logic_vector;
@@ -68,7 +64,8 @@ begin
 end function;
 
 function fun_mul_truncate (
-    datain: std_logic_vector
+    datain: std_logic_vector;
+    zeropt: integer
 ) return std_logic_vector is
     variable carry: std_logic;
     variable var_ret: std_logic_vector (16 - 1 downto 0);
@@ -77,10 +74,10 @@ function fun_mul_truncate (
     variable maxed: std_logic_vector (16 - 1 downto 0);
 begin
     sign_bit := datain (datain'length - 1);
-    top_bit  := datain (2*PARAM_FRC + PARAM_DEC - 1);
+    top_bit  := datain (zeropt + PARAM_DEC);
     --is the multiplication result too large?
     carry := '0';
-    for I in 2*PARAM_FRC + PARAM_DEC to datain'length - 1 loop
+    for I in zeropt + 1 + PARAM_DEC to datain'length - 1 loop
         if (datain(I) /= top_bit) then
             carry := '1';
         end if;
@@ -94,7 +91,7 @@ begin
     end if;
 
     if (carry = '0') then
-        var_ret := datain (2*PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);
+        var_ret := datain (zeropt + PARAM_DEC downto zeropt - PARAM_FRC + 1);
     else
         var_ret := maxed;
     end if;
@@ -118,25 +115,6 @@ begin
     C_sfixed_full := A_sfixed + B_sfixed; 
     C_stdvec_full := sum_result_type (C_sfixed_full);
     ret := fun_add_truncate (C_stdvec_full);
-    return ret;
-end function;
-
-function func_safe_mult (
-    A: std_logic_vector (15 downto 0);
-    B: std_logic_vector (15 downto 0)
-)return std_logic_vector is
-    variable A_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
-    variable B_sfixed: sfixed (PARAM_DEC - 1 downto -PARAM_FRC);
-    variable C_sfixed_full: sfixed (2* PARAM_DEC - 1 downto -2* PARAM_FRC); 
-    variable C_stdvec_full: std_logic_vector (31 downto 0);
-    subtype  mult_result_type is std_logic_vector (31 downto 0); 
-    variable ret: std_logic_vector (15 downto 0);
-begin
-    A_sfixed := to_sfixed (A, PARAM_DEC - 1, -PARAM_FRC);
-    B_sfixed := to_sfixed (B, PARAM_DEC - 1, -PARAM_FRC);
-    C_sfixed_full := A_sfixed * B_sfixed; 
-    C_stdvec_full := mult_result_type (C_sfixed_full);
-    ret := fun_mul_truncate (C_stdvec_full);
     return ret;
 end function;
 

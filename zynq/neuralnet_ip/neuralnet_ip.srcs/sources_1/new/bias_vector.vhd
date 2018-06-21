@@ -66,9 +66,8 @@ component three_port_ram is
 end component three_port_ram;
 
 signal unbiased_truncated: std_logic_vector (15 downto 0);
+signal unbiased_pipe: std_logic_vector (15 downto 0);
 signal unbiased_delayed: std_logic_vector (15 downto 0);
-
-signal vin_pipe: std_logic;
 
 signal fp_rdata : std_logic_vector (15 downto 0);
 
@@ -88,17 +87,20 @@ signal bp_raddr_pipe: integer range 0 to nrows - 1;
 signal upd_data_pipe_in : std_logic_vector (16 downto 0);
 signal upd_data_pipe_out : std_logic_vector (16 downto 0);
 
+signal vout_pipe: std_logic;
+
 begin
+
 
 unbiased_align: process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                unbiased_truncated <= (others => '0');
                 unbiased_delayed <= (others => '0');
+                unbiased_truncated <= (others => '0');
             else
-                unbiased_truncated <= fun_mul_truncate (unbiased); 
                 unbiased_delayed <= unbiased_truncated;
+                unbiased_truncated <= fun_mul_truncate (unbiased, 15);
             end if;
         end if;
     end process;
@@ -107,11 +109,11 @@ validout_align: process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                vin_pipe <= '0';
                 vout <= '0';
+                vout_pipe <= '0';
             else
-                vin_pipe <= vin;
-                vout <= vin_pipe;
+                vout <= vout_pipe;
+                vout_pipe <= vin;
             end if;
         end if;
     end process;

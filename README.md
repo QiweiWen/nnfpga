@@ -44,3 +44,11 @@ I observe that rows in the forward-propagation matrix are columns in the backwar
 reducing the demand for block ram. Processing elements are written in such a way that they can be implemented either using DSP slices or in fabric. On-line
 training is preferred over batch training and the pipeline does not stall even as the weight and bias memory and registers are being partially overwritten,
 trading accuracy for performance.
+
+## Directory Sturcture
+
+blog: notes, observations, diary
+config: configuration generation script for bash and VHDL
+metaprogramming: scripts and utilities for metaprogramming VHDL modules
+sw\_prototype: software implementation written in Python, will use for testing FPGA implementation
+zynq: Vivado projects. SoC block design will later go in there once neuralnet\_ip development finishes 
