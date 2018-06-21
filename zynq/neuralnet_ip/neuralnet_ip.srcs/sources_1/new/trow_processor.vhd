@@ -60,7 +60,6 @@ signal dl_req_derivative: std_logic;
 signal sig_l1_rden : std_logic;
 -- i.e. product almost ready, fetch last level
 -- unactivated output right now
-signal zll1_prefetch: std_logic;
 -- multiplication result
 signal prod_dout: std_logic_vector (31 downto 0);
 signal prod_vout: std_logic;
@@ -98,7 +97,6 @@ begin
     dl_req <= '1' when dl_req_backprop = '1' and
                        dl_req_derivative = '1' else '0'; 
     l1_rden <= sig_l1_rden;
-    zll1_req <= zll1_prefetch;
     -- TODO:
     -- stops synthesis tool from being a cunt
     -- remove later
@@ -119,7 +117,7 @@ begin
         ve_req      => dl_req_backprop,
         dataout     => prod_dout,
         validout    => prod_vout,
-        fvalid      => zll1_prefetch,
+        fvalid      => zll1_req,
         validfwd    => validfwd,
         datafwd     => deltafwd
     );
