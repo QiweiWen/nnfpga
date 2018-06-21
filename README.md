@@ -47,8 +47,8 @@ trading accuracy for performance.
 
 ## Directory Sturcture
 
-blog: notes, observations, diary
-config: configuration generation script for bash and VHDL
-metaprogramming: scripts and utilities for metaprogramming VHDL modules
-sw\_prototype: software implementation written in Python, will use for testing FPGA implementation
-zynq: Vivado projects. SoC block design will later go in there once neuralnet\_ip development finishes 
+**blog**: notes, observations, diary  
+**config**: configuration generation script for bash and VHDL  
+**metaprogramming**: scripts and utilities for metaprogramming VHDL modules  
+**sw\_prototype**: software implementation written in Python, will use for testing FPGA implementation  
+**zynq**: Vivado projects. SoC block design will later go in there once neuralnet\_ip development finishes   
