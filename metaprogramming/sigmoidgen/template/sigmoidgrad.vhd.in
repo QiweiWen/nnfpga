@@ -18,16 +18,14 @@ end sigmoidgrad;
 
 architecture Behavioural of sigmoidgrad is
 
-signal latched_datain: std_logic_vector (16 - 2 downto 0);
+signal dataout_pipe: std_logic_vector (14 downto 0);
 
 begin
 
 process (clk, validin, datain) is
 begin
     if (clk'event and clk = '1') then
-        if (validin = '1') then
-            latched_datain <= datain;
-        end if;
+        dataout <= dataout_pipe;
     end if;
 end process;
 

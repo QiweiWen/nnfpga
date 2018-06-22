@@ -8,8 +8,8 @@
 #include <fstream>
 #include <exception>
 
-#define INPUT "latched_datain"
-#define OUTPUT "dataout"
+#define INPUT "datain"
+#define OUTPUT "dataout_pipe"
 
 
 #define SIGMOIDFILE "./template/sigmoid.vhd.in" 
