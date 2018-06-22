@@ -55,7 +55,7 @@ begin
             else
                 vout_pipe <= vin;
                 vout <= vout_pipe;
-                unbiased_trunc <= fun_mul_truncate (unbiased, 15);
+                unbiased_trunc <= fun_mul_truncate (unbiased, 2* PARAM_FRC - 1);
                 biased <= func_safe_sum (bias_register, unbiased_trunc);
             end if;
         end if;

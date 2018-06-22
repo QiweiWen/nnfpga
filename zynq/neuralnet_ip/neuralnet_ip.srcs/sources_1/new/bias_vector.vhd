@@ -100,7 +100,7 @@ unbiased_align: process (clk, alrst) is
                 unbiased_truncated <= (others => '0');
             else
                 unbiased_delayed <= unbiased_truncated;
-                unbiased_truncated <= fun_mul_truncate (unbiased, 15);
+                unbiased_truncated <= fun_mul_truncate (unbiased, 2* PARAM_FRC - 1);
             end if;
         end if;
     end process;

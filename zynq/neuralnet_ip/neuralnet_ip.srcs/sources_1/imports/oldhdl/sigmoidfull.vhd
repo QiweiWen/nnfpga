@@ -27,7 +27,6 @@ use ieee_proposed.fixed_pkg.all;
 
 use work.helperpkg.all;
 
-
 entity sigmoidfull is
 port (
     clk: in std_logic;

@@ -34,7 +34,6 @@ architecture tb of tb_row_processor is
               ve_req      : out std_logic;
               dataout    : out std_logic_vector (31 downto 0);
               validout   : out std_logic;
-              fvalid     : out std_logic;
               validfwd   : out std_logic;
               datafwd    : out std_logic_vector (15 downto 0));
     end component;
@@ -101,7 +100,6 @@ architecture tb of tb_row_processor is
     signal validout   : std_logic;
     signal validfwd   : std_logic;
     signal datafwd    : std_logic_vector (15 downto 0);
-    signal fvalid     : std_logic;
 
     -- l1 cache signals
     signal re_a: std_logic;
@@ -192,7 +190,6 @@ begin
               ve_req     => ve_req,
               dataout    => dataout,
               validout   => validout,
-              fvalid     => fvalid,
               validfwd   => validfwd,
               datafwd    => datafwd);
 
