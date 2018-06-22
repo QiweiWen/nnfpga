@@ -40,6 +40,9 @@ port(
     l1_wren: out std_logic;
     l1_waddr: out integer range 0 to ncols - 1;
     l1_wdata: out std_logic_vector (15 downto 0);
+-- bias unit write ports
+    bias_dout: out std_logic_vector (15 downto 0);
+    bias_vout: out std_logic;
 -- aL-1 input for derivative calculation
     all1_datain: in std_logic_vector (15 downto 0);
     all1_validin: in std_logic;
@@ -62,10 +65,16 @@ signal sig_l1_rden : std_logic;
 -- unactivated output right now
 -- multiplication result
 signal prod_dout: std_logic_vector (31 downto 0);
+signal prod_trunc: std_logic_vector (15 downto 0);
 signal prod_vout: std_logic;
+signal prod_vtrunc: std_logic;
+
 signal delta_validout_next: std_logic;
-signal dll1_full: std_logic_vector (47 downto 0);
-subtype dll1_full_t is std_logic_vector (47 downto 0);
+signal dll1_full: std_logic_vector (31 downto 0);
+subtype dll1_full_t is std_logic_vector (31 downto 0);
+-- delay prefetch signal by one cycle to account
+-- for truncation
+signal zll1_req_pipe: std_logic;
 
 component row_processor is
 generic (
@@ -97,11 +106,8 @@ begin
     dl_req <= '1' when dl_req_backprop = '1' and
                        dl_req_derivative = '1' else '0'; 
     l1_rden <= sig_l1_rden;
-    -- TODO:
-    -- stops synthesis tool from being a cunt
-    -- remove later
-    dl_req_derivative <= '1';
-
+    
+    -- backprop part
     backprop: row_processor
     generic map (ncols => ncols)
     port map (
@@ -117,14 +123,33 @@ begin
         ve_req      => dl_req_backprop,
         dataout     => prod_dout,
         validout    => prod_vout,
-        fvalid      => zll1_req,
+        fvalid      => zll1_req_pipe,
         validfwd    => validfwd,
         datafwd     => deltafwd
     );
-    -- drive deltaout and validout 
-    dll1_full <= dll1_full_t (to_sfixed (prod_dout, 2*PARAM_DEC - 1, -2*PARAM_FRC) *
-                              to_sfixed (zll1_datain, PARAM_DEC - 1, -PARAM_FRC));
-    validout <= '1' when zll1_validin = '1' and prod_vout = '1' else '0';
-    deltaout <= dll1_full (PARAM_FRC * 3 + PARAM_DEC - 1 downto 2*PARAM_FRC);
-   
+
+    delta_validout_next <= '1' when zll1_validin = '1' and prod_vtrunc = '1' else '0';
+    deltaout <= dll1_full (PARAM_FRC * 2 + PARAM_DEC - 1 downto PARAM_FRC);
+
+    hadamard_process: process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                zll1_req <= '0';
+                prod_trunc <= (others => '0');
+                prod_vtrunc <= '0';
+                dll1_full <= (others => '0');
+                validout <= '0';
+            else
+                zll1_req <= zll1_req_pipe;
+                prod_trunc <= fun_mul_truncate (prod_dout, 15);
+                prod_vtrunc <= prod_vout;
+                dll1_full <= dll1_full_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
+                                          to_sfixed (zll1_datain, PARAM_DEC - 1, -PARAM_FRC));
+                validout <= delta_validout_next;
+            end if;
+        end if;
+    end process;
+    -- derivative calculation and weight update part
+
 end Behavioral;
