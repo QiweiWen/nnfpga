@@ -1,7 +1,7 @@
 .PHONY: all, clean
 
 CXX=g++
-CFLAGS=-O2 -Wall -std=gnu++11
+CFLAGS=-O2 -Wall -std=gnu++11 -g3
 LFLAGS=-lm -pthread
 
 OBJECTS=$(patsubst %.cpp,%.o,$(wildcard *.cpp))

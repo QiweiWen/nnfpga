@@ -13,22 +13,11 @@
 #include <assert.h>
 #include <ext/stdio_filebuf.h>
 
-static void print_preamble (int pin, bool tiedown){
-    if (!tiedown)
-        printf (OUTPUT "(%d) <= \'1\' when ", pin);
-    else
-        printf (OUTPUT "(%d) <= \'0\';\n", pin);
-}
-
-static void print_term (int pin, bool complement){
-    printf (INPUT "(%d) = \'%d\'", pin, complement?0:1);
-}
-
-static void print_postamble (void){
-    printf ("else \'0\';");
-}
-
-void Metaprogrammer::print_product_term(prodterm_t term){
+void Metaprogrammer::print_product_term
+(prodterm_t term, std::vector<size_t>& _pipe_bits){
+    static size_t pipeline_bit = 0;
+    _pipe_bits.push_back (pipeline_bit);
+/*
     if (term.empty()){
         //tautology
         printf ("(true)\n");
@@ -41,27 +30,60 @@ void Metaprogrammer::print_product_term(prodterm_t term){
             printf (" and ");
     }
     printf (")\n");
+    */
+    if (term.empty()){
+        printf (PROD_OUT " (%zu) <= '1';\n", pipeline_bit); 
+    }else{
+        printf (PROD_OUT " (%zu) <= '1' when ", pipeline_bit);
+        for (auto& bit: term){
+            printf (INPUT " (%d) = \'%d\' and ", bit.position, bit.onoff?1:0); 
+        }
+        printf ("(true);\n");
+    }
+    
+    ++pipeline_bit;
 }
 
 void Metaprogrammer::print_sum_term (const sumterm_t& term, int pin){
-    bool tie_to_false = (term.size() == 0);
-    print_preamble (pin, tie_to_false);
-    if (tie_to_false)
+    if (term.size() == '0'){
+        printf ("%s (%d) <= \'0\';\n", SUM_OUT, pin);
         return;
-    for (auto itr = term.begin(); itr != term.end(); ++itr){
-        if (itr != term.begin())
-            printf (" or ");
-        print_product_term (*itr);
     }
-    print_postamble();
+    std::vector<size_t> pipeline_bits; 
+    for (auto itr = term.begin(); itr != term.end(); ++itr){
+        print_product_term (*itr, pipeline_bits);
+    }
+}
+
+void Metaprogrammer::print_dictionary (void){
+    for (auto& kv: _running_dict){
+        const std::string& name = kv.first,
+                           val  = kv.second.val,
+                           type = kv.second.type;
+        printf ("constant %s: %s := %s;\n", name.c_str(), type.c_str(), val.c_str());
+    }
 }
 
 void Metaprogrammer::do_metaprogram (void){
     std::string line;
     espresso_start();
     vector_result_t result = _tt.get_vector_result();
+    
+    // insert a pipeline register between the and gates and or gates
+    // to reduce fan-out
+    size_t register_size = 0;
+    for (auto& sum_term: result)
+        register_size += sum_term.size();
+
+    _running_dict ["PIPE_LEN"] = {
+        .val = std::to_string(register_size),
+        .type = "integer"
+    };
+
     while (getline (infile, line)){
-        if (line.find (CUE) != std::string::npos){
+        if (line.find (CONST_DUMP) != std::string::npos){
+            print_dictionary (); 
+        }else if (line.find (CUE) != std::string::npos){
             for (size_t i = 0; i < result.size(); ++i){
                 print_sum_term (result[i], i);
                 printf ("\n");

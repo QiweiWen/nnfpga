@@ -10,6 +10,7 @@ use ieee_proposed.fixed_pkg.all;
 entity sigmoid is
 port (
     clk: in std_logic;
+    rst: in std_logic;
     datain: in std_logic_vector (16 - 2 downto 0);
     validin: in std_logic;
     dataout: out std_logic_vector (16 - 2 downto 0);
@@ -18,22 +19,33 @@ end sigmoid;
 
 architecture Behavioural of sigmoid is
 
-signal dataout_pipe: std_logic_vector (14 downto 0);
+-- <DICT>
+
+signal pipe_in: std_logic_vector (PIPE_LEN - 1 downto 0);
+signal pipe_out: std_logic_vector (PIPE_LEN - 1 downto 0);
 
 begin
 
 process (clk, validin, datain) is
 begin
-    if (clk'event and clk = '1') then
-        dataout <= dataout_pipe;
+    if (rising_edge(clk)) then
+        if (rst = '0') then
+            pipe_out <= (others => '0');
+        else
+            pipe_out <= pipe_in;
+        end if;
     end if;
 end process;
 
 -- data is present one cycle later
 process (clk, validin) is
 begin
-    if (clk'event and clk = '1') then
-        validout <= validin;
+    if (rising_edge(clk)) then
+        if (rst = '0') then
+            validout <= '0';
+        else
+            validout <= validin;
+        end if;
     end if;
 end process;
 
