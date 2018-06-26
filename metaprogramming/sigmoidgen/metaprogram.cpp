@@ -17,42 +17,35 @@ void Metaprogrammer::print_product_term
 (prodterm_t term, std::vector<size_t>& _pipe_bits){
     static size_t pipeline_bit = 0;
     _pipe_bits.push_back (pipeline_bit);
-/*
+
     if (term.empty()){
-        //tautology
-        printf ("(true)\n");
-        return;
-    }
-    printf ("(");
-    for (auto itr = term.begin(); itr != term.end(); ++itr){
-        print_term (itr->position, !itr->onoff);
-        if (itr + 1 != term.end())
-            printf (" and ");
-    }
-    printf (")\n");
-    */
-    if (term.empty()){
-        printf (PROD_OUT " (%zu) <= '1';\n", pipeline_bit); 
+        printf (PROD_OUT " (%zu) <= \'1\';\n", pipeline_bit); 
     }else{
-        printf (PROD_OUT " (%zu) <= '1' when ", pipeline_bit);
+        printf (PROD_OUT " (%zu) <= \'1\' when ", pipeline_bit);
         for (auto& bit: term){
             printf (INPUT " (%d) = \'%d\' and ", bit.position, bit.onoff?1:0); 
         }
-        printf ("(true);\n");
+        printf ("(true) else '0';\n");
     }
     
     ++pipeline_bit;
 }
 
 void Metaprogrammer::print_sum_term (const sumterm_t& term, int pin){
-    if (term.size() == '0'){
-        printf ("%s (%d) <= \'0\';\n", SUM_OUT, pin);
+    if (term.size() == 0){
+        printf (SUM_OUT " (%d) <= \'0\';\n", pin);
         return;
     }
     std::vector<size_t> pipeline_bits; 
     for (auto itr = term.begin(); itr != term.end(); ++itr){
         print_product_term (*itr, pipeline_bits);
     }
+
+    printf (SUM_OUT " (%d) <= \'1\' when ", pin);
+    for (auto bit: pipeline_bits){
+        printf (PIPE_OUT " (%zu) = \'1\' or ", bit); 
+    }
+    printf ("(false) else '0';");
 }
 
 void Metaprogrammer::print_dictionary (void){

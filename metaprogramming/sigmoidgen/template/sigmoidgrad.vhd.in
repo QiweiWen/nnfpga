@@ -26,7 +26,7 @@ signal pipe_out: std_logic_vector (PIPE_LEN - 1 downto 0);
 
 begin
 
-process (clk, validin, datain) is
+process (clk, rst) is
 begin
     if (rising_edge(clk)) then
         if (rst = '0') then
@@ -37,8 +37,8 @@ begin
     end if;
 end process;
 
--- data is present one cycle later
-process (clk, validin) is
+-- data is present a cycle later
+process (clk, rst) is
 begin
     if (rising_edge(clk)) then
         if (rst = '0') then

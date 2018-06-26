@@ -106,6 +106,7 @@ subtype word_t is std_logic_vector (15 downto 0);
 component sigmoidfull is
 port (
     clk: in std_logic;
+    rst: in std_logic;
     datain: in std_logic_vector (16 - 1 downto 0);
     validin: in std_logic;
     dataout: out std_logic_vector (16 - 1 downto 0);
@@ -115,6 +116,7 @@ end component sigmoidfull;
 component sigmoidgradfull is
 port (
     clk: in std_logic;
+    rst: in std_logic;
     datain: in std_logic_vector (16 - 1 downto 0);
     validin: in std_logic;
     dataout: out std_logic_vector (16 - 1 downto 0);
@@ -186,6 +188,7 @@ begin
     activate: sigmoidfull
     port map (
         clk         => clk,
+        rst         => alrst,
         datain      => zll1_datain,
         validin     => zll1_validin,
         dataout     => sigmoid_dout,
@@ -195,6 +198,7 @@ begin
     sigmoid_prime: sigmoidgradfull
     port map (
         clk         => clk,
+        rst         => alrst,
         datain      => zll1_datain,
         validin     => zll1_validin,
         dataout     => sigmoid_prime_dout,

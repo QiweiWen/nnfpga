@@ -8,6 +8,7 @@ use work.helperpkg.all;
 entity sigmoidgradfull is
 port (
     clk: in std_logic;
+    rst: in std_logic;
     datain: in std_logic_vector (16 - 1 downto 0);
     validin: in std_logic;
     dataout: 
@@ -20,39 +21,51 @@ architecture Behavioral of sigmoidgradfull is
 component sigmoidgrad is
 port (
     clk: in std_logic;
+    rst: in std_logic;
     datain: in std_logic_vector (16 - 2 downto 0);
     validin: in std_logic;
     dataout: out std_logic_vector (16 - 2 downto 0);
     validout: out std_logic);
 end component sigmoidgrad;
 
-signal innegative: std_logic_vector
-    (16 - 1 downto 0);
-signal insign  : std_logic;
-signal inabsval: std_logic_vector 
-    (16 - 1 downto 0);
+signal inabsval: std_logic_vector (14 downto 0);
 
-signal sigmoidgradout:
-    std_logic_vector (16 - 2 downto 0);
+signal sigmoidgrad_dout: std_logic_vector (15 downto 0);
+signal sigmoidgrad_vout: std_logic;
+
 begin
+
+in_absval_proc: process (datain) is
+    variable in_inverse: std_logic_vector(14 downto 0);
+begin
+    in_inverse := not (datain(14 downto 0)); 
+    inabsval <= std_logic_vector (unsigned (in_inverse) + 1);
+end process;
 
 postitive_half:
 sigmoidgrad port map
 (
     clk => clk,
-    datain => inabsval (16 - 2 downto 0),
+    rst  => rst,
+    datain => inabsval,
     validin => validin,
-    dataout => sigmoidgradout,
-    validout => validout
+    dataout => sigmoidgrad_dout(14 downto 0),
+    validout => sigmoidgrad_vout
 );
 
-insign <= datain (16 - 1);
-innegative <= std_logic_vector
-              (to_signed((-1* to_integer(signed(datain))),
-                        innegative'length));
-inabsval <= datain when insign = '0' else
-            innegative;
+sigmoidgrad_dout (15) <= '0';
 
-dataout <= '0' & sigmoidgradout;
+outproc: process (clk, rst) is
+begin
+    if (rising_edge(clk)) then
+        if (rst = '0') then
+            validout <= '0';
+            dataout <= (others => '0');
+        else
+            validout <= sigmoidgrad_vout;
+            dataout  <= sigmoidgrad_dout;
+        end if;
+    end if;
+end process;
 
 end Behavioral;

@@ -11,6 +11,7 @@
 
 #define INPUT "datain"
 #define PROD_OUT "pipe_in"
+#define PIPE_OUT "pipe_out"
 #define SUM_OUT  "dataout"
 
 #define SIGMOIDFILE "./template/sigmoid.vhd.in" 
