@@ -29,6 +29,7 @@ port (
 end component sigmoid;
 
 signal inabsval: std_logic_vector (14 downto 0);
+signal innegative: std_logic_vector (14 downto 0);
 
 signal insign_delayed: std_logic;
 
@@ -47,8 +48,10 @@ begin
         variable in_inverse: std_logic_vector(14 downto 0);
     begin
         in_inverse := not (datain(14 downto 0)); 
-        inabsval <= std_logic_vector (unsigned (in_inverse) + 1);
+        innegative <= std_logic_vector (unsigned (in_inverse) + 1);
     end process;
+
+    inabsval <= innegative when datain (15) = '1' else datain (14 downto 0);
 
     activate: sigmoid port map (
         clk => clk,

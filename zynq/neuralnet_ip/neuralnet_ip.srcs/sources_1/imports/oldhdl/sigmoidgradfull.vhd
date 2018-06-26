@@ -29,6 +29,7 @@ port (
 end component sigmoidgrad;
 
 signal inabsval: std_logic_vector (14 downto 0);
+signal innegative: std_logic_vector (14 downto 0);
 
 signal sigmoidgrad_dout: std_logic_vector (15 downto 0);
 signal sigmoidgrad_vout: std_logic;
@@ -39,8 +40,10 @@ in_absval_proc: process (datain) is
     variable in_inverse: std_logic_vector(14 downto 0);
 begin
     in_inverse := not (datain(14 downto 0)); 
-    inabsval <= std_logic_vector (unsigned (in_inverse) + 1);
+    innegative <= std_logic_vector (unsigned (in_inverse) + 1);
 end process;
+
+inabsval <= innegative when datain (15) = '1' else datain (14 downto 0);
 
 postitive_half:
 sigmoidgrad port map

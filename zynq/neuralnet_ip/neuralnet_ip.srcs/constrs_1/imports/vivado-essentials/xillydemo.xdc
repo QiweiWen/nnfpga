@@ -1,4 +1,4 @@
-create_clock -name gclk -period 5.5 [get_ports "clk"]
+create_clock -name gclk -period 6.6 [get_ports "clk"]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets "clk"]
 
 # Vivado constraints unrelated clocks. So set false paths.
