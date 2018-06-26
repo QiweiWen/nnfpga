@@ -59,6 +59,8 @@ signal sig_l1_rden : std_logic;
 -- unactivated output right now
 -- multiplication result
 signal prod_dout: std_logic_vector (31 downto 0);
+signal prod_dout_trunc: std_logic_vector (15 downto 0);
+signal prod_vout_pipe: std_logic;
 signal prod_vout: std_logic;
 
 signal dll1_full: std_logic_vector (31 downto 0);
@@ -76,9 +78,6 @@ signal sigmoid_prime_vout: std_logic;
 signal sigmoid_prime_latched: std_logic_vector (15 downto 0);
 
 signal sigmoid_prime_ll1: std_logic_vector (15 downto 0);
-
--- state variable for reading from zL-1 fifo
-signal derivative_multcnt: integer range 0 to ncols - 1; 
 
 -- learning rate
 signal learning_rate: std_logic_vector (15 downto 0);
@@ -232,23 +231,37 @@ begin
     -- all1 is the newly computed sigmoid value when it's there
     -- otherwise use the latched value
     all1 <= sigmoid_latched when sigmoid_vout = '0' else sigmoid_dout;
-    sigmoid_prime_ll1 <= sigmoid_prime_latched when sigmoid_prime_vout = '0' else
-                         sigmoid_prime_dout;
+
+    -- make extra cycle to allow for prod_dout truncation
+    sigmoid_prime_ll1 <= sigmoid_prime_latched;
+
+    -- compute dll1
+    -- (wT(r) * dL) * sigmoid_prime_ll1
+    backprop_process: process (clk, alrst) is
+        variable dll1_full: std_logic_vector (31 downto 0);
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                deltaout <= (others => '0'); 
+                validout <= '0';
+                prod_dout_trunc <= (others => '0');
+                prod_vout_pipe <= '0';
+            else
+                prod_dout_trunc <= fun_mul_truncate (prod_dout, 2*PARAM_FRC - 1);
+                prod_vout_pipe <= prod_vout;
+
+                dll1_full := full_prod_t (to_sfixed (prod_dout_trunc,   PARAM_DEC - 1, -PARAM_FRC) *
+                                          to_sfixed (sigmoid_prime_ll1, PARAM_DEC - 1, -PARAM_FRC));
+                deltaout <= dll1_full (2*PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);
+                validout <= prod_vout_pipe;
+            end if;
+        end if;
+    end process;
+
     
     -- pulse zll1_req high for a cycle when we just requested
     -- the last element in the dL vector
     zll1_req <= '1' when sig_l1_raddr = 0 and dl_ack = '1' else '0';  
-
-    multcnt_proc: process (clk, alrst) is
-    begin
-        if (rising_edge(clk)) then
-            if (alrst = '0') then
-                derivative_multcnt <= 0;
-            elsif (dL_ack = '1') then
-                derivative_multcnt <= (derivative_multcnt + 1) mod ncols;
-            end if;
-        end if;
-    end process;
 
     -- multiply dL by learning rate and share with bias unit
     -- lambda_dl and all1 are then valid on the same cycle 
