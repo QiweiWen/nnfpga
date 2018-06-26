@@ -85,6 +85,12 @@ signal learning_rate: std_logic_vector (15 downto 0);
 signal lambda_dl: std_logic_vector (15 downto 0);
 signal lambda_dl_valid: std_logic;
 
+-- dL and zL-1 are clocked in at the same time
+-- activating zL-1 = 2 cycles, multiplying dL by lambda = 1 cycle
+-- therefore, delay lambda_dl by one cycle
+signal lambda_dl_delayed: std_logic_vector (15 downto 0);
+signal lambda_dl_delayed_valid: std_logic;
+
 -- weight update amount
 signal weight_adj: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
@@ -231,7 +237,7 @@ begin
     
     -- pulse zll1_req high for a cycle when we just requested
     -- the last element in the dL vector
-    zll1_req <= '1' when derivative_multcnt = ncols - 1 and dl_ack = '1' else '0';  
+    zll1_req <= '1' when sig_l1_raddr = 0 and dl_ack = '1' else '0';  
 
     multcnt_proc: process (clk, alrst) is
     begin
@@ -255,11 +261,17 @@ begin
             if (alrst = '0') then
                 lambda_dl <= (others => '0');
                 lambda_dl_valid <= '0';
+
+                lambda_dl_delayed <= (others => '0');
+                lambda_dl_delayed_valid <= '0'; 
             else
                 lambda_dl_full :=  full_prod_t (to_sfixed (dl_datain, PARAM_DEC - 1, -PARAM_FRC) *
                                             to_sfixed (LEARN_RATE, PARAM_DEC - 1, -PARAM_FRC));
                 lambda_dl <= lambda_dl_full (2 * PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);
                 lambda_dl_valid <= dl_validin;
+
+                lambda_dl_delayed <= lambda_dl;
+                lambda_dl_delayed_valid <= lambda_dl_valid;
             end if;
         end if;
     end process;
@@ -277,9 +289,9 @@ begin
                 weight_adj_valid <= '0';
             else
                 weight_change_full := full_prod_t (to_sfixed (all1, PARAM_DEC - 1, -PARAM_FRC) *
-                                                   to_sfixed (lambda_dl, PARAM_DEC - 1, -PARAM_FRC));
+                                                   to_sfixed (lambda_dl_delayed, PARAM_DEC - 1, -PARAM_FRC));
                 weight_adj <= weight_change_full (2 * PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);
-                weight_adj_valid <= lambda_dl_valid;
+                weight_adj_valid <= lambda_dl_delayed_valid;
             end if;
         end if;
     end process;
@@ -292,7 +304,7 @@ begin
     l1_pipe_in (16) <= l1_vin;
 
     l1_align: delay_buffer 
-    generic map (ncycles => 2, width => 17)
+    generic map (ncycles => 3, width => 17)
     port map (
         clk     => clk,
         rst     => alrst,
