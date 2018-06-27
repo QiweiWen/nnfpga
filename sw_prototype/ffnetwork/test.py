@@ -42,7 +42,7 @@ def numpy_feed_forward (net, inputarr):
     return thisvec;
 
 def test_feed_forward():
-    net = nn.Neuralnet(reg = 5)
+    net = nn.Neuralnet(reg = 1)
     invec = np.random.random (size = net.nunits[0])
     invec = matwrap.Alnvec (elements = invec)
     res = net.feed_forward (invec)

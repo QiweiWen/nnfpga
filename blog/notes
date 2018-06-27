@@ -6,3 +6,31 @@ Design adjustments needed:
 2. add additional row and col processor output for when the multiplier and multiplicant is valid
    to make up for FIFO latency
 3. add ve_ack to row processor to make up for memory latency
+
+27/06/2018
+-------------
+Reverted adjustment 2 from above.
+
+Gave up on the idea of a generic deriviative unit, as much sense as the idea makes. It's just too
+tricky to have it work with both row and colomn processors. Instead I've made the modules
+trow_processor and tcol_processor for transpose-row and column processing elements with derivative
+calculation built in.
+
+I also realised that having completely combinatorial positive halves of sigmoid and sigmoid-prime units
+incurs way to much logic delay, so I modified sigmoidgen to add a massive pipeline register between
+the product terms (AND-gates) and sum terms (OR-gates). I also realised that my signed sigmoid and
+sigmoid-prime wrappers were pieces of shit. I've fixed all of these things and it still doesn't want
+to run at 200Mhz so I'm settling on 150Mhz.
+
+Next steps:
+
+Ok, the Python prototype is coming into good use at long last (a year after it was first written,
+procrastination is real). I'm going to need its help in testing trow_processor.
+
+Specifically, I'm going to get real zl-1 vectors, take the first vector elements, and observe the
+first dL-1 vector elements as well as the first columns of the weight adjustment matrixes. Then I
+will convert everything to fixed point and feed the same data through a trow_processor.
+
+When trow processor is solid I'll move onto tcol processor. When that is done, I will write the
+script to metaprogram the top-level neuralnet IP module. When that is done, I will begin zynq block
+design. When that is done, I will begin zynq software development...

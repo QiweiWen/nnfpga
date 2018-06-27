@@ -37,7 +37,7 @@ class opti_wrapper(object):
         accucost += self.net.regcost
         accucost /= len(self.invecs)
         # gradient computation
-        print ("%f" % accucost)
+        # print ("%f" % accucost)
         grads = self.net.train(self.invecs, self.teachers, ffres_set).backing
         return (accucost, grads)
 

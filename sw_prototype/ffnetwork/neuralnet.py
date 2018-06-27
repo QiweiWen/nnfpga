@@ -36,11 +36,14 @@ class Neuralnet(object):
             resvec += [zres, ares]
         return resvec
     
-    def feed_backward(self,ffres,Y):
+    def feed_backward(self,ffres,Y, log = None):
         nres = len(ffres)
         Aind = nres - 1
         Zind = Aind - 1
         gc = flattener(self)
+
+        f = open (log, "w") if log else None
+
         for i in reversed(range(1, self.nlayers)):
             A = ffres[Aind]
             Z = ffres[Zind]
@@ -49,12 +52,45 @@ class Neuralnet(object):
             else:
                 tmatt = self.transpose_matrixes[i] 
                 D = (tmatt * D) * sigmoidgrad(Z)
+                if f:
+                    f.write ("\ndLL1:\n")
+                    for x in range(0, D.dim):
+                        f.write ("%f|" % D[x])
+                    f.write ("\n\n")
+
             Aind -= 2
             Zind -= 2
             lastA = ffres[Aind]
             wgradmatt = D ** lastA
+            
+            if f:
+                f.write ("trows size: %d, tcols size: %d\n" % (wgradmatt.rows, wgradmatt.cols)) 
+
+                f.write ("dL:\n")
+                for x in D:
+                    f.write ("%f|" % x)
+                    
+                f.write ("\n(trow) derivative matrix column 0:\n")
+                for x in range (0, wgradmatt.rows):
+                    f.write ("%f|" % wgradmatt[(x, 0)])
+
+                f.write ("\n(tcol) derivative matrix row 0:\n") 
+                for x in range (0, wgradmatt.cols):
+                    f.write ("%f|" % wgradmatt[(0, x)])
+                if (Zind >= 0):
+                    f.write ("\nzll1:\n")
+                    lastZ = ffres[Zind]
+                    for x in range(0, lastZ.dim):
+                        f.write ("%f|" % lastZ[x])
+
+                f.write ("\nall1:\n")
+                for x in range (0, lastA.dim):
+                    f.write ("%f|" % lastA[x])
+
             gc.wmattput (i - 1, wgradmatt)
             gc.bvecput (i, D)
+        if f:
+            f.close()
         return gc 
     
     # ffres_set: precomputed feed forward result (if provided)
