@@ -34,3 +34,8 @@ will convert everything to fixed point and feed the same data through a trow_pro
 When trow processor is solid I'll move onto tcol processor. When that is done, I will write the
 script to metaprogram the top-level neuralnet IP module. When that is done, I will begin zynq block
 design. When that is done, I will begin zynq software development...
+
+27/06/2018
+-------------
+I remember now that a0 is the input vector and will not have a corresponding z0 vector. I'm leaning
+towards duplicated sigmoid and sigmoid-prime fifos now.

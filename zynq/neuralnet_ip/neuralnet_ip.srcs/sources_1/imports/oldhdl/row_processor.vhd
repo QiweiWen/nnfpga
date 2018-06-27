@@ -30,6 +30,7 @@ port(
 -- product terms output channel
     dataout: out std_logic_vector (31 downto 0);
     validout: out std_logic;
+    fvalid: out std_logic;
 -- vector input forwarded to the adjacent row processor down the line
     validfwd: out std_logic;
     datafwd: out std_logic_vector (15 downto 0)
@@ -114,6 +115,7 @@ end process;
 lastone <= '1' when (col_ptr = ncols - 1) else '0';
 product <= product_type (to_sfixed(ve_datain, PARAM_DEC - 1, -PARAM_FRC) * 
                          to_sfixed(l1_din,    PARAM_DEC - 1, -PARAM_FRC));
+fvalid <= '1' when lastone = '1' and l1_vin = '1' else '0';
 
 -- accumulator input pipeline
 accu_pipe: 
