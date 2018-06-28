@@ -58,9 +58,8 @@ architecture Behavioral of trow_processor is
 
 -- dl and l1 are shared between row processor
 -- and derivative unit
-signal dl_req_backprop: std_logic;
-signal dl_req_derivative: std_logic;
 signal sig_l1_rden : std_logic;
+signal sig_l1_raddr: integer range 0 to ncols - 1;
 -- i.e. product almost ready, fetch last level
 -- unactivated output right now
 -- multiplication result
@@ -71,10 +70,20 @@ signal prod_vtrunc: std_logic;
 
 signal delta_validout_next: std_logic;
 signal dll1_full: std_logic_vector (31 downto 0);
-subtype dll1_full_t is std_logic_vector (31 downto 0);
+subtype full_prod_t is std_logic_vector (31 downto 0);
 -- delay prefetch signal by one cycle to account
 -- for truncation
 signal apll1_req_pipe: std_logic;
+-- all1 (previous activated result) signals
+signal all1_latched: std_logic_vector (15 downto 0); 
+signal all1_final: std_logic_vector (15 downto 0);
+-- dl * all1
+signal dl_all1_data: std_logic_vector (15 downto 0);
+signal dl_all1_valid: std_logic;
+-- lambda * dl * all1
+signal learning_rate: std_logic_vector (15 downto 0);
+signal weight_adj_data: std_logic_vector (15 downto 0);
+signal weight_adj_valid: std_logic;
 
 component row_processor is
 generic (
@@ -103,9 +112,8 @@ port(
 );
 end component row_processor;
 begin
-    dl_req <= '1' when dl_req_backprop = '1' and
-                       dl_req_derivative = '1' else '0'; 
     l1_rden <= sig_l1_rden;
+    l1_raddr <= sig_l1_raddr;
     
     -- backprop part
     backprop: row_processor
@@ -114,13 +122,13 @@ begin
         clk         => clk,
         alrst       => alrst,
         l1_rden     => sig_l1_rden,
-        l1_raddr    => l1_raddr,
+        l1_raddr    => sig_l1_raddr,
         l1_din      => l1_din,
         l1_vin      => l1_vin,
         ve_datain   => dl_datain,
         ve_validin  => dl_validin,
         ve_ack      => dl_ack,
-        ve_req      => dl_req_backprop,
+        ve_req      => dl_req,
         dataout     => prod_dout,
         validout    => prod_vout,
         fvalid      => apll1_req_pipe,
@@ -144,12 +152,31 @@ begin
                 apll1_req <= apll1_req_pipe;
                 prod_trunc <= fun_mul_truncate (prod_dout, 15);
                 prod_vtrunc <= prod_vout;
-                dll1_full <= dll1_full_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
+                dll1_full <= full_prod_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
                                           to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
                 validout <= delta_validout_next;
             end if;
         end if;
     end process;
     -- derivative calculation and weight update part
+
+    -- read new activated vector element when new dl is being read
+    -- all1 and dl occur, then, at the same cycle
+    all1_req <= '1' when l1_raddr = 0 and dl_ack = '1' else '0';
+    all1_latch: process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                all1_latched <= (others => '0');
+            elsif (all1_validin = '1') then
+                all1_latched <= all1_datain;
+            end if;
+        end if;
+    end process;
+    all1_final <= all1_latched when all1_validin = '0' else all1_datain;
+
+    -- TODO:
+    -- fill in al-1 * dl, lambda * al-1 * dl, weight change, l1 data and read address delay
+    
 
 end Behavioral;
