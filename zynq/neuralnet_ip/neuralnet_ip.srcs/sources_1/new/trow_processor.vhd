@@ -162,7 +162,7 @@ begin
 
     -- read new activated vector element when new dl is being read
     -- all1 and dl occur, then, at the same cycle
-    all1_req <= '1' when l1_raddr = 0 and dl_ack = '1' else '0';
+    all1_req <= '1' when sig_l1_raddr = 0 and dl_ack = '1' else '0';
     all1_latch: process (clk, alrst) is
     begin
         if (rising_edge(clk)) then

@@ -13,6 +13,8 @@ use ieee.math_real.all;
 
 use work.helperpkg.all;
 
+use work.nn_arith_package.all;
+
 entity tb_row_processor is
 end tb_row_processor;
 
@@ -137,10 +139,13 @@ architecture tb of tb_row_processor is
     subtype param_type is std_logic_vector (15 downto 0);
 
 begin
-
+    
+    
     debug:
     process (clk, alrst) is
     begin
+        
+        
         if (rising_edge(clk)) then
             if (alrst = '0') then
                 debug_product_latch <= 0.0; 

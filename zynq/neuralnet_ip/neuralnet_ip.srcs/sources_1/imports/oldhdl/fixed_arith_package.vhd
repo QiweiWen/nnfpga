@@ -24,6 +24,12 @@ function func_safe_sum (
     B: std_logic_vector (15 downto 0)
 )return std_logic_vector;
 
+-- approximate learning rate by shiting
+-- to save luts, ffs and dsps
+function fraction_to_shift (
+    lambda: real
+)return integer;
+
 type wordarr_t is array (integer range <>) of std_logic_vector (15 downto 0);
 function log2( i : natural) return integer;
 
@@ -134,6 +140,25 @@ begin
         ret_val := ret_val + 1;
     end if;
     return ret_val;
+end function;
+
+function fraction_to_shift (
+    lambda: real
+)return integer is
+    subtype word_t is std_logic_vector (15 downto 0);
+    variable lambda_sfixed: word_t; 
+
+    variable lambda_as_int: integer;
+begin
+    if (lambda > 0.5) then
+        return 0;
+    end if;
+    -- convert to sfixed, interpret as integer 
+    lambda_sfixed := word_t(to_sfixed (lambda, PARAM_DEC - 1, -PARAM_FRC)); 
+    lambda_as_int := to_integer(unsigned(lambda_sfixed));
+
+    return PARAM_FRC - log2(lambda_as_int);
+
 end function;
 
 
