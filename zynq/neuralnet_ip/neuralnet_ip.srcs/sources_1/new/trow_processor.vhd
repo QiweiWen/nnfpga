@@ -41,8 +41,8 @@ port(
     l1_waddr: out integer range 0 to ncols - 1;
     l1_wdata: out std_logic_vector (15 downto 0);
 -- bias unit write ports
-    bias_dout: out std_logic_vector (15 downto 0);
-    bias_vout: out std_logic;
+    bias_change_dout: out std_logic_vector (15 downto 0);
+    bias_change_vout: out std_logic;
 -- aL-1 input for derivative calculation
     all1_datain: in std_logic_vector (15 downto 0);
     all1_validin: in std_logic;
@@ -71,19 +71,22 @@ signal prod_vtrunc: std_logic;
 signal delta_validout_next: std_logic;
 signal dll1_full: std_logic_vector (31 downto 0);
 subtype full_prod_t is std_logic_vector (31 downto 0);
+subtype word_t is std_logic_vector (15 downto 0);
 -- delay prefetch signal by one cycle to account
 -- for truncation
 signal apll1_req_pipe: std_logic;
 -- all1 (previous activated result) signals
 signal all1_latched: std_logic_vector (15 downto 0); 
 signal all1_final: std_logic_vector (15 downto 0);
--- dl * all1
-signal dl_all1_data: std_logic_vector (15 downto 0);
-signal dl_all1_valid: std_logic;
--- lambda * dl * all1
-signal learning_rate: std_logic_vector (15 downto 0);
+signal lambda_dl: std_logic_vector (15 downto 0); 
+-- lambda_dl * all1
 signal weight_adj_data: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
+-- delay l1 read address by 3 cycles to become l1 writeback address
+-- delay l1 read data by 1 cycle to align with weight_adj_data
+type l1_raddr_pipe_t is array (3 downto 0) of integer range 0 to ncols - 1;
+signal l1_raddr_pipe: l1_raddr_pipe_t;
+signal l1_din_delayed: std_logic_vector (15 downto 0);
 
 component row_processor is
 generic (
@@ -174,9 +177,69 @@ begin
         end if;
     end process;
     all1_final <= all1_latched when all1_validin = '0' else all1_datain;
+    
+    bias_change_vout <= dl_validin; 
+    bias_change_dout <= lambda_dl;
 
-    -- TODO:
-    -- fill in al-1 * dl, lambda * al-1 * dl, weight change, l1 data and read address delay
+    lambda_dl_process: process (dl_datain) is
+        constant shift_amount : integer := fraction_to_shift (LEARN_RATE);
+        variable padding : std_logic_vector (shift_amount - 1 downto 0) := (others => '0'); 
+    begin
+        lambda_dl <= padding & dl_datain (15 downto shift_amount); 
+    end process;
+
+    -- weight adjustment calculation
+    weight_adj_proc: process (clk, alrst) is
+        variable weight_adj_full: full_prod_t;
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                weight_adj_data <= (others => '0'); 
+                weight_adj_valid <= '0';
+            else
+                weight_adj_valid <= dl_validin;
+                weight_adj_full := full_prod_t(to_sfixed(lambda_dl, PARAM_DEC - 1, -PARAM_FRC) *
+                                               to_sfixed(all1_final,PARAM_DEC - 1, -PARAM_FRC));
+                weight_adj_data <= weight_adj_full 
+                                   (2 * PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);
+            end if;
+        end if;
+    end process;
+
+    -- new memory content
+    l1_writeback_proc: process (clk, alrst) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                l1_din_delayed <= (others => '0');
+                l1_wdata <= (others => '0');
+                l1_wren <= '0';
+            else
+                l1_din_delayed <= l1_din;
+                l1_wdata <= func_safe_sum (l1_din_delayed, weight_adj_data);
+                l1_wren <= weight_adj_valid;
+            end if;
+        end if;
+    end process;
+
+    -- weight memory write address generation
+    l1_wraddr_proc: process (clk, alrst) is
+    begin
+        if (rising_edge (clk)) then
+            if (alrst = '0') then
+                for I in 3 downto 0 loop
+                    l1_raddr_pipe (I) <= 0;
+                end loop;
+            else
+                l1_raddr_pipe (3) <= sig_l1_raddr;
+                for I in 2 downto 0 loop
+                    l1_raddr_pipe (I) <= l1_raddr_pipe (I + 1);
+                end loop;
+            end if;
+        end if;
+    end process;
+
+    l1_waddr <= l1_raddr_pipe (0);
     
 
 end Behavioral;
