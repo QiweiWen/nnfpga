@@ -53,6 +53,14 @@ class Neuralnet(object):
                 tmatt = self.transpose_matrixes[i] 
                 D = (tmatt * D) * sigmoidgrad(Z)
                 if f:
+                    f.write ("\n(tcol) transpose matrix column 0:\n")
+                    for x in range (0, tmatt.rows):
+                        f.write ("%f|" % tmatt[(x,0)])
+                        
+                    f.write ("\n(trow) transpose matrix row 0:\n")
+                    for x in range (0, tmatt.cols):
+                        f.write ("%f|" % tmatt[(0,x)])
+                    
                     f.write ("\ndLL1:\n")
                     for x in range(0, D.dim):
                         f.write ("%f|" % D[x])
@@ -69,7 +77,7 @@ class Neuralnet(object):
                 f.write ("dL:\n")
                 for x in D:
                     f.write ("%f|" % x)
-                    
+
                 f.write ("\n(trow) derivative matrix column 0:\n")
                 for x in range (0, wgradmatt.rows):
                     f.write ("%f|" % wgradmatt[(x, 0)])
