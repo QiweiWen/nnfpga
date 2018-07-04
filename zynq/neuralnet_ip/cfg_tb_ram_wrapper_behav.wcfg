@@ -3,158 +3,230 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="cfg_tb_row_processor_behav.wdb" id="1">
+      <db_ref path="backprop_testbench_behav.wdb" id="1">
          <top_modules>
+            <top_module name="backprop_testbench" />
             <top_module name="helperpkg" />
             <top_module name="nn_arith_package" />
-            <top_module name="tb_row_processor" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="4082490964fs"></ZoomEndTime>
-      <Cursor1Time time="561760000fs"></Cursor1Time>
+      <ZoomEndTime time="5290000001fs"></ZoomEndTime>
+      <Cursor1Time time="1000000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="35" />
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/clk">
+   <WVObjectSize size="41" />
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/alrst">
-      <obj_property name="ElementShortName">alrst</obj_property>
-      <obj_property name="ObjectShortName">alrst</obj_property>
+   <wvobject db_ref_id="1" type="other" fp_name="/backprop_testbench/deltaout_debug">
+      <obj_property name="ElementShortName">deltaout_debug</obj_property>
+      <obj_property name="ObjectShortName">deltaout_debug</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/l1_rden">
+   <wvobject db_ref_id="1" type="other" fp_name="/backprop_testbench/l1_wdata_debug">
+      <obj_property name="ElementShortName">l1_wdata_debug</obj_property>
+      <obj_property name="ObjectShortName">l1_wdata_debug</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="other" fp_name="/backprop_testbench/l1_rdata_debug">
+      <obj_property name="ElementShortName">l1_rdata_debug</obj_property>
+      <obj_property name="ObjectShortName">l1_rdata_debug</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/all1_readen">
+      <obj_property name="ElementShortName">all1_readen</obj_property>
+      <obj_property name="ObjectShortName">all1_readen</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/all1_dataout">
+      <obj_property name="ElementShortName">all1_dataout[15:0]</obj_property>
+      <obj_property name="ObjectShortName">all1_dataout[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/all1_ackout">
+      <obj_property name="ElementShortName">all1_ackout</obj_property>
+      <obj_property name="ObjectShortName">all1_ackout</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/all1_validout">
+      <obj_property name="ElementShortName">all1_validout</obj_property>
+      <obj_property name="ObjectShortName">all1_validout</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/apll1_readen">
+      <obj_property name="ElementShortName">apll1_readen</obj_property>
+      <obj_property name="ObjectShortName">apll1_readen</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/apll1_dataout">
+      <obj_property name="ElementShortName">apll1_dataout[15:0]</obj_property>
+      <obj_property name="ObjectShortName">apll1_dataout[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/apll1_ackout">
+      <obj_property name="ElementShortName">apll1_ackout</obj_property>
+      <obj_property name="ObjectShortName">apll1_ackout</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/apll1_validout">
+      <obj_property name="ElementShortName">apll1_validout</obj_property>
+      <obj_property name="ObjectShortName">apll1_validout</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/dl_readen">
+      <obj_property name="ElementShortName">dl_readen</obj_property>
+      <obj_property name="ObjectShortName">dl_readen</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/dl_dataout">
+      <obj_property name="ElementShortName">dl_dataout[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dl_dataout[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/dl_ackout">
+      <obj_property name="ElementShortName">dl_ackout</obj_property>
+      <obj_property name="ObjectShortName">dl_ackout</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/dl_validout">
+      <obj_property name="ElementShortName">dl_validout</obj_property>
+      <obj_property name="ObjectShortName">dl_validout</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/deltaout">
+      <obj_property name="ElementShortName">deltaout[15:0]</obj_property>
+      <obj_property name="ObjectShortName">deltaout[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/trow_validout">
+      <obj_property name="ElementShortName">trow_validout</obj_property>
+      <obj_property name="ObjectShortName">trow_validout</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/l1_rdata">
+      <obj_property name="ElementShortName">l1_rdata[15:0]</obj_property>
+      <obj_property name="ObjectShortName">l1_rdata[15:0]</obj_property>
+   </wvobject>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/l1_rden">
       <obj_property name="ElementShortName">l1_rden</obj_property>
       <obj_property name="ObjectShortName">l1_rden</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_row_processor/l1_raddr">
+   <wvobject db_ref_id="1" type="other" fp_name="/backprop_testbench/l1_raddr">
       <obj_property name="ElementShortName">l1_raddr</obj_property>
       <obj_property name="ObjectShortName">l1_raddr</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/l1_din">
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/l1_din">
       <obj_property name="ElementShortName">l1_din[15:0]</obj_property>
       <obj_property name="ObjectShortName">l1_din[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/l1_vin">
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/l1_vin">
       <obj_property name="ElementShortName">l1_vin</obj_property>
       <obj_property name="ObjectShortName">l1_vin</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/ve_datain">
-      <obj_property name="ElementShortName">ve_datain[15:0]</obj_property>
-      <obj_property name="ObjectShortName">ve_datain[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/l1_wren">
+      <obj_property name="ElementShortName">l1_wren</obj_property>
+      <obj_property name="ObjectShortName">l1_wren</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/ve_validin">
-      <obj_property name="ElementShortName">ve_validin</obj_property>
-      <obj_property name="ObjectShortName">ve_validin</obj_property>
+   <wvobject db_ref_id="1" type="other" fp_name="/backprop_testbench/l1_waddr">
+      <obj_property name="ElementShortName">l1_waddr</obj_property>
+      <obj_property name="ObjectShortName">l1_waddr</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/ve_req">
-      <obj_property name="ElementShortName">ve_req</obj_property>
-      <obj_property name="ObjectShortName">ve_req</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/l1_wdata">
+      <obj_property name="ElementShortName">l1_wdata[15:0]</obj_property>
+      <obj_property name="ObjectShortName">l1_wdata[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/ve_ack">
-      <obj_property name="ElementShortName">ve_ack</obj_property>
-      <obj_property name="ObjectShortName">ve_ack</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/l1_wren_bp">
+      <obj_property name="ElementShortName">l1_wren_bp</obj_property>
+      <obj_property name="ObjectShortName">l1_wren_bp</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/dataout">
-      <obj_property name="ElementShortName">dataout[31:0]</obj_property>
-      <obj_property name="ObjectShortName">dataout[31:0]</obj_property>
+   <wvobject db_ref_id="1" type="other" fp_name="/backprop_testbench/l1_waddr_bp">
+      <obj_property name="ElementShortName">l1_waddr_bp</obj_property>
+      <obj_property name="ObjectShortName">l1_waddr_bp</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/validout">
-      <obj_property name="ElementShortName">validout</obj_property>
-      <obj_property name="ObjectShortName">validout</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/l1_wdata_bp">
+      <obj_property name="ElementShortName">l1_wdata_bp[15:0]</obj_property>
+      <obj_property name="ObjectShortName">l1_wdata_bp[15:0]</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/fvalid">
-      <obj_property name="ElementShortName">fvalid</obj_property>
-      <obj_property name="ObjectShortName">fvalid</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/validfwd">
-      <obj_property name="ElementShortName">validfwd</obj_property>
-      <obj_property name="ObjectShortName">validfwd</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/bp_rst">
+      <obj_property name="ElementShortName">bp_rst</obj_property>
+      <obj_property name="ObjectShortName">bp_rst</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/datafwd">
-      <obj_property name="ElementShortName">datafwd[15:0]</obj_property>
-      <obj_property name="ObjectShortName">datafwd[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/l1_write_mux">
+      <obj_property name="ElementShortName">l1_write_mux</obj_property>
+      <obj_property name="ObjectShortName">l1_write_mux</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/re_a">
-      <obj_property name="ElementShortName">re_a</obj_property>
-      <obj_property name="ObjectShortName">re_a</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/l1_wren_tb">
+      <obj_property name="ElementShortName">l1_wren_tb</obj_property>
+      <obj_property name="ObjectShortName">l1_wren_tb</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_row_processor/addr_a">
-      <obj_property name="ElementShortName">addr_a</obj_property>
-      <obj_property name="ObjectShortName">addr_a</obj_property>
+   <wvobject db_ref_id="1" type="other" fp_name="/backprop_testbench/l1_waddr_tb">
+      <obj_property name="ElementShortName">l1_waddr_tb</obj_property>
+      <obj_property name="ObjectShortName">l1_waddr_tb</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/vout_a">
-      <obj_property name="ElementShortName">vout_a</obj_property>
-      <obj_property name="ObjectShortName">vout_a</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/l1_wdata_tb">
+      <obj_property name="ElementShortName">l1_wdata_tb[15:0]</obj_property>
+      <obj_property name="ObjectShortName">l1_wdata_tb[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/dout_a">
-      <obj_property name="ElementShortName">dout_a[15:0]</obj_property>
-      <obj_property name="ObjectShortName">dout_a[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/dl_writeen">
+      <obj_property name="ElementShortName">dl_writeen</obj_property>
+      <obj_property name="ObjectShortName">dl_writeen</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/re_b">
-      <obj_property name="ElementShortName">re_b</obj_property>
-      <obj_property name="ObjectShortName">re_b</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/dl_datain">
+      <obj_property name="ElementShortName">dl_datain[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dl_datain[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_row_processor/addr_b">
-      <obj_property name="ElementShortName">addr_b</obj_property>
-      <obj_property name="ObjectShortName">addr_b</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/all1_writeen">
+      <obj_property name="ElementShortName">all1_writeen</obj_property>
+      <obj_property name="ObjectShortName">all1_writeen</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/vout_b">
-      <obj_property name="ElementShortName">vout_b</obj_property>
-      <obj_property name="ObjectShortName">vout_b</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/all1_datain">
+      <obj_property name="ElementShortName">all1_datain[15:0]</obj_property>
+      <obj_property name="ObjectShortName">all1_datain[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/dout_b">
-      <obj_property name="ElementShortName">dout_b[15:0]</obj_property>
-      <obj_property name="ObjectShortName">dout_b[15:0]</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/backprop_testbench/apll1_datain">
+      <obj_property name="ElementShortName">apll1_datain[15:0]</obj_property>
+      <obj_property name="ObjectShortName">apll1_datain[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_row_processor/addr_c">
-      <obj_property name="ElementShortName">addr_c</obj_property>
-      <obj_property name="ObjectShortName">addr_c</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/vin_c">
-      <obj_property name="ElementShortName">vin_c</obj_property>
-      <obj_property name="ObjectShortName">vin_c</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/din_c">
-      <obj_property name="ElementShortName">din_c[15:0]</obj_property>
-      <obj_property name="ObjectShortName">din_c[15:0]</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/writeen">
-      <obj_property name="ElementShortName">writeen</obj_property>
-      <obj_property name="ObjectShortName">writeen</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/datain">
-      <obj_property name="ElementShortName">datain[15:0]</obj_property>
-      <obj_property name="ObjectShortName">datain[15:0]</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/readen">
-      <obj_property name="ElementShortName">readen</obj_property>
-      <obj_property name="ObjectShortName">readen</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/tb_row_processor/fifo_dataout">
-      <obj_property name="ElementShortName">fifo_dataout[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_dataout[15:0]</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/ackout">
-      <obj_property name="ElementShortName">ackout</obj_property>
-      <obj_property name="ObjectShortName">ackout</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/fifo_validout">
-      <obj_property name="ElementShortName">fifo_validout</obj_property>
-      <obj_property name="ObjectShortName">fifo_validout</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/empty">
-      <obj_property name="ElementShortName">empty</obj_property>
-      <obj_property name="ObjectShortName">empty</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/tb_row_processor/full">
-      <obj_property name="ElementShortName">full</obj_property>
-      <obj_property name="ObjectShortName">full</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="other" fp_name="/tb_row_processor/debug_product_latch">
-      <obj_property name="ElementShortName">debug_product_latch</obj_property>
-      <obj_property name="ObjectShortName">debug_product_latch</obj_property>
+   <wvobject db_ref_id="1" type="logic" fp_name="/backprop_testbench/apll1_writeen">
+      <obj_property name="ElementShortName">apll1_writeen</obj_property>
+      <obj_property name="ObjectShortName">apll1_writeen</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
 </wave_config>

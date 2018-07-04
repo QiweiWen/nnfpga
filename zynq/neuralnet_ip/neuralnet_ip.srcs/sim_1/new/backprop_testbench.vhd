@@ -16,7 +16,11 @@ end backprop_testbench;
 architecture Behavioral of backprop_testbench is
 
 constant ntcols: integer := 5;
+constant ncols : integer := ntcols;
 constant dfifo : integer := 10;
+constant data_width : integer := 16;
+
+constant period: time := 100 ns;
 
 component trow_processor is
 generic (
@@ -103,7 +107,7 @@ component std_fifo is
     );
 end component std_fifo;
 
-signal clk: std_logic;
+signal clk: std_logic := '0';
 
 signal deltaout_debug: real;
 signal l1_wdata_debug: real;
@@ -126,7 +130,6 @@ signal dl_validout: std_logic;
 
 signal deltaout: std_logic_vector (15 downto 0);
 signal l1_rdata: std_logic_vector (15 downto 0);
-signal l1_wdata: std_logic_vector (15 downto 0);
 
 signal trow_validout: std_logic;
 
@@ -134,6 +137,10 @@ signal l1_rden: std_logic;
 signal l1_raddr: integer range 0 to ncols - 1; 
 signal l1_din : std_logic_vector (15 downto 0);
 signal l1_vin : std_logic;
+
+signal l1_wren: std_logic;
+signal l1_waddr: integer range 0 to ncols - 1;
+signal l1_wdata: std_logic_vector (15 downto 0);
 
 signal l1_wren_bp: std_logic;
 signal l1_waddr_bp: integer range 0 to ncols - 1;
@@ -165,6 +172,7 @@ l1_wren <= l1_wren_bp when l1_write_mux = '1' else l1_wren_tb;
 l1_waddr <= l1_waddr_bp when l1_write_mux = '1' else l1_waddr_tb;
 l1_wdata <= l1_wdata_bp when l1_write_mux = '1' else l1_wdata_tb;
 
+clk <= not clk after period/2; 
 
 debug_process: process (clk, rst) is
 begin
@@ -291,6 +299,37 @@ port map (
     vin_c   => l1_wren,
     din_c   => l1_wdata
 );
+
+stimuli: process
+    procedure param_put (
+        signal target: out std_logic_vector (15 downto 0); 
+        constant value : real 
+    )is
+        subtype word_t is std_logic_vector (15 downto 0);
+    begin
+        target <= word_t (to_sfixed (value, PARAM_DEC - 1, -PARAM_FRC));
+    end procedure;
+begin
+
+-- hold trow_processor reset signal low, set up parameters
+    rst             <= '0';
+    bp_rst          <= '0';
+    l1_write_mux    <= '0';
+    l1_wren_tb      <= '0';
+    l1_waddr_tb     <= 0;
+    l1_wdata_tb     <= (others => '0');
+    apll1_writeen   <= '0';
+    apll1_datain    <= (others => '0');
+    dl_writeen      <= '0';
+    dl_datain       <= (others => '0');
+    all1_writeen    <= '0';
+    all1_datain     <= (others => '0');
+    wait for period;
+    rst <= '1';
+    wait for period;
+
+    wait;
+end process;
 
 
 end Behavioral;
