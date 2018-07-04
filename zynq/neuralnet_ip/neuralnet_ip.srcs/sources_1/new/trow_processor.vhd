@@ -13,6 +13,10 @@ use ieee.math_real.all;
 -- preserve all row processor ports
 -- add duplicated aL-1 input, weight memory write ports
 -- and zL-1 FIFO input
+
+-- note: foward stage is column major, so all1 and apll1 are parallel FIFOs
+--       i.e. made up of as many fifos are there are col-/trow-processors
+--       each holding a queue of single vector elements
 entity trow_processor is
 generic (
     ncols: integer := 100
@@ -78,8 +82,8 @@ signal apll1_req_pipe: std_logic;
 -- all1 (previous activated result) signals
 signal all1_latched: std_logic_vector (15 downto 0); 
 signal all1_final: std_logic_vector (15 downto 0);
-signal lambda_dl: std_logic_vector (15 downto 0); 
--- lambda_dl * all1
+signal minus_lambda_dl: std_logic_vector (15 downto 0); 
+-- minus_lambda_dl * all1
 signal weight_adj_data: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
 -- delay l1 read address by 3 cycles to become l1 writeback address
@@ -179,13 +183,15 @@ begin
     all1_final <= all1_latched when all1_validin = '0' else all1_datain;
     
     bias_change_vout <= dl_validin; 
-    bias_change_dout <= lambda_dl;
+    bias_change_dout <= minus_lambda_dl;
 
-    lambda_dl_process: process (dl_datain) is
+    minus_lambda_dl_process: process (dl_datain) is
         constant shift_amount : integer := fraction_to_shift (LEARN_RATE);
         variable padding : std_logic_vector (shift_amount - 1 downto 0) := (others => '0'); 
+        variable lambda_dl: std_logic_vector (15 downto 0);
     begin
-        lambda_dl <= padding & dl_datain (15 downto shift_amount); 
+        lambda_dl := padding & dl_datain (15 downto shift_amount); 
+        minus_lambda_dl <= std_logic_vector(unsigned(not (lambda_dl)) + 1); 
     end process;
 
     -- weight adjustment calculation
@@ -198,7 +204,7 @@ begin
                 weight_adj_valid <= '0';
             else
                 weight_adj_valid <= dl_validin;
-                weight_adj_full := full_prod_t(to_sfixed(lambda_dl, PARAM_DEC - 1, -PARAM_FRC) *
+                weight_adj_full := full_prod_t(to_sfixed(minus_lambda_dl, PARAM_DEC - 1, -PARAM_FRC) *
                                                to_sfixed(all1_final,PARAM_DEC - 1, -PARAM_FRC));
                 weight_adj_data <= weight_adj_full 
                                    (2 * PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);

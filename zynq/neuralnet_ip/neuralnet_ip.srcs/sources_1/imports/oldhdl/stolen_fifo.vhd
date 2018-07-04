@@ -7,22 +7,22 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity std_fifo is
-	generic (
-		constant data_width  : positive := 8;
-		constant fifo_depth	: positive := 256
-	);
-	port ( 
-		clk		: in  std_logic;
-		rst		: in  std_logic;
-		writeen	: in  std_logic;
-		datain	: in  std_logic_vector (data_width - 1 downto 0);
-		readen	: in  std_logic;
-		dataout	: out std_logic_vector (data_width - 1 downto 0);
-		ackout  : out std_logic;
+    generic (
+        constant data_width  : positive := 8;
+        constant fifo_depth	: positive := 256
+    );
+    port ( 
+        clk		: in  std_logic;
+        rst		: in  std_logic;
+        writeen	: in  std_logic;
+        datain	: in  std_logic_vector (data_width - 1 downto 0);
+        readen	: in  std_logic;
+        dataout	: out std_logic_vector (data_width - 1 downto 0);
+        ackout  : out std_logic;
         validout: out std_logic;
-		empty	: out std_logic;
-		full	: out std_logic
-	);
+        empty	: out std_logic;
+        full	: out std_logic
+    );
 end std_fifo;
 
 architecture behavioral of std_fifo is
