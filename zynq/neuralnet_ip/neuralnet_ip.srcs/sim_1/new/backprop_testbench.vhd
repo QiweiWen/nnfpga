@@ -15,12 +15,39 @@ end backprop_testbench;
 
 architecture Behavioral of backprop_testbench is
 
+constant ntests: integer := 10;
+
 constant ntcols: integer := 5;
 constant ncols : integer := ntcols;
-constant dfifo : integer := 10;
+constant dfifo : integer := ntests;
 constant data_width : integer := 16;
 
 constant period: time := 100 ns;
+
+type testcase_t is array (integer range <>) of real; 
+signal dl_testcases: testcase_t (ntests * ncols - 1 downto 0) := 
+(0.583486,0.574348,0.319676,-0.797673,0.450610,
+0.611267,0.572265,-0.667909,0.192147,0.437322,
+-0.378571,0.548800,0.311309,0.187077,0.443624,
+0.592730,0.591352,0.335260,0.196285,-0.553438,
+0.593162,0.567203,0.336407,0.190221,-0.579405,
+-0.392324,0.555430,0.321170,0.193191,0.436045,
+0.601545,0.548151,0.326464,0.202326,-0.555112,
+0.591166,0.575220,0.334778,-0.805444,0.441277,
+0.584197,0.578320,0.329827,-0.798744,0.451349,
+0.607979,-0.440198,0.327813,0.195254,0.441677);
+
+signal all1_testcases: testcase_t (ntests - 1 downto 0) := 
+(0.387906,0.376820,0.274759,0.445996,0.319601,
+0.322106,0.237987,0.313754,0.360545,0.315768);
+
+signal apll1_testcases: testcase_t (ntests - 1 downto 0) :=
+(0.237435,0.234827,0.199266,0.247084,0.217456,
+0.218354,0.181349,0.215313,0.230552,0.216059);
+
+signal initial_weight: testcase_t (ncols - 1 downto 0) := 
+(-0.139193,0.251833,-0.375736,-0.132665,-0.059883);
+
 
 component trow_processor is
 generic (
@@ -124,12 +151,12 @@ signal apll1_ackout  : std_logic;
 signal apll1_validout: std_logic;
 
 signal dl_readen  : std_logic;
+signal dl_readen_bp: std_logic;
 signal dl_dataout : std_logic_vector (data_width - 1 downto 0);
 signal dl_ackout  : std_logic;
 signal dl_validout: std_logic;
 
 signal deltaout: std_logic_vector (15 downto 0);
-signal l1_rdata: std_logic_vector (15 downto 0);
 
 signal trow_validout: std_logic;
 
@@ -151,7 +178,6 @@ signal l1_wdata_bp: std_logic_vector (15 downto 0);
 signal rst: std_logic;
 signal bp_rst: std_logic;
 
-signal l1_write_mux: std_logic := '0';
 
 signal l1_wren_tb: std_logic;
 signal l1_waddr_tb: integer range 0 to ncols - 1;
@@ -168,9 +194,9 @@ signal all1_datain  : std_logic_vector (data_width - 1 downto 0);
 
 begin
 
-l1_wren <= l1_wren_bp when l1_write_mux = '1' else l1_wren_tb;
-l1_waddr <= l1_waddr_bp when l1_write_mux = '1' else l1_waddr_tb;
-l1_wdata <= l1_wdata_bp when l1_write_mux = '1' else l1_wdata_tb;
+l1_wren <= l1_wren_tb;
+l1_waddr <= l1_waddr_tb;
+l1_wdata <= l1_wdata_tb;
 
 clk <= not clk after period/2; 
 
@@ -187,7 +213,7 @@ begin
             end if;
 
             if (l1_vin = '1') then
-                l1_rdata_debug <= to_real (to_sfixed(l1_rdata, PARAM_DEC - 1, -PARAM_FRC));
+                l1_rdata_debug <= to_real (to_sfixed(l1_din, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
             if (l1_wren = '1') then
@@ -212,6 +238,8 @@ port map (
     empty => open,
     full => open
 );
+
+dl_readen <= '1' when bp_rst = '1' and dl_readen_bp = '1' else '0';
 
 all1_fifo: std_fifo
 generic map (data_width => 16, fifo_depth => dfifo)  
@@ -251,7 +279,7 @@ port map (
     dl_datain => dl_dataout,
     dl_validin => dl_validout,
     dl_ack  => dl_ackout,
-    dl_req  =>  dl_readen,
+    dl_req  =>  dl_readen_bp,
     deltaout => deltaout,
     validout => trow_validout,
     
@@ -314,7 +342,6 @@ begin
 -- hold trow_processor reset signal low, set up parameters
     rst             <= '0';
     bp_rst          <= '0';
-    l1_write_mux    <= '0';
     l1_wren_tb      <= '0';
     l1_waddr_tb     <= 0;
     l1_wdata_tb     <= (others => '0');
@@ -327,7 +354,34 @@ begin
     wait for period;
     rst <= '1';
     wait for period;
-
+    l1_wren_tb <= '1';
+    -- set up initial weight
+    for i in 0 to ncols - 1 loop
+        l1_waddr_tb <= i;
+        param_put (l1_wdata_tb, initial_weight (i)); 
+        wait for 100 ns;
+    end loop;
+    l1_wren_tb <= '0';
+    all1_writeen <= '1';
+    apll1_writeen <= '1';
+    -- set up sigmoid and sigmoid prime fifos
+    for i in 0 to ntests - 1 loop
+        param_put (all1_datain, all1_testcases (i));
+        param_put (apll1_datain, apll1_testcases (i));
+        wait for 100 ns;
+    end loop;
+    all1_writeen <= '0';
+    apll1_writeen <= '0';
+    dl_writeen <= '1';
+    -- set up delta input vector fifo
+    for i in 0 to ntests * ncols - 1 loop
+        param_put (dl_datain, dl_testcases (i));
+        wait for 100 ns;
+    end loop;
+    dl_writeen <= '0';
+    bp_rst <= '1';
+    wait for 100 ns;
+    -- go on and let trow do its thing
     wait;
 end process;
 

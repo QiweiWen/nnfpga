@@ -86,10 +86,10 @@ class Neuralnet(object):
                 for x in range (0, wgradmatt.cols):
                     f.write ("%f|" % wgradmatt[(0, x)])
                 if (Zind >= 0):
-                    f.write ("\nzll1:\n")
+                    f.write ("\napll1:\n")
                     lastZ = ffres[Zind]
                     for x in range(0, lastZ.dim):
-                        f.write ("%f|" % lastZ[x])
+                        f.write ("%f|" % sigmoidgrad(lastZ)[x])
 
                 f.write ("\nall1:\n")
                 for x in range (0, lastA.dim):
