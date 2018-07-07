@@ -25,7 +25,7 @@ constant data_width : integer := 16;
 constant period: time := 100 ns;
 
 type testcase_t is array (integer range <>) of real; 
-signal dl_testcases: testcase_t (ntests * ncols - 1 downto 0) := 
+signal dl_testcases: testcase_t (0 to ntests * ncols - 1) := 
 (0.583486,0.574348,0.319676,-0.797673,0.450610,
 0.611267,0.572265,-0.667909,0.192147,0.437322,
 -0.378571,0.548800,0.311309,0.187077,0.443624,
@@ -37,15 +37,15 @@ signal dl_testcases: testcase_t (ntests * ncols - 1 downto 0) :=
 0.584197,0.578320,0.329827,-0.798744,0.451349,
 0.607979,-0.440198,0.327813,0.195254,0.441677);
 
-signal all1_testcases: testcase_t (ntests - 1 downto 0) := 
+signal all1_testcases: testcase_t (0 to ntests - 1) := 
 (0.387906,0.376820,0.274759,0.445996,0.319601,
 0.322106,0.237987,0.313754,0.360545,0.315768);
 
-signal apll1_testcases: testcase_t (ntests - 1 downto 0) :=
+signal apll1_testcases: testcase_t (0 to ntests - 1) :=
 (0.237435,0.234827,0.199266,0.247084,0.217456,
 0.218354,0.181349,0.215313,0.230552,0.216059);
 
-signal initial_weight: testcase_t (ncols - 1 downto 0) := 
+signal initial_weight: testcase_t (0 to ncols - 1) := 
 (-0.139193,0.251833,-0.375736,-0.132665,-0.059883);
 
 
@@ -216,8 +216,8 @@ begin
                 l1_rdata_debug <= to_real (to_sfixed(l1_din, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
-            if (l1_wren = '1') then
-                l1_wdata_debug <= to_real (to_sfixed(l1_wdata, PARAM_DEC - 1, -PARAM_FRC));
+            if (l1_wren_bp = '1') then
+                l1_wdata_debug <= to_real (to_sfixed(l1_wdata_bp, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
         end if;
