@@ -22,6 +22,9 @@ generic (
     ncols: integer := 100
 );
 port(
+-- TODO: get rid of later
+    debug: out std_logic_vector (16 downto 0);
+-- 
     clk: in std_logic;
     alrst: in std_logic;
 -- delta vector input channel
@@ -119,6 +122,11 @@ port(
 );
 end component row_processor;
 begin
+
+    -- TODO: get rid of later
+    debug (15 downto 0) <= weight_adj_data;
+    debug (16) <= weight_adj_valid;
+
     l1_rden <= sig_l1_rden;
     l1_raddr <= sig_l1_raddr;
     
@@ -187,9 +195,10 @@ begin
 
     minus_lambda_dl_process: process (dl_datain) is
         constant shift_amount : integer := fraction_to_shift (LEARN_RATE);
-        variable padding : std_logic_vector (shift_amount - 1 downto 0) := (others => '0'); 
+        variable padding : std_logic_vector (shift_amount - 1 downto 0);
         variable lambda_dl: std_logic_vector (15 downto 0);
     begin
+        padding := (others => dl_datain(15));
         lambda_dl := padding & dl_datain (15 downto shift_amount); 
         minus_lambda_dl <= std_logic_vector(unsigned(not (lambda_dl)) + 1); 
     end process;
