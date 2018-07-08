@@ -250,7 +250,7 @@ port map (
     full => open
 );
 
-dl_readen <= '1' when bp_rst = '1' and dl_readen_bp = '1' else '0';
+dl_readen <= dl_readen_bp;
 
 all1_fifo: std_fifo
 generic map (data_width => 16, fifo_depth => dfifo)  

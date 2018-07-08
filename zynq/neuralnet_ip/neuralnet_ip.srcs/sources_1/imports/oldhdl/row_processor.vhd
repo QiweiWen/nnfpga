@@ -68,7 +68,7 @@ begin
 l1_rden <= ve_ack;
 
 -- row processor is always ready to consume more vector elements
-ve_req <= '1';
+ve_req <= '1' when alrst = '1' else '0';
 
 l1_raddr <= sig_l1_raddr;
 sig_l1_raddr_proc: 
