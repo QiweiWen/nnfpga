@@ -32,8 +32,8 @@ port (
     idfwd: in std_logic_vector (31 downto 0);
 -- partial result accumulation output to the next column processor
 -- or to be truncated and committed to the FIFO 
-    ovfwd: out std_logic;
-    odfwd: out std_logic_vector (31 downto 0);
+    validout: out std_logic;
+    deltaout: out std_logic_vector (15 downto 0);
 -- weight memory write ports
     l1_wren: out std_logic;
     l1_waddr: out integer range 0 to nrows - 1;
@@ -102,9 +102,19 @@ type l1_raddr_pipe_t is array (3 downto 0) of integer range 0 to nrows - 1;
 signal l1_raddr_pipe: l1_raddr_pipe_t;
 signal l1_din_delayed: std_logic_vector (15 downto 0);
 
+signal prod_trunc: std_logic_vector (15 downto 0);
+signal prod_vtrunc: std_logic;
+
+signal sig_ovfwd: std_logic;
+signal sig_odfwd: std_logic_vector (31 downto 0);
+
+signal delta_validout_next: std_logic;
+signal dll1_full: std_logic_vector (31 downto 0);
+
 begin
 
 l1_raddr <= sig_l1_raddr;
+
 backprop: column_processor
 generic map (nrows => nrows)
 port map (
@@ -122,8 +132,8 @@ port map (
     isync           => isync,
     ivfwd           => ivfwd,
     idfwd           => idfwd,
-    ovfwd           => ovfwd,
-    odfwd           => odfwd
+    ovfwd           => sig_ovfwd,
+    odfwd           => sig_odfwd
 );
 
 all1_req <= '1' when sig_l1_raddr /= 0 or dl_ack = '1' else '0';
@@ -173,7 +183,7 @@ begin
             weight_adj_data <= (others => '0'); 
             weight_adj_valid <= '0';
         else
-            weight_adj_valid <= dl_validin;
+            weight_adj_valid <= all1_validin;
             weight_adj_full := full_prod_t(to_sfixed(lambda_dl,PARAM_DEC - 1,-PARAM_FRC) *
                                            to_sfixed(minus_all1_datain,PARAM_DEC - 1,-PARAM_FRC));
             weight_adj_data <= weight_adj_full 
@@ -214,5 +224,28 @@ begin
 end process;
 
 l1_waddr <= l1_raddr_pipe (0);
+
+-- Backprop part
+apll1_req <= ivfwd; 
+delta_validout_next <= '1' when apll1_validin = '1' and prod_vtrunc = '1' else '0';
+deltaout <= dll1_full (PARAM_FRC * 2 + PARAM_DEC - 1 downto PARAM_FRC);
+
+hadamard_process: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            prod_trunc <= (others => '0');
+            prod_vtrunc <= '0';
+            dll1_full <= (others => '0');
+            validout <= '0';
+        else
+            prod_trunc <= fun_mul_truncate (sig_odfwd, 15);
+            prod_vtrunc <= sig_ovfwd;
+            dll1_full <= full_prod_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
+                                      to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
+            validout <= delta_validout_next;
+        end if;
+    end if;
+end process;
 
 end Behavioral;
