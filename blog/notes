@@ -39,3 +39,8 @@ design. When that is done, I will begin zynq software development...
 -------------
 I remember now that a0 is the input vector and will not have a corresponding z0 vector. I'm leaning
 towards duplicated sigmoid and sigmoid-prime fifos now.
+
+10/07/2018
+-------------
+Generated test data for transpose row and column processing elements using the python scripts, verified
+transpose row processor output. Finished coding transpose column processor, not yet tested.
