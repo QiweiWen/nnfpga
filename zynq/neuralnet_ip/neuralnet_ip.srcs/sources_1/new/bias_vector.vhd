@@ -19,7 +19,7 @@ port (
 -- goes to sigmoid unit and fifos
     biased: out std_logic_vector (15 downto 0);
     vout: out std_logic;
--- bias update channel from delta fifo
+-- bias update channel from transpose row processor
     updated: in std_logic_vector (15 downto 0);
     uvin: in std_logic
 );

@@ -54,7 +54,6 @@ generic (
     ncols: integer := 100
 );
 port(
-    debug : out std_logic_vector (16 downto 0);
     clk: in std_logic;
     alrst: in std_logic;
 -- delta vector input channel
@@ -140,7 +139,6 @@ signal clk: std_logic := '0';
 signal deltaout_debug: real;
 signal l1_wdata_debug: real;
 signal l1_rdata_debug: real;
-signal gradient_descent_step: real;
 
 signal all1_readen  : std_logic;
 signal all1_dataout : std_logic_vector (data_width - 1 downto 0);
@@ -175,7 +173,7 @@ signal l1_wren_bp: std_logic;
 signal l1_waddr_bp: integer range 0 to ncols - 1;
 signal l1_wdata_bp: std_logic_vector (15 downto 0);
 
-signal bp_debug: std_logic_vector (16 downto 0);
+signal bp_aebug: std_logic_vector (16 downto 0);
 
 -- testbench signals
 
@@ -212,7 +210,6 @@ begin
             deltaout_debug <= -42.0;
             l1_wdata_debug <= -42.0;
             l1_rdata_debug <= -42.0;
-            gradient_descent_step <= -42.0;
         else
             if (trow_validout = '1') then
                 deltaout_debug <= to_real (to_sfixed(deltaout, PARAM_DEC - 1, -PARAM_FRC));
@@ -224,11 +221,6 @@ begin
 
             if (l1_wren_bp = '1') then
                 l1_wdata_debug <= to_real (to_sfixed(l1_wdata_bp, PARAM_DEC - 1, -PARAM_FRC));
-            end if;
-
-            if (bp_debug (16) = '1') then
-                gradient_descent_step <= to_real (to_sfixed (bp_debug(15 downto 0),
-                                                  PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
         end if;
@@ -285,8 +277,6 @@ port map (
 backprop: trow_processor
 generic map (ncols => ntcols)
 port map (
-    debug => bp_debug,    
-
     clk   => clk,
     alrst => bp_rst,
     dl_datain => dl_dataout,

@@ -12,19 +12,19 @@ use ieee.math_real.all;
 
 -- preserve all row processor ports
 -- add duplicated aL-1 input, weight memory write ports
--- and zL-1 FIFO input
+-- and sigmoid prime (L-1) FIFO input
 
 -- note: foward stage is column major, so all1 and apll1 are parallel FIFOs
 --       i.e. made up of as many fifos are there are col-/trow-processors
 --       each holding a queue of single vector elements
+--
+-- Also note: only the bias_change_dout and bias_change_vout output from the
+--            trow processor is used, the others are redundant and will be trimmed
 entity trow_processor is
 generic (
     ncols: integer := 100
 );
 port(
--- TODO: get rid of later
-    debug: out std_logic_vector (16 downto 0);
--- 
     clk: in std_logic;
     alrst: in std_logic;
 -- delta vector input channel
@@ -123,10 +123,6 @@ port(
 end component row_processor;
 begin
 
-    -- TODO: get rid of later
-    debug (15 downto 0) <= weight_adj_data;
-    debug (16) <= weight_adj_valid;
-
     l1_rden <= sig_l1_rden;
     l1_raddr <= sig_l1_raddr;
     
@@ -190,8 +186,18 @@ begin
     end process;
     all1_final <= all1_latched when all1_validin = '0' else all1_datain;
     
-    bias_change_vout <= dl_validin; 
-    bias_change_dout <= minus_lambda_dl;
+    bias_derivative_process: process (clk) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                bias_change_vout <= '0';
+                bias_change_dout <= (others => '0');
+            else
+                bias_change_vout <= dl_validin; 
+                bias_change_dout <= minus_lambda_dl;
+            end if;
+        end if;
+    end process;
 
     minus_lambda_dl_process: process (dl_datain) is
         constant shift_amount : integer := fraction_to_shift (LEARN_RATE);
