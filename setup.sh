@@ -27,3 +27,17 @@ sw_prototype/libs/makeall
 chmod a+x metaprogramming/makeall
 metaprogramming/makeall clean
 metaprogramming/makeall
+
+# copy metaprogrammed files into vivado project
+cp metaprogramming/sigmoidgen/vhdl/*.vhd zynq/neuralnet_ip/hdl/source
+# TODO: do the same here for metaprogrammed top-level neural net design
+#       when the software is there
+
+cat << EOF
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Project set up complete! Run the tcl scripts under zynq
+in vivado to create the projects.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+EOF

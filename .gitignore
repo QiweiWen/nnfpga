@@ -1,0 +1,6 @@
+*.o
+*.so
+*/sigmoidgen
+*.pyc
+sw_prototype/ffnetwork/log
+.tmp
