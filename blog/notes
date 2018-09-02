@@ -44,3 +44,17 @@ towards duplicated sigmoid and sigmoid-prime fifos now.
 -------------
 Generated test data for transpose row and column processing elements using the python scripts, verified
 transpose row processor output. Finished coding transpose column processor, not yet tested.
+
+02/09/2018
+-------------
+Life has been a trainwreck, new job has been stressful, and it's been hard to find time to work on Zynq.
+Recently re-acquainted myself with the codebase and realised that the transpose column processing element
+lacked the partial product output ports, which has been fixed. Also got rid of the old project folder in
+favour of a form suitable for version control.
+
+I'm afraid testing a single tcol PE won't be enough, need to put a few of them in series to test overall
+behaviour.
+
+Once tcol PE is tested I will start on the metaprogramming tool for the top module. Might use a preprocessing language
+now that there's a stable place to put HDL design files.
+

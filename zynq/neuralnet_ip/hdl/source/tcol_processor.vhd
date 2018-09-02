@@ -31,7 +31,11 @@ port (
     ivfwd: in std_logic;
     idfwd: in std_logic_vector (31 downto 0);
 -- partial result accumulation output to the next column processor
--- or to be truncated and committed to the FIFO 
+    ovfwd: out std_logic;
+    odfwd: out std_logic_vector (31 downto 0);
+-- dll1 output from the last column processor  
+-- left unconnected for all other transpose
+-- column processors so it can be trimmed
     validout: out std_logic;
     deltaout: out std_logic_vector (15 downto 0);
 -- weight memory write ports
@@ -135,6 +139,9 @@ port map (
     ovfwd           => sig_ovfwd,
     odfwd           => sig_odfwd
 );
+
+odfwd <= sig_odfwd;
+ovfwd <= sig_ovfwd;
 
 all1_req <= '1' when sig_l1_raddr /= 0 or dl_ack = '1' else '0';
 
