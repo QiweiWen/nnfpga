@@ -49,6 +49,8 @@ port (
     all1_datain: in std_logic_vector (15 downto 0);
     all1_validin: in std_logic;
     all1_req: out std_logic;
+    all1_fwd: out std_logic_vector (15 downto 0);
+    all1_vfwd: out std_logic;
 -- sigmoid-prime L-1 input for backprop
     apll1_datain: in std_logic_vector (15 downto 0);
     apll1_validin: in std_logic;
@@ -233,6 +235,20 @@ end process;
 l1_waddr <= l1_raddr_pipe (0);
 
 -- Backprop part
+all1_fwd_proc: process (clk, alrst) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            all1_fwd <= (others => '0'); 
+            all1_vfwd <= '0';
+        else
+            all1_fwd <= all1_datain; 
+            all1_vfwd <= all1_validin;
+        end if;
+    end if;
+end process;
+
+
 apll1_req <= ivfwd; 
 delta_validout_next <= '1' when apll1_validin = '1' and prod_vtrunc = '1' else '0';
 deltaout <= dll1_full (PARAM_FRC * 2 + PARAM_DEC - 1 downto PARAM_FRC);

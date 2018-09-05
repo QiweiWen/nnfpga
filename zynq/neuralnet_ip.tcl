@@ -200,7 +200,7 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/rpe_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/bias_vector_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/sigmoid_tb.vhd" ]\
- [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/backprop_testbench.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/trow_testbench.vhd" ]\
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -245,7 +245,7 @@ set file "sigmoid_tb.vhd"
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
-set file "backprop_testbench.vhd"
+set file "trow_testbench.vhd"
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 

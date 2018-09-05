@@ -10,10 +10,10 @@ use ieee.math_real.all;
 use work.helperpkg.all;
 use work.nn_arith_package.all;
 
-entity backprop_testbench is
-end backprop_testbench;
+entity trow_testbench is
+end trow_testbench;
 
-architecture Behavioral of backprop_testbench is
+architecture Behavioral of trow_testbench is
 
 constant ntests: integer := 10;
 
