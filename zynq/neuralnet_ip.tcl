@@ -201,6 +201,7 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/bias_vector_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/sigmoid_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/trow_testbench.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/tcol_testbench.vhd" ]\
 ]
 add_files -norecurse -fileset $obj $files
 

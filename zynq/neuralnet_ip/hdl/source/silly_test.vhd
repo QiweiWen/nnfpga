@@ -15,6 +15,9 @@ end silly_test;
 architecture Behavioral of silly_test is
     signal vin_latched: std_logic;
     signal din_latched: std_logic_vector (15 downto 0);
+    
+    signal vout_next: std_logic;
+    signal dout_next: std_logic_vector (15 downto 0);
 
     component sigmoidfull is
     port (
@@ -34,9 +37,13 @@ input_register: process (clk, rst) is
             if (rst = '0') then
                 vin_latched <= '0';
                 din_latched <= (others => '0');
+                vout <= '0';
+                dout <= (others => '0');
             else
                 vin_latched <= vin;
                 din_latched <= din;
+                vout <= vout_next;
+                dout <= dout_next;
             end if;
         end if;
     end process;
@@ -47,8 +54,8 @@ port map (
     rst => rst,
     datain => din_latched,
     validin => vin_latched,
-    dataout => dout,
-    validout => vout
+    dataout => dout_next,
+    validout => vout_next
 );
 
 end Behavioral;
