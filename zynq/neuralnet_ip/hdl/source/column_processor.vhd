@@ -76,7 +76,7 @@ end process;
 
 -- FIFO read synchronisation
 sig_ve_req <= '1' when sig_l1_raddr_curr = 0 else '0';
-ve_req <= '1' when sig_ve_req = '1' and isync = '1' else '0';
+ve_req <= '1' when sig_ve_req = '1' and isync = '1' and alrst = '1' else '0';
 
 osync_proc: process (clk, alrst) is
 begin

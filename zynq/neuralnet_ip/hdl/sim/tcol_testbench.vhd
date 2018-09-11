@@ -369,7 +369,11 @@ begin
     end generate;
 
     aLL1_readen <= tcol_all1_req_array(0);
-    apLL1_readen <= tcol_apll1_req_array(0);
+    apLL1_readen <= tcol_apll1_req_array(ncols - 1);
+
+    -- tie down unused ports
+    ram_re_b_array <= (others => '0'); 
+    ram_addr_b_array <= (others => 0);
 
     stimulus: process is
         procedure param_put (
@@ -388,14 +392,44 @@ begin
             dL_datain_array(I) <= (others => '0');
             ram_vin_c_array(I) <= '0';
             ram_din_c_array(I) <= (others => '0');
-
-            ram_re_b_array(I) <= '0'; 
-            ram_addr_b_array(I) <= 0;
         end loop;
         aLL1_writeen <= '0';
         aLL1_datain <= (others => '0');
         apLL1_writeen <= '0';
         apLL1_datain <= (others => '0');
+        wait for period;
+        rst <= '1';
+        -- set up all1 and apll1 fifo 
+        aLL1_writeen <= '1';
+        apLL1_writeen <= '1';
+        for I in 0 to ntests * nrows - 1 loop
+            param_put(aLL1_datain, all1_input(I));
+            param_put(apLL1_datain, apll1_input(I));
+            wait for 100 ns;
+        end loop;
+        apLL1_writeen <= '0';
+        aLL1_writeen <= '0';
+        
+        -- set up dL fifos
+        dl_writeen_array <= (others => '1');
+        for I in 0 to ntests - 1 loop
+            for J in 0 to ncols - 1 loop
+                param_put(dL_datain_array(J), dl_input(I, J)); 
+            end loop;
+            wait for 100 ns;
+        end loop;
+        dl_writeen_array <= (others => '0');
+
+        -- set up blockram weights
+        ram_vin_c_array <= (others => '1');
+        for I in 0 to nrows - 1 loop
+            for J in 0 to ncols - 1 loop
+                param_put(ram_din_c_array(J), tcol_weights(J, I));
+            end loop;
+            wait for 100 ns;
+        end loop;
+        ram_vin_c_array <= (others => '0');
+        bp_rst <= '1';
         wait;
     end process;
 

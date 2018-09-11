@@ -253,7 +253,7 @@ set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
-set_property -name "top" -value "cfg_tb_cpe_massive" -objects $obj
+set_property -name "top" -value "tcol_testbench" -objects $obj
 
 # Create 'synth_1' run (if not found)
 if {[string equal [get_runs -quiet synth_1] ""]} {
