@@ -12,6 +12,7 @@ end package;
 package body helperpkg is
 constant PARAM_DEC: integer := 8;
 constant PARAM_FRC: integer := 8;
-constant LEARN_RATE: real := 0.1;
+-- TODO: reduce!!! this is for testing only
+constant LEARN_RATE: real := 1.0;
 constant DFIFO: integer := 256;
 end package body;

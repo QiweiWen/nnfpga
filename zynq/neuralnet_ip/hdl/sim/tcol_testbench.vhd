@@ -28,7 +28,7 @@ type float_1d_arr_t is array (integer range <>) of real;
 
 -- first dimension: each test case
 -- second dimension: element in each dl fifo
-signal dl_input: float_2d_arr_t(ntests - 1 downto 0, ncols - 1 downto 0) :=
+signal dl_input: float_2d_arr_t(0 to ntests - 1, 0 to ncols - 1) :=
     ((-0.381193,0.651545,0.417554,0.589392,0.306240),
     (-0.365389,0.659172,0.395017,0.572511,0.281734),
     (0.608586,-0.345382,0.400250,0.589144,0.280464),
@@ -40,7 +40,7 @@ signal dl_input: float_2d_arr_t(ntests - 1 downto 0, ncols - 1 downto 0) :=
     (-0.387744,0.674816,0.400102,0.581529,0.301592),
     (0.638633,0.670508,0.404044,0.584788,-0.708483));
 
-signal all1_input: float_1d_arr_t(ntests * nrows - 1 downto 0) :=
+signal all1_input: float_1d_arr_t(0 to ntests * nrows - 1) :=
     (0.502839,0.422817,0.599461,0.272314,0.573418,0.404518,0.199917,0.545752,
     0.440281,0.435661,0.650539,0.517641,0.571945,0.386644,0.293389,0.627112,
     0.397033,0.453427,0.635725,0.392508,0.692474,0.415871,0.319699,0.597401,
@@ -52,7 +52,7 @@ signal all1_input: float_1d_arr_t(ntests * nrows - 1 downto 0) :=
     0.386656,0.486426,0.549601,0.459429,0.620028,0.559125,0.269921,0.582694,
     0.507551,0.435053,0.672456,0.454738,0.632737,0.444412,0.191653,0.551874);
 
-signal apll1_input: float_1d_arr_t(ntests * nrows - 1 downto 0) :=
+signal apll1_input: float_1d_arr_t(0 to ntests * nrows - 1) :=
     (0.249992,0.244043,0.240108,0.198159,0.244610,0.240883,0.159950,0.247907,
     0.246434,0.245860,0.227338,0.249689,0.244824,0.237150,0.207312,0.233843,
     0.239398,0.247831,0.231579,0.238445,0.212954,0.242922,0.217492,0.240513,
@@ -64,7 +64,7 @@ signal apll1_input: float_1d_arr_t(ntests * nrows - 1 downto 0) :=
     0.237153,0.249816,0.247540,0.248354,0.235593,0.246504,0.197064,0.243162,
     0.249943,0.245782,0.220259,0.247951,0.232381,0.246910,0.154922,0.247309);
 
-signal tcol_weights: float_2d_arr_t(ncols - 1 downto 0, nrows - 1 downto 0) :=
+signal tcol_weights: float_2d_arr_t(0 to ncols - 1, 0 to nrows - 1) :=
     ((0.324416,-0.492426,0.399589,0.368251,-0.240314,0.112991,-0.259429,0.114863),
     (0.268788,0.257569,-0.102694,0.392164,0.088052,0.345470,0.000559,-0.460112),
     (-0.170633,0.026760,0.339232,-0.348056,-0.328511,0.128848,-0.022117,-0.399690),
@@ -244,8 +244,48 @@ signal tcol_apll1_datain_array: word_array_t(ncols - 1 downto 0);
 signal tcol_apll1_validin_array: std_logic_vector(ncols - 1 downto 0);
 signal tcol_apll1_req_array: std_logic_vector(ncols - 1 downto 0);
 
+-- +++++++++++++++++++++++
+--     Debug signals
+-- +++++++++++++++++++++++
+signal bias_derivative: float_1d_arr_t(ncols - 1 downto 0) := (others => 42.0);
+signal weight_derivative: float_1d_arr_t(ncols - 1 downto 0) := (others => 42.0);
+signal dLL1: real := 42.0;
+
 
 begin
+    debug_process: process(clk) is
+        variable waddr: integer;
+    begin
+        if (rising_edge(clk)) then
+            if (rst = '0') then
+                bias_derivative <= (others => 42.0);
+                weight_derivative <= (others => 42.0);
+                dLL1 <= 42.0;
+            else
+                for I in 0 to ncols - 1 loop
+                    if (tcol_bias_change_vout_array(I) = '1') then
+                        bias_derivative(I) <= -1 * 
+                                              to_real(to_sfixed(tcol_bias_change_dout_array(I),
+                                                      PARAM_DEC - 1, -PARAM_FRC));
+                    end if;
+                    
+                    if (tcol_l1_wren_array(I) = '1') then
+                        waddr := tcol_l1_waddr_array(I);
+                        weight_derivative(I) <= tcol_weights(I, waddr) - 
+                                                to_real(to_sfixed(tcol_l1_wdata_array(I),
+                                                        PARAM_DEC - 1, -PARAM_FRC));
+                    end if;
+                end loop;
+
+                if (tcol_validout_array(ncols - 1) = '1') then
+                    dLL1 <= to_real(to_sfixed(tcol_deltaout_array(ncols - 1),
+                                    PARAM_DEC - 1, -PARAM_FRC));
+                end if;
+
+            end if;
+        end if;
+    end process;
+
     clk <= not clk after period/2;
 
     aLL1_inst: std_fifo
@@ -392,6 +432,7 @@ begin
             dL_datain_array(I) <= (others => '0');
             ram_vin_c_array(I) <= '0';
             ram_din_c_array(I) <= (others => '0');
+            ram_addr_c_array(I) <= 0;
         end loop;
         aLL1_writeen <= '0';
         aLL1_datain <= (others => '0');
@@ -423,6 +464,7 @@ begin
         -- set up blockram weights
         ram_vin_c_array <= (others => '1');
         for I in 0 to nrows - 1 loop
+            ram_addr_c_array <= (others => I);
             for J in 0 to ncols - 1 loop
                 param_put(ram_din_c_array(J), tcol_weights(J, I));
             end loop;
