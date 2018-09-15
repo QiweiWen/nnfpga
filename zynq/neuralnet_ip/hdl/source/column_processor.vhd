@@ -14,11 +14,11 @@ generic (
 port(
     clk: in std_logic;
     alrst: in std_logic;
--- l1 cache external interface
-    l1_rden: out std_logic;
-    l1_raddr: out integer range 0 to nrows - 1; 
-    l1_din : in std_logic_vector (15 downto 0);
-    l1_vin : in std_logic;
+-- wram cache external interface
+    wram_rden: out std_logic;
+    wram_raddr: out integer range 0 to nrows - 1; 
+    wram_din : in std_logic_vector (15 downto 0);
+    wram_vin : in std_logic;
 -- vector element input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
@@ -38,8 +38,8 @@ port(
 end column_processor;
 
 architecture Behavioral of column_processor is
-    signal sig_l1_raddr_curr: integer range 0 to nrows - 1;
-    signal sig_l1_raddr_next: integer range 0 to nrows - 1;
+    signal sig_wram_raddr_curr: integer range 0 to nrows - 1;
+    signal sig_wram_raddr_next: integer range 0 to nrows - 1;
 
     -- we latch a vector element and compute a partial
     -- product vector
@@ -75,7 +75,7 @@ begin
 end process;
 
 -- FIFO read synchronisation
-sig_ve_req <= '1' when sig_l1_raddr_curr = 0 else '0';
+sig_ve_req <= '1' when sig_wram_raddr_curr = 0 else '0';
 ve_req <= '1' when sig_ve_req = '1' and isync = '1' and alrst = '1' else '0';
 
 osync_proc: process (clk, alrst) is
@@ -101,32 +101,32 @@ begin
     end if;
 end process;
 
--- l1 (column weight) read address
+-- wram (column weight) read address
 -- latches at 0 until FIFO becomes ready to read
-l1_raddr_proc:
+wram_raddr_proc:
 process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
         if (alrst = '0') then
-            sig_l1_raddr_curr <= 0;
+            sig_wram_raddr_curr <= 0;
         else
-            sig_l1_raddr_curr <= sig_l1_raddr_next;
+            sig_wram_raddr_curr <= sig_wram_raddr_next;
         end if;
     end if;
 end process;
 
-l1_raddr <= sig_l1_raddr_curr;
-sig_l1_raddr_next <= (sig_l1_raddr_curr + 1) mod nrows when sig_l1_raddr_curr /= 0 else 
+wram_raddr <= sig_wram_raddr_curr;
+sig_wram_raddr_next <= (sig_wram_raddr_curr + 1) mod nrows when sig_wram_raddr_curr /= 0 else 
                                                      1 when ve_ack = '1' else 0;
 
-l1_rden <= '1' when sig_l1_raddr_curr /= 0 else
+wram_rden <= '1' when sig_wram_raddr_curr /= 0 else
            '1' when ve_ack = '1' else '0';
 
 sig_A <= ve_datain when ve_validin = '1' else vector_element;
--- sig_B === l1_din
+-- sig_B === wram_din
 
 sig_product <= product_type (to_sfixed (sig_A, PARAM_DEC - 1, -PARAM_FRC) *
-                             to_sfixed (l1_din, PARAM_DEC - 1, -PARAM_FRC));
+                             to_sfixed (wram_din, PARAM_DEC - 1, -PARAM_FRC));
 
 sum_product_align: process (clk, alrst) is
 begin
@@ -141,7 +141,7 @@ begin
     end if;
 end process;
 
-product_valid_next <= l1_vin;
+product_valid_next <= wram_vin;
                    
 full_sum   <= fullsum_type (to_sfixed (idfwd,               2*PARAM_DEC - 1, -2*PARAM_FRC) +
                             to_sfixed (sig_product_latched, 2*PARAM_DEC - 1, -2*PARAM_FRC));

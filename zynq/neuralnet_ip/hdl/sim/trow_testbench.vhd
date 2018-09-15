@@ -68,14 +68,14 @@ port(
     validfwd: out std_logic;
     deltafwd: out std_logic_vector (15 downto 0);
 -- weight memory read ports 
-    l1_rden: out std_logic;
-    l1_raddr: out integer range 0 to ncols - 1; 
-    l1_din : in std_logic_vector (15 downto 0);
-    l1_vin : in std_logic;
+    wram_rden: out std_logic;
+    wram_raddr: out integer range 0 to ncols - 1; 
+    wram_din : in std_logic_vector (15 downto 0);
+    wram_vin : in std_logic;
 -- weight memory write ports
-    l1_wren: out std_logic;
-    l1_waddr: out integer range 0 to ncols - 1;
-    l1_wdata: out std_logic_vector (15 downto 0);
+    wram_wren: out std_logic;
+    wram_waddr: out integer range 0 to ncols - 1;
+    wram_wdata: out std_logic_vector (15 downto 0);
 -- bias unit write ports
     bias_change_dout: out std_logic_vector (15 downto 0);
     bias_change_vout: out std_logic;
@@ -137,8 +137,8 @@ end component std_fifo;
 signal clk: std_logic := '0';
 
 signal deltaout_debug: real;
-signal l1_wdata_debug: real;
-signal l1_rdata_debug: real;
+signal wram_wdata_debug: real;
+signal wram_rdata_debug: real;
 
 signal all1_readen  : std_logic;
 signal all1_dataout : std_logic_vector (data_width - 1 downto 0);
@@ -160,18 +160,18 @@ signal deltaout: std_logic_vector (15 downto 0);
 
 signal trow_validout: std_logic;
 
-signal l1_rden: std_logic;
-signal l1_raddr: integer range 0 to ncols - 1; 
-signal l1_din : std_logic_vector (15 downto 0);
-signal l1_vin : std_logic;
+signal wram_rden: std_logic;
+signal wram_raddr: integer range 0 to ncols - 1; 
+signal wram_din : std_logic_vector (15 downto 0);
+signal wram_vin : std_logic;
 
-signal l1_wren: std_logic;
-signal l1_waddr: integer range 0 to ncols - 1;
-signal l1_wdata: std_logic_vector (15 downto 0);
+signal wram_wren: std_logic;
+signal wram_waddr: integer range 0 to ncols - 1;
+signal wram_wdata: std_logic_vector (15 downto 0);
 
-signal l1_wren_bp: std_logic;
-signal l1_waddr_bp: integer range 0 to ncols - 1;
-signal l1_wdata_bp: std_logic_vector (15 downto 0);
+signal wram_wren_bp: std_logic;
+signal wram_waddr_bp: integer range 0 to ncols - 1;
+signal wram_wdata_bp: std_logic_vector (15 downto 0);
 
 signal bp_aebug: std_logic_vector (16 downto 0);
 
@@ -181,9 +181,9 @@ signal rst: std_logic;
 signal bp_rst: std_logic;
 
 
-signal l1_wren_tb: std_logic;
-signal l1_waddr_tb: integer range 0 to ncols - 1;
-signal l1_wdata_tb: std_logic_vector (15 downto 0);
+signal wram_wren_tb: std_logic;
+signal wram_waddr_tb: integer range 0 to ncols - 1;
+signal wram_wdata_tb: std_logic_vector (15 downto 0);
 
 signal apll1_writeen : std_logic;
 signal apll1_datain  : std_logic_vector (data_width - 1 downto 0);
@@ -197,9 +197,9 @@ signal all1_datain  : std_logic_vector (data_width - 1 downto 0);
 
 begin
 
-l1_wren <= l1_wren_tb;
-l1_waddr <= l1_waddr_tb;
-l1_wdata <= l1_wdata_tb;
+wram_wren <= wram_wren_tb;
+wram_waddr <= wram_waddr_tb;
+wram_wdata <= wram_wdata_tb;
 
 clk <= not clk after period/2; 
 
@@ -208,19 +208,19 @@ begin
     if (rising_edge(clk)) then
         if (rst = '0') then
             deltaout_debug <= -42.0;
-            l1_wdata_debug <= -42.0;
-            l1_rdata_debug <= -42.0;
+            wram_wdata_debug <= -42.0;
+            wram_rdata_debug <= -42.0;
         else
             if (trow_validout = '1') then
                 deltaout_debug <= to_real (to_sfixed(deltaout, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
-            if (l1_vin = '1') then
-                l1_rdata_debug <= to_real (to_sfixed(l1_din, PARAM_DEC - 1, -PARAM_FRC));
+            if (wram_vin = '1') then
+                wram_rdata_debug <= to_real (to_sfixed(wram_din, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
-            if (l1_wren_bp = '1') then
-                l1_wdata_debug <= to_real (to_sfixed(l1_wdata_bp, PARAM_DEC - 1, -PARAM_FRC));
+            if (wram_wren_bp = '1') then
+                wram_wdata_debug <= to_real (to_sfixed(wram_wdata_bp, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
         end if;
@@ -289,14 +289,14 @@ port map (
     validfwd => open,
     deltafwd => open,
     
-    l1_rden => l1_rden,
-    l1_raddr => l1_raddr,
-    l1_din => l1_din,
-    l1_vin => l1_vin,
+    wram_rden => wram_rden,
+    wram_raddr => wram_raddr,
+    wram_din => wram_din,
+    wram_vin => wram_vin,
 
-    l1_wren => l1_wren_bp,
-    l1_waddr => l1_waddr_bp,
-    l1_wdata => l1_wdata_bp,
+    wram_wren => wram_wren_bp,
+    wram_waddr => wram_waddr_bp,
+    wram_wdata => wram_wdata_bp,
 
     bias_change_dout => open,
     bias_change_vout => open,
@@ -316,19 +316,19 @@ port map (
     clk     => clk,
     alrst   => rst,
     
-    re_a    => l1_rden,
-    addr_a  => l1_raddr,
-    vout_a  => l1_vin,
-    dout_a  => l1_din,
+    re_a    => wram_rden,
+    addr_a  => wram_raddr,
+    vout_a  => wram_vin,
+    dout_a  => wram_din,
 
     re_b    => '0',
     addr_b  => 0,
     vout_b  => open,
     dout_b  => open,
 
-    addr_c  => l1_waddr,
-    vin_c   => l1_wren,
-    din_c   => l1_wdata
+    addr_c  => wram_waddr,
+    vin_c   => wram_wren,
+    din_c   => wram_wdata
 );
 
 stimuli: process
@@ -345,9 +345,9 @@ begin
 -- hold trow_processor reset signal low, set up parameters
     rst             <= '0';
     bp_rst          <= '0';
-    l1_wren_tb      <= '0';
-    l1_waddr_tb     <= 0;
-    l1_wdata_tb     <= (others => '0');
+    wram_wren_tb      <= '0';
+    wram_waddr_tb     <= 0;
+    wram_wdata_tb     <= (others => '0');
     apll1_writeen   <= '0';
     apll1_datain    <= (others => '0');
     dl_writeen      <= '0';
@@ -357,14 +357,14 @@ begin
     wait for period;
     rst <= '1';
     wait for period;
-    l1_wren_tb <= '1';
+    wram_wren_tb <= '1';
     -- set up initial weight
     for i in 0 to ncols - 1 loop
-        l1_waddr_tb <= i;
-        param_put (l1_wdata_tb, initial_weight (i)); 
+        wram_waddr_tb <= i;
+        param_put (wram_wdata_tb, initial_weight (i)); 
         wait for 100 ns;
     end loop;
-    l1_wren_tb <= '0';
+    wram_wren_tb <= '0';
     all1_writeen <= '1';
     apll1_writeen <= '1';
     -- set up sigmoid and sigmoid prime fifos

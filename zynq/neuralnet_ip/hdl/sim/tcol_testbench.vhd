@@ -79,10 +79,10 @@ generic (
 port (
     clk:    in std_logic;
     alrst:  in std_logic;
-    l1_rden: out std_logic;
-    l1_raddr: out integer range 0 to nrows - 1;
-    l1_din : in std_logic_vector (15 downto 0);
-    l1_vin : in std_logic;
+    wram_rden: out std_logic;
+    wram_raddr: out integer range 0 to nrows - 1;
+    wram_din : in std_logic_vector (15 downto 0);
+    wram_vin : in std_logic;
     dl_datain: in std_logic_vector (15 downto 0);
     dl_validin: in std_logic;
     dl_req     : out std_logic;
@@ -95,9 +95,9 @@ port (
     odfwd: out std_logic_vector (31 downto 0);
     validout: out std_logic;
     deltaout: out std_logic_vector (15 downto 0);
-    l1_wren: out std_logic;
-    l1_waddr: out integer range 0 to nrows - 1;
-    l1_wdata: out std_logic_vector (15 downto 0);
+    wram_wren: out std_logic;
+    wram_waddr: out integer range 0 to nrows - 1;
+    wram_wdata: out std_logic_vector (15 downto 0);
     bias_change_dout: out std_logic_vector (15 downto 0);
     bias_change_vout: out std_logic;
     all1_datain: in std_logic_vector (15 downto 0);
@@ -230,9 +230,9 @@ signal tcol_ovfwd_array: std_logic_vector(ncols - 1 downto 0);
 signal tcol_odfwd_array: dword_array_t(ncols - 1 downto 0);
 signal tcol_validout_array: std_logic_vector(ncols - 1 downto 0);
 signal tcol_deltaout_array: word_array_t(ncols - 1 downto 0);
-signal tcol_l1_wren_array: std_logic_vector(ncols - 1 downto 0);
-signal tcol_l1_waddr_array: bram_addr_array_t(ncols - 1 downto 0);
-signal tcol_l1_wdata_array: word_array_t(ncols - 1 downto 0);
+signal tcol_wram_wren_array: std_logic_vector(ncols - 1 downto 0);
+signal tcol_wram_waddr_array: bram_addr_array_t(ncols - 1 downto 0);
+signal tcol_wram_wdata_array: word_array_t(ncols - 1 downto 0);
 signal tcol_bias_change_dout_array: word_array_t(ncols - 1 downto 0);
 signal tcol_bias_change_vout_array: std_logic_vector(ncols - 1 downto 0);
 signal tcol_all1_datain_array: word_array_t(ncols - 1 downto 0);
@@ -269,10 +269,10 @@ begin
                                                       PARAM_DEC - 1, -PARAM_FRC));
                     end if;
                     
-                    if (tcol_l1_wren_array(I) = '1') then
-                        waddr := tcol_l1_waddr_array(I);
+                    if (tcol_wram_wren_array(I) = '1') then
+                        waddr := tcol_wram_waddr_array(I);
                         weight_derivative(I) <= tcol_weights(I, waddr) - 
-                                                to_real(to_sfixed(tcol_l1_wdata_array(I),
+                                                to_real(to_sfixed(tcol_wram_wdata_array(I),
                                                         PARAM_DEC - 1, -PARAM_FRC));
                     end if;
                 end loop;
@@ -365,10 +365,10 @@ begin
         (
             clk         => clk,
             alrst       => bp_rst,
-            l1_rden     => ram_re_a_array(I),
-            l1_raddr    => ram_addr_a_array(I),
-            l1_din      => ram_dout_a_array(I),
-            l1_vin      => ram_vout_a_array(I),
+            wram_rden     => ram_re_a_array(I),
+            wram_raddr    => ram_addr_a_array(I),
+            wram_din      => ram_dout_a_array(I),
+            wram_vin      => ram_vout_a_array(I),
             dl_datain   => dL_dataout_array(I),
             dl_validin  => dL_validout_array(I),
             dl_req      => dL_readen_array(I),
@@ -381,9 +381,9 @@ begin
             odfwd       => tcol_odfwd_array(I),
             validout    => tcol_validout_array(I),
             deltaout    => tcol_deltaout_array(I),
-            l1_wren     => tcol_l1_wren_array(I),
-            l1_waddr    => tcol_l1_waddr_array(I),
-            l1_wdata    => tcol_l1_wdata_array(I),
+            wram_wren     => tcol_wram_wren_array(I),
+            wram_waddr    => tcol_wram_waddr_array(I),
+            wram_wdata    => tcol_wram_wdata_array(I),
             bias_change_dout => tcol_bias_change_dout_array(I),
             bias_change_vout => tcol_bias_change_vout_array(I),
             all1_datain => tcol_all1_datain_array(I),

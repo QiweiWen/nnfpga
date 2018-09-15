@@ -26,10 +26,10 @@ architecture tb of tb_row_processor is
         );
         port (clk        : in std_logic;
               alrst      : in std_logic;
-              l1_rden    : out std_logic;
-              l1_raddr   : out integer;
-              l1_din     : in std_logic_vector (15 downto 0);
-              l1_vin     : in std_logic;
+              wram_rden    : out std_logic;
+              wram_raddr   : out integer;
+              wram_din     : in std_logic_vector (15 downto 0);
+              wram_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
               ve_validin : in std_logic;
               ve_ack     : in std_logic;
@@ -91,10 +91,10 @@ architecture tb of tb_row_processor is
     signal clk        : std_logic;
     signal alrst      : std_logic;
     -- row processor signals
-    signal l1_rden    : std_logic;
-    signal l1_raddr   : integer;
-    signal l1_din     : std_logic_vector (15 downto 0);
-    signal l1_vin     : std_logic;
+    signal wram_rden    : std_logic;
+    signal wram_raddr   : integer;
+    signal wram_din     : std_logic_vector (15 downto 0);
+    signal wram_vin     : std_logic;
     signal ve_datain  : std_logic_vector (15 downto 0);
     signal ve_validin : std_logic;
     signal ve_req     : std_logic;
@@ -105,7 +105,7 @@ architecture tb of tb_row_processor is
     signal validfwd   : std_logic;
     signal datafwd    : std_logic_vector (15 downto 0);
 
-    -- l1 cache signals
+    -- wram cache signals
     signal re_a: std_logic;
     signal addr_a: integer range 0 to ncols - 1;
     signal vout_a: std_logic;
@@ -159,10 +159,10 @@ begin
     end process;
 
     -- connect row processor to channel A
-    re_a <= l1_rden;
-    addr_a <= l1_raddr;
-    l1_din  <= dout_a;
-    l1_vin  <= vout_a;
+    re_a <= wram_rden;
+    addr_a <= wram_raddr;
+    wram_din  <= dout_a;
+    wram_vin  <= vout_a;
 
     ve_ack <= ackout;
     readen <= ve_req;
@@ -187,10 +187,10 @@ begin
     generic map (ncols   => ncols)
     port map (clk        => clk,
               alrst      => alrst,
-              l1_rden    => l1_rden,
-              l1_raddr   => l1_raddr,
-              l1_din     => l1_din,
-              l1_vin     => l1_vin,
+              wram_rden    => wram_rden,
+              wram_raddr   => wram_raddr,
+              wram_din     => wram_din,
+              wram_vin     => wram_vin,
               ve_datain  => ve_datain,
               ve_validin => ve_validin,
               ve_ack     => ve_ack,

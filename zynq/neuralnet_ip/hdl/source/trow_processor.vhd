@@ -39,14 +39,14 @@ port(
     validfwd: out std_logic;
     deltafwd: out std_logic_vector (15 downto 0);
 -- weight memory read ports 
-    l1_rden: out std_logic;
-    l1_raddr: out integer range 0 to ncols - 1; 
-    l1_din : in std_logic_vector (15 downto 0);
-    l1_vin : in std_logic;
+    wram_rden: out std_logic;
+    wram_raddr: out integer range 0 to ncols - 1; 
+    wram_din : in std_logic_vector (15 downto 0);
+    wram_vin : in std_logic;
 -- weight memory write ports
-    l1_wren: out std_logic;
-    l1_waddr: out integer range 0 to ncols - 1;
-    l1_wdata: out std_logic_vector (15 downto 0);
+    wram_wren: out std_logic;
+    wram_waddr: out integer range 0 to ncols - 1;
+    wram_wdata: out std_logic_vector (15 downto 0);
 -- bias unit write ports
     bias_change_dout: out std_logic_vector (15 downto 0);
     bias_change_vout: out std_logic;
@@ -63,10 +63,10 @@ end trow_processor;
 
 architecture Behavioral of trow_processor is
 
--- dl and l1 are shared between row processor
+-- dl and wram are shared between row processor
 -- and derivative unit
-signal sig_l1_rden : std_logic;
-signal sig_l1_raddr: integer range 0 to ncols - 1;
+signal sig_wram_rden : std_logic;
+signal sig_wram_raddr: integer range 0 to ncols - 1;
 -- i.e. product almost ready, fetch last level
 -- unactivated output right now
 -- multiplication result
@@ -89,11 +89,11 @@ signal minus_lambda_dl: std_logic_vector (15 downto 0);
 -- minus_lambda_dl * all1
 signal weight_adj_data: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
--- delay l1 read address by 3 cycles to become l1 writeback address
--- delay l1 read data by 1 cycle to align with weight_adj_data
-type l1_raddr_pipe_t is array (3 downto 0) of integer range 0 to ncols - 1;
-signal l1_raddr_pipe: l1_raddr_pipe_t;
-signal l1_din_delayed: std_logic_vector (15 downto 0);
+-- delay wram read address by 3 cycles to become wram writeback address
+-- delay wram read data by 1 cycle to align with weight_adj_data
+type wram_raddr_pipe_t is array (3 downto 0) of integer range 0 to ncols - 1;
+signal wram_raddr_pipe: wram_raddr_pipe_t;
+signal wram_din_delayed: std_logic_vector (15 downto 0);
 
 component row_processor is
 generic (
@@ -102,11 +102,11 @@ generic (
 port(
     clk: in std_logic;
     alrst: in std_logic;
--- l1 cache external interface
-    l1_rden: out std_logic;
-    l1_raddr: out integer range 0 to ncols - 1; 
-    l1_din : in std_logic_vector (15 downto 0);
-    l1_vin : in std_logic;
+-- wram cache external interface
+    wram_rden: out std_logic;
+    wram_raddr: out integer range 0 to ncols - 1; 
+    wram_din : in std_logic_vector (15 downto 0);
+    wram_vin : in std_logic;
 -- vector input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
@@ -123,8 +123,8 @@ port(
 end component row_processor;
 begin
 
-    l1_rden <= sig_l1_rden;
-    l1_raddr <= sig_l1_raddr;
+    wram_rden <= sig_wram_rden;
+    wram_raddr <= sig_wram_raddr;
     
     -- backprop part
     backprop: row_processor
@@ -132,10 +132,10 @@ begin
     port map (
         clk         => clk,
         alrst       => alrst,
-        l1_rden     => sig_l1_rden,
-        l1_raddr    => sig_l1_raddr,
-        l1_din      => l1_din,
-        l1_vin      => l1_vin,
+        wram_rden     => sig_wram_rden,
+        wram_raddr    => sig_wram_raddr,
+        wram_din      => wram_din,
+        wram_vin      => wram_vin,
         ve_datain   => dl_datain,
         ve_validin  => dl_validin,
         ve_ack      => dl_ack,
@@ -173,7 +173,7 @@ begin
 
     -- read new activated vector element when new dl is being read
     -- all1 and dl occur, then, at the same cycle
-    all1_req <= '1' when sig_l1_raddr = 0 and dl_ack = '1' else '0';
+    all1_req <= '1' when sig_wram_raddr = 0 and dl_ack = '1' else '0';
     all1_latch: process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
@@ -228,39 +228,39 @@ begin
     end process;
 
     -- new memory content
-    l1_writeback_proc: process (clk, alrst) is
+    wram_writeback_proc: process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                l1_din_delayed <= (others => '0');
-                l1_wdata <= (others => '0');
-                l1_wren <= '0';
+                wram_din_delayed <= (others => '0');
+                wram_wdata <= (others => '0');
+                wram_wren <= '0';
             else
-                l1_din_delayed <= l1_din;
-                l1_wdata <= func_safe_sum (l1_din_delayed, weight_adj_data);
-                l1_wren <= weight_adj_valid;
+                wram_din_delayed <= wram_din;
+                wram_wdata <= func_safe_sum (wram_din_delayed, weight_adj_data);
+                wram_wren <= weight_adj_valid;
             end if;
         end if;
     end process;
 
     -- weight memory write address generation
-    l1_wraddr_proc: process (clk, alrst) is
+    wram_wraddr_proc: process (clk, alrst) is
     begin
         if (rising_edge (clk)) then
             if (alrst = '0') then
                 for I in 3 downto 0 loop
-                    l1_raddr_pipe (I) <= 0;
+                    wram_raddr_pipe (I) <= 0;
                 end loop;
             else
-                l1_raddr_pipe (3) <= sig_l1_raddr;
+                wram_raddr_pipe (3) <= sig_wram_raddr;
                 for I in 2 downto 0 loop
-                    l1_raddr_pipe (I) <= l1_raddr_pipe (I + 1);
+                    wram_raddr_pipe (I) <= wram_raddr_pipe (I + 1);
                 end loop;
             end if;
         end if;
     end process;
 
-    l1_waddr <= l1_raddr_pipe (0);
+    wram_waddr <= wram_raddr_pipe (0);
     
 
 end Behavioral;

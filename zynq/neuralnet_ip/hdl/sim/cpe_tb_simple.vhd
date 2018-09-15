@@ -23,10 +23,10 @@ architecture tb of tb_column_processor is
         generic (nrows: integer);
         port (clk        : in std_logic;
               alrst      : in std_logic;
-              l1_rden    : out std_logic;
-              l1_raddr   : out integer range 0 to nrows - 1; 
-              l1_din     : in std_logic_vector (15 downto 0);
-              l1_vin     : in std_logic;
+              wram_rden    : out std_logic;
+              wram_raddr   : out integer range 0 to nrows - 1; 
+              wram_din     : in std_logic_vector (15 downto 0);
+              wram_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
               ve_validin : in std_logic;
               ve_req     : out std_logic;
@@ -41,10 +41,10 @@ architecture tb of tb_column_processor is
 
     signal clk        : std_logic;
     signal alrst      : std_logic;
-    signal l1_rden    : std_logic;
-    signal l1_raddr   : integer range 0 to nrows - 1;
-    signal l1_din     : std_logic_vector (15 downto 0);
-    signal l1_vin     : std_logic;
+    signal wram_rden    : std_logic;
+    signal wram_raddr   : integer range 0 to nrows - 1;
+    signal wram_din     : std_logic_vector (15 downto 0);
+    signal wram_vin     : std_logic;
     signal ve_datain  : std_logic_vector (15 downto 0);
     signal ve_validin : std_logic;
     signal ve_req     : std_logic;
@@ -83,9 +83,9 @@ begin
     fake_data: process (clk) is
     begin
         if (rising_edge (clk)) then
-            l1_vin <= l1_rden;
-            if (l1_rden = '1') then
-                l1_din <= std_logic_vector (to_unsigned(l1_raddr, 8)) & X"00";
+            wram_vin <= wram_rden;
+            if (wram_rden = '1') then
+                wram_din <= std_logic_vector (to_unsigned(wram_raddr, 8)) & X"00";
             end if;
 
             ve_validin <= ve_req;
@@ -102,10 +102,10 @@ begin
     generic map (nrows => nrows)
     port map (clk        => clk,
               alrst      => alrst,
-              l1_rden    => l1_rden,
-              l1_raddr   => l1_raddr,
-              l1_din     => l1_din,
-              l1_vin     => l1_vin,
+              wram_rden    => wram_rden,
+              wram_raddr   => wram_raddr,
+              wram_din     => wram_din,
+              wram_vin     => wram_vin,
               ve_datain  => ve_datain,
               ve_validin => ve_validin,
               ve_req     => ve_req,
