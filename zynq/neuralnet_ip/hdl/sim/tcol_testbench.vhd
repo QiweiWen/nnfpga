@@ -264,14 +264,14 @@ begin
             else
                 for I in 0 to ncols - 1 loop
                     if (tcol_bias_change_vout_array(I) = '1') then
-                        bias_derivative(I) <= -1 * 
+                        bias_derivative(I) <= -1 *
                                               to_real(to_sfixed(tcol_bias_change_dout_array(I),
                                                       PARAM_DEC - 1, -PARAM_FRC));
                     end if;
-                    
+
                     if (tcol_wram_wren_array(I) = '1') then
                         waddr := tcol_wram_waddr_array(I);
-                        weight_derivative(I) <= tcol_weights(I, waddr) - 
+                        weight_derivative(I) <= tcol_weights(I, waddr) -
                                                 to_real(to_sfixed(tcol_wram_wdata_array(I),
                                                         PARAM_DEC - 1, -PARAM_FRC));
                     end if;
@@ -412,13 +412,13 @@ begin
     apLL1_readen <= tcol_apll1_req_array(ncols - 1);
 
     -- tie down unused ports
-    ram_re_b_array <= (others => '0'); 
+    ram_re_b_array <= (others => '0');
     ram_addr_b_array <= (others => 0);
 
     stimulus: process is
         procedure param_put (
-            signal target: out std_logic_vector (15 downto 0); 
-            constant value : real 
+            signal target: out std_logic_vector (15 downto 0);
+            constant value : real
         )is
         begin
             target <= slv_16_t (to_sfixed (value, PARAM_DEC - 1, -PARAM_FRC));
@@ -439,7 +439,7 @@ begin
         apLL1_datain <= (others => '0');
         wait for period;
         rst <= '1';
-        -- set up all1 and apll1 fifo 
+        -- set up all1 and apll1 fifo
         aLL1_writeen <= '1';
         apLL1_writeen <= '1';
         for I in 0 to ntests * nrows - 1 loop
@@ -449,12 +449,12 @@ begin
         end loop;
         apLL1_writeen <= '0';
         aLL1_writeen <= '0';
-        
+
         -- set up dL fifos
         dl_writeen_array <= (others => '1');
         for I in 0 to ntests - 1 loop
             for J in 0 to ncols - 1 loop
-                param_put(dL_datain_array(J), dl_input(I, J)); 
+                param_put(dL_datain_array(J), dl_input(I, J));
             end loop;
             wait for 100 ns;
         end loop;

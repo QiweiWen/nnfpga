@@ -16,14 +16,14 @@ port (
     alrst:  in std_logic;
 -- weight memory read ports
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to nrows - 1; 
+    wram_raddr: out integer range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- delta input ports
     dl_datain: in std_logic_vector (15 downto 0);
     dl_validin: in std_logic;
     dl_req     : out std_logic;
-    dl_ack     : in std_logic; 
+    dl_ack     : in std_logic;
 -- synchronisation signals
     osync:   out std_logic;
     isync:   in std_logic;
@@ -33,7 +33,7 @@ port (
 -- partial result accumulation output to the next column processor
     ovfwd: out std_logic;
     odfwd: out std_logic_vector (31 downto 0);
--- dll1 output from the last column processor  
+-- dll1 output from the last column processor
 -- left unconnected for all other transpose
 -- column processors so it can be trimmed
     validout: out std_logic;
@@ -69,14 +69,14 @@ port(
     alrst: in std_logic;
 -- wram cache external interface
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to nrows - 1; 
+    wram_raddr: out integer range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- vector element input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
     ve_req     : out std_logic;
-    ve_ack     : in std_logic; 
+    ve_ack     : in std_logic;
 -- synchronisation signals
     osync:   out std_logic;
     isync:   in std_logic;
@@ -84,17 +84,17 @@ port(
     ivfwd: in std_logic;
     idfwd: in std_logic_vector (31 downto 0);
 -- partial result accumulation output to the next column processor
--- or to be truncated and committed to the FIFO 
+-- or to be truncated and committed to the FIFO
     ovfwd: out std_logic;
     odfwd: out std_logic_vector (31 downto 0)
 );
 end component column_processor;
 
 signal sig_wram_raddr: integer range 0 to nrows - 1;
-signal dl_latched: std_logic_vector (15 downto 0); 
+signal dl_latched: std_logic_vector (15 downto 0);
 signal dl_final: std_logic_vector (15 downto 0);
-signal minus_lambda_dl: std_logic_vector (15 downto 0); 
-signal minus_all1_datain: std_logic_vector (15 downto 0); 
+signal minus_lambda_dl: std_logic_vector (15 downto 0);
+signal minus_all1_datain: std_logic_vector (15 downto 0);
 signal lambda_dl: std_logic_vector (15 downto 0);
 -- minus_lambda_dl * all1
 signal weight_adj_data: std_logic_vector (15 downto 0);
@@ -164,7 +164,7 @@ begin
             bias_change_vout <= '0';
             bias_change_dout <= (others => '0');
         else
-            bias_change_vout <= dl_validin; 
+            bias_change_vout <= dl_validin;
             bias_change_dout <= minus_lambda_dl;
         end if;
     end if;
@@ -175,10 +175,10 @@ lambda_dl_process: process (dl_final) is
     variable padding : std_logic_vector (shift_amount - 1 downto 0);
 begin
     padding := (others => dl_final(15));
-    lambda_dl <= padding & dl_final (15 downto shift_amount); 
+    lambda_dl <= padding & dl_final (15 downto shift_amount);
 end process;
-minus_lambda_dl <= std_logic_vector(unsigned(not (lambda_dl)) + 1); 
-minus_all1_datain <= std_logic_vector(unsigned(not (all1_datain)) + 1); 
+minus_lambda_dl <= std_logic_vector(unsigned(not (lambda_dl)) + 1);
+minus_all1_datain <= std_logic_vector(unsigned(not (all1_datain)) + 1);
 
 -- weight adjustment calculation
 weight_adj_proc: process (clk, alrst) is
@@ -186,13 +186,13 @@ weight_adj_proc: process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
         if (alrst = '0') then
-            weight_adj_data <= (others => '0'); 
+            weight_adj_data <= (others => '0');
             weight_adj_valid <= '0';
         else
             weight_adj_valid <= all1_validin;
             weight_adj_full := slv_32_t(to_sfixed(lambda_dl,PARAM_DEC - 1,-PARAM_FRC) *
                                            to_sfixed(minus_all1_datain,PARAM_DEC - 1,-PARAM_FRC));
-            weight_adj_data <= weight_adj_full 
+            weight_adj_data <= weight_adj_full
                                (2 * PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);
         end if;
     end if;
@@ -236,17 +236,17 @@ all1_fwd_proc: process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
         if (alrst = '0') then
-            all1_fwd <= (others => '0'); 
+            all1_fwd <= (others => '0');
             all1_vfwd <= '0';
         else
-            all1_fwd <= all1_datain; 
+            all1_fwd <= all1_datain;
             all1_vfwd <= all1_validin;
         end if;
     end if;
 end process;
 
 
-apll1_req <= ivfwd; 
+apll1_req <= ivfwd;
 delta_validout_next <= '1' when apll1_validin = '1' and prod_vtrunc = '1' else '0';
 deltaout <= dll1_full (PARAM_FRC * 2 + PARAM_DEC - 1 downto PARAM_FRC);
 
@@ -262,7 +262,7 @@ begin
             prod_trunc <= fun_mul_truncate (sig_odfwd, 15);
             prod_vtrunc <= sig_ovfwd;
             dll1_full <= slv_32_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
-                                      to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
+                                   to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
             validout <= delta_validout_next;
         end if;
     end if;

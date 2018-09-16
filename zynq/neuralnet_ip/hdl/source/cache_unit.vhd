@@ -110,22 +110,16 @@ ram_raddr_proc:
 
 preload_count_proc:
     process(clk) is
-        variable increment: integer := 0;
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
                 preload_count <= 0;
             else
-                increment := 0;
-                if (sig_ram_rden = '1') then
-                    increment := increment + 1;
+                if (sig_ram_rden = '1' and sig_vout = '0') then
+                    preload_count <= (preload_count + 1) mod 5;
+                elsif (sig_ram_rden = '0' and sig_vout = '1') then
+                    preload_count <= (preload_count - 1) mod 5;
                 end if;
-
-                if (sig_vout = '1') then
-                    increment := increment - 1;
-                end if;
-
-                preload_count <= (preload_count + increment) mod 5;
             end if;
         end if;
     end process;
