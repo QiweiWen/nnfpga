@@ -336,9 +336,8 @@ stimuli: process
         signal target: out std_logic_vector (15 downto 0); 
         constant value : real 
     )is
-        subtype word_t is std_logic_vector (15 downto 0);
     begin
-        target <= word_t (to_sfixed (value, PARAM_DEC - 1, -PARAM_FRC));
+        target <= slv_16_t (to_sfixed (value, PARAM_DEC - 1, -PARAM_FRC));
     end procedure;
 begin
 

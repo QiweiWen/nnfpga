@@ -44,9 +44,6 @@ architecture tb of tb_bias_vector is
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
 
-    subtype unbiased_type is std_logic_vector (31 downto 0);
-    subtype biased_type is std_logic_vector (15 downto 0);
-
     signal latched_biased: real;
 
 begin
@@ -84,14 +81,14 @@ begin
         constant  val: real
     ) is
     begin
-        updated <= biased_type(to_sfixed (val, PARAM_DEC - 1, -PARAM_FRC)); 
+        updated <= slv_16_t(to_sfixed (val, PARAM_DEC - 1, -PARAM_FRC)); 
     end procedure;
 
     procedure unbias_put (
         constant val: real
     ) is
     begin
-        unbiased <= unbiased_type(to_sfixed (val, 2 * PARAM_DEC - 1, -2*PARAM_FRC)); 
+        unbiased <= slv_32_t(to_sfixed (val, 2 * PARAM_DEC - 1, -2*PARAM_FRC)); 
     end procedure;
 
     begin

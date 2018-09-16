@@ -26,7 +26,6 @@ begin
 
 summing_proc:
 process (clk) is
-subtype full_sum_type is std_logic_vector (32 downto 0);
 variable full_sum: std_logic_vector (32 downto 0);
 begin
     if (rising_edge(clk)) then
@@ -39,7 +38,7 @@ begin
                 sig_sum <= (others => '0');
             end if;
         elsif (validin = '1') then
-            full_sum := full_sum_type(to_sfixed(sig_sum, 2*PARAM_DEC - 1, -2*PARAM_FRC) + 
+            full_sum := slv_33_t(to_sfixed(sig_sum, 2*PARAM_DEC - 1, -2*PARAM_FRC) + 
                                       to_sfixed(datain,  2*PARAM_DEC - 1, -2*PARAM_FRC));
             sig_sum <= fun_add_truncate (full_sum);
         end if;

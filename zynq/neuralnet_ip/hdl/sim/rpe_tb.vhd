@@ -135,8 +135,6 @@ architecture tb of tb_row_processor is
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
-    
-    subtype param_type is std_logic_vector (15 downto 0);
 
 begin
     
@@ -246,7 +244,7 @@ begin
         vin_c <= '1';
         for i in 0 to ncols - 1 loop
             addr_c <= i;
-            din_c <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC)); 
+            din_c <= slv_16_t(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC)); 
             wait for 100 ns;
         end loop;
         vin_c <= '0';
@@ -254,7 +252,7 @@ begin
         -- multiplication test
         writeen <= '1';
         for i in 0 to 7 loop
-            datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
+            datain <= slv_16_t(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
             wait for 100 ns;
         end loop;
 
@@ -263,7 +261,7 @@ begin
             
         writeen <= '1';
         for i in 0 to 1 loop
-            datain <= param_type(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
+            datain <= slv_16_t(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
             wait for 100 ns;
         end loop;
 

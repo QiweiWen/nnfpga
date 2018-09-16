@@ -24,19 +24,18 @@ end bias_unit;
 
 architecture Behavioral of bias_unit is
     signal bias_register: std_logic_vector (15 downto 0);
-    subtype  sum_type is std_logic_vector (16 downto 0);
     signal vout_pipe: std_logic;
     signal unbiased_trunc: std_logic_vector (15 downto 0); 
 begin
     
     bias_reg_proc: process (clk, alrst) is
-    variable full_sum: sum_type; 
+    variable full_sum: slv_17_t; 
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
                 bias_register <= (others => '0');
             elsif (uvin = '1') then
-                full_sum := sum_type(to_sfixed(bias_register, PARAM_DEC - 1, -PARAM_FRC) + 
+                full_sum := slv_17_t(to_sfixed(bias_register, PARAM_DEC - 1, -PARAM_FRC) + 
                                      to_sfixed(updated,       PARAM_DEC - 1, -PARAM_FRC));
                 bias_register <= fun_add_truncate (full_sum);
             end if;
@@ -44,7 +43,7 @@ begin
     end process;
 
     outproc: process (clk, alrst) is
-        variable full_biased: sum_type;
+        variable full_biased: slv_17_t;
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then

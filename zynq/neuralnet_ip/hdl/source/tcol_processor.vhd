@@ -90,9 +90,6 @@ port(
 );
 end component column_processor;
 
-subtype full_prod_t is std_logic_vector (31 downto 0);
-subtype word_t is std_logic_vector (15 downto 0);
-
 signal sig_wram_raddr: integer range 0 to nrows - 1;
 signal dl_latched: std_logic_vector (15 downto 0); 
 signal dl_final: std_logic_vector (15 downto 0);
@@ -185,7 +182,7 @@ minus_all1_datain <= std_logic_vector(unsigned(not (all1_datain)) + 1);
 
 -- weight adjustment calculation
 weight_adj_proc: process (clk, alrst) is
-    variable weight_adj_full: full_prod_t;
+    variable weight_adj_full: slv_32_t;
 begin
     if (rising_edge(clk)) then
         if (alrst = '0') then
@@ -193,7 +190,7 @@ begin
             weight_adj_valid <= '0';
         else
             weight_adj_valid <= all1_validin;
-            weight_adj_full := full_prod_t(to_sfixed(lambda_dl,PARAM_DEC - 1,-PARAM_FRC) *
+            weight_adj_full := slv_32_t(to_sfixed(lambda_dl,PARAM_DEC - 1,-PARAM_FRC) *
                                            to_sfixed(minus_all1_datain,PARAM_DEC - 1,-PARAM_FRC));
             weight_adj_data <= weight_adj_full 
                                (2 * PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);
@@ -264,7 +261,7 @@ begin
         else
             prod_trunc <= fun_mul_truncate (sig_odfwd, 15);
             prod_vtrunc <= sig_ovfwd;
-            dll1_full <= full_prod_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
+            dll1_full <= slv_32_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
                                       to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
             validout <= delta_validout_next;
         end if;

@@ -35,8 +35,6 @@ architecture tb of tb_sigmoidgradfull is
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
-    
-    subtype word_t is std_logic_vector (15 downto 0);
 
     signal debug: real;
 
@@ -78,7 +76,7 @@ begin
         wait for 100 ns;
         validin <= '1';
         for i in -5 to 5 loop
-            datain <= word_t(to_sfixed (real(i), PARAM_DEC - 1, -PARAM_FRC)); 
+            datain <= slv_16_t(to_sfixed (real(i), PARAM_DEC - 1, -PARAM_FRC)); 
             wait for 100 ns;
         end loop;
         validin <= '0';

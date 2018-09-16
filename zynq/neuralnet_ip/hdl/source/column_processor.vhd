@@ -54,9 +54,7 @@ architecture Behavioral of column_processor is
 
     signal sig_product: std_logic_vector (31 downto 0);
     signal sig_product_latched: std_logic_vector (31 downto 0);
-    subtype product_type is std_logic_vector (31 downto 0);
-    subtype fullsum_type is std_logic_vector (32 downto 0);
-    signal full_sum: fullsum_type;
+    signal full_sum: slv_33_t;
 
     signal product_valid: std_logic;
     signal product_valid_next: std_logic;
@@ -125,7 +123,7 @@ wram_rden <= '1' when sig_wram_raddr_curr /= 0 else
 sig_A <= ve_datain when ve_validin = '1' else vector_element;
 -- sig_B === wram_din
 
-sig_product <= product_type (to_sfixed (sig_A, PARAM_DEC - 1, -PARAM_FRC) *
+sig_product <= slv_32_t (to_sfixed (sig_A, PARAM_DEC - 1, -PARAM_FRC) *
                              to_sfixed (wram_din, PARAM_DEC - 1, -PARAM_FRC));
 
 sum_product_align: process (clk, alrst) is
@@ -143,7 +141,7 @@ end process;
 
 product_valid_next <= wram_vin;
                    
-full_sum   <= fullsum_type (to_sfixed (idfwd,               2*PARAM_DEC - 1, -2*PARAM_FRC) +
+full_sum   <= slv_33_t (to_sfixed (idfwd,               2*PARAM_DEC - 1, -2*PARAM_FRC) +
                             to_sfixed (sig_product_latched, 2*PARAM_DEC - 1, -2*PARAM_FRC));
 
 odfwd_next <= fun_add_truncate(full_sum);

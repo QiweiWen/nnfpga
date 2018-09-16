@@ -77,8 +77,6 @@ signal prod_vtrunc: std_logic;
 
 signal delta_validout_next: std_logic;
 signal dll1_full: std_logic_vector (31 downto 0);
-subtype full_prod_t is std_logic_vector (31 downto 0);
-subtype word_t is std_logic_vector (15 downto 0);
 -- delay prefetch signal by one cycle to account
 -- for truncation
 signal apll1_req_pipe: std_logic;
@@ -163,7 +161,7 @@ begin
                 apll1_req <= apll1_req_pipe;
                 prod_trunc <= fun_mul_truncate (prod_dout, 15);
                 prod_vtrunc <= prod_vout;
-                dll1_full <= full_prod_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
+                dll1_full <= slv_32_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
                                           to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
                 validout <= delta_validout_next;
             end if;
@@ -211,7 +209,7 @@ begin
 
     -- weight adjustment calculation
     weight_adj_proc: process (clk, alrst) is
-        variable weight_adj_full: full_prod_t;
+        variable weight_adj_full: slv_32_t;
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
@@ -219,7 +217,7 @@ begin
                 weight_adj_valid <= '0';
             else
                 weight_adj_valid <= dl_validin;
-                weight_adj_full := full_prod_t(to_sfixed(minus_lambda_dl, PARAM_DEC - 1, -PARAM_FRC) *
+                weight_adj_full := slv_32_t(to_sfixed(minus_lambda_dl, PARAM_DEC - 1, -PARAM_FRC) *
                                                to_sfixed(all1_final,PARAM_DEC - 1, -PARAM_FRC));
                 weight_adj_data <= weight_adj_full 
                                    (2 * PARAM_FRC + PARAM_DEC - 1 downto PARAM_FRC);

@@ -54,7 +54,6 @@ end component accumulator;
 signal ve_datain_delayed: std_logic_vector (15 downto 0);
 signal col_ptr: integer range 0 to ncols - 1; 
 -- the intermediate product term
-subtype product_type is std_logic_vector (31 downto 0);
 signal product: std_logic_vector (31 downto 0);
 signal sig_wram_raddr: integer range 0 to ncols - 1;
 
@@ -113,7 +112,7 @@ begin
 end process;
 
 lastone <= '1' when (col_ptr = ncols - 1) else '0';
-product <= product_type (to_sfixed(ve_datain, PARAM_DEC - 1, -PARAM_FRC) * 
+product <= slv_32_t (to_sfixed(ve_datain, PARAM_DEC - 1, -PARAM_FRC) * 
                          to_sfixed(wram_din,    PARAM_DEC - 1, -PARAM_FRC));
 fvalid <= '1' when lastone = '1' and wram_vin = '1' else '0';
 
