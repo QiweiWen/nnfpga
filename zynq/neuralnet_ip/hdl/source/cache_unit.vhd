@@ -35,7 +35,7 @@ architecture behavioural of cache is
     signal regs: regs_t(3 downto 0);
     signal rdptr: integer range 0 to 3;
     signal wrptr: integer range 0 to 3;
-    signal half_full: std_logic;
+    signal almost_full: std_logic;
     signal full: std_logic;
 --
     signal sig_rdy: std_logic;
@@ -46,8 +46,8 @@ architecture behavioural of cache is
 --
     signal preload_count: integer range 0 to 4;
 begin
-    half_full <= '1' when regs(0)(16) = '1' or regs(1)(16) = '1' 
-                       or regs(2)(16) = '1' or regs(3)(16) = '1' else '0';
+    almost_full <= '1' when regs(0)(16) = '1' and regs(1)(16) = '1' 
+                       and regs(2)(16) = '1' else '0';
 
     full <= '1' when regs(0)(16) = '1' and regs(1)(16) = '1' 
                  and regs(2)(16) = '1' and regs(3)(16) = '1' else '0';
@@ -63,7 +63,7 @@ rdy_proc: process(clk) is
                 if (sig_rdy = '1') then
                     sig_rdy <= '1';
                 else
-                    if (half_full  = '1' and ram_vin = '1') then
+                    if (almost_full  = '1' and ram_vin = '1') then
                         sig_rdy <= '1';
                     else
                         sig_rdy <= '0';
@@ -131,15 +131,6 @@ cache_populate:
             if (alrst = '0') then
                 regs <= (others => (others => '0'));
             else
-                if (wrptr /= rdptr and sig_vout = '1') then
-                    regs(rdptr)(16) <= '0';
-                end if;
-
-                if (ram_vin = '1') then
-                    regs(wrptr)(16) <= ram_vin;
-                    regs(wrptr)(15 downto 0) <= ram_rdata;
-                end if;
-
                 if (wrptr /= rdptr) then
                     if (sig_vout = '1') then
                         regs(rdptr)(16) <= '0';

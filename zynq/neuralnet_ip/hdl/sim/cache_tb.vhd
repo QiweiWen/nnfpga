@@ -164,7 +164,7 @@ begin
             wait for 100 ns;
         end loop;
         cache_reset <= '1';
-        wait for 500 ns;
+        wait until rdy = '1';
         rden <= '1';    
         wait;
     end process;
