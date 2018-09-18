@@ -17,14 +17,14 @@ entity tb_column_processor is
 end tb_column_processor;
 
 architecture tb of tb_column_processor is
-    constant nrows : integer := 5;
+    constant nrows : natural := 5;
 
     component column_processor
-        generic (nrows: integer);
+        generic (nrows: natural);
         port (clk        : in std_logic;
               alrst      : in std_logic;
               wram_rden    : out std_logic;
-              wram_raddr   : out integer range 0 to nrows - 1; 
+              wram_raddr   : out natural range 0 to nrows - 1; 
               wram_din     : in std_logic_vector (15 downto 0);
               wram_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
@@ -42,7 +42,7 @@ architecture tb of tb_column_processor is
     signal clk        : std_logic;
     signal alrst      : std_logic;
     signal wram_rden    : std_logic;
-    signal wram_raddr   : integer range 0 to nrows - 1;
+    signal wram_raddr   : natural range 0 to nrows - 1;
     signal wram_din     : std_logic_vector (15 downto 0);
     signal wram_vin     : std_logic;
     signal ve_datain  : std_logic_vector (15 downto 0);

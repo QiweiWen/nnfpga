@@ -9,14 +9,14 @@ use ieee.math_real.all;
 
 entity column_processor is
 generic (
-    nrows: integer := 100
+    nrows: natural := 100
 );
 port(
     clk: in std_logic;
     alrst: in std_logic;
 -- wram cache external interface
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to nrows - 1; 
+    wram_raddr: out natural range 0 to nrows - 1; 
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- vector element input channel
@@ -38,8 +38,8 @@ port(
 end column_processor;
 
 architecture Behavioral of column_processor is
-    signal sig_wram_raddr_curr: integer range 0 to nrows - 1;
-    signal sig_wram_raddr_next: integer range 0 to nrows - 1;
+    signal sig_wram_raddr_curr: natural range 0 to nrows - 1;
+    signal sig_wram_raddr_next: natural range 0 to nrows - 1;
 
     -- we latch a vector element and compute a partial
     -- product vector

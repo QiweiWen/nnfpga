@@ -19,11 +19,11 @@ end tb_cache;
 
 architecture tb of tb_cache is
 
-    constant ram_depth : integer := 10;
+    constant ram_depth : natural := 10;
     component cache
         generic
         (
-            ram_depth: integer := 128
+            ram_depth: natural := 128
         );
         port (clk       : in std_logic;
               alrst     : in std_logic;
@@ -32,31 +32,31 @@ architecture tb of tb_cache is
               rdata     : out std_logic_vector (15 downto 0);
               vout      : out std_logic;
               ram_rden  : out std_logic;
-              ram_raddr : out integer range 0 to ram_depth - 1;
+              ram_raddr : out natural range 0 to ram_depth - 1;
               ram_rdata : in std_logic_vector (15 downto 0);
               ram_vin   : in std_logic);
     end component;
 
     component three_port_ram is
         generic (
-            width: integer := 16;
-            depth: integer := 128
+            width: natural := 16;
+            depth: natural := 128
         );
         port (
             clk: in std_logic;
             alrst: in std_logic;
             -- read port A
             re_a: in std_logic;
-            addr_a: in integer range 0 to depth - 1;
+            addr_a: in natural range 0 to depth - 1;
             vout_a: out std_logic;
             dout_a: out std_logic_vector (width - 1 downto 0);
             -- read port B
             re_b: in std_logic;
-            addr_b: in integer range 0 to depth - 1;
+            addr_b: in natural range 0 to depth - 1;
             vout_b: out std_logic;
             dout_b: out std_logic_vector (width - 1 downto 0);
             -- write port C
-            addr_c: in integer range 0 to depth - 1;
+            addr_c: in natural range 0 to depth - 1;
             vin_c: in std_logic;
             din_c: in std_logic_vector (width - 1 downto 0)
         );
@@ -69,11 +69,11 @@ architecture tb of tb_cache is
     signal rdata     : std_logic_vector (15 downto 0);
     signal vout      : std_logic;
     signal ram_rden  : std_logic;
-    signal ram_raddr : integer range 0 to ram_depth - 1;
+    signal ram_raddr : natural range 0 to ram_depth - 1;
     signal ram_rdata : std_logic_vector (15 downto 0);
     signal ram_vin   : std_logic;
 --
-    signal addr_c    : integer range 0 to ram_depth - 1;
+    signal addr_c    : natural range 0 to ram_depth - 1;
     signal vin_c     : std_logic;
     signal din_c     : std_logic_vector(15 downto 0);
 -- 
@@ -94,6 +94,8 @@ begin
             else
                 if (vout = '1') then
                     sig_debug <= rdata;
+                else
+                    sig_debug <= X"beef";
                 end if;
             end if;
         end if;
@@ -142,7 +144,7 @@ begin
     stimuli : process
         procedure param_put (
             signal target: out std_logic_vector (15 downto 0);
-            constant value : integer
+            constant value : natural
         )is
         begin
             target <= std_logic_vector(to_unsigned(value, 16));
@@ -166,6 +168,10 @@ begin
         cache_reset <= '1';
         wait until rdy = '1';
         rden <= '1';    
+        wait for 500 ns;
+        rden <= '0';
+        wait for 200 ns;
+        rden <= '1';
         wait;
     end process;
 

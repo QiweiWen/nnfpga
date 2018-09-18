@@ -8,7 +8,7 @@ use work.fixed_pkg.all;
 use ieee.math_real.all;
 -- simulation only module to ease testbench design
 entity fifo_cpe_bundle is
-    generic (nrows: integer := 100; dfifo: integer := 128; offset: integer := 0);
+    generic (nrows: natural := 100; dfifo: natural := 128; offset: natural := 0);
     port (
         clk: in std_logic;
         alrst: in std_logic;
@@ -27,11 +27,11 @@ end fifo_cpe_bundle;
 
 architecture Behavioral of fifo_cpe_bundle is
     component column_processor
-        generic (nrows: integer);
+        generic (nrows: natural);
         port (clk        : in std_logic;
               alrst      : in std_logic;
               wram_rden    : out std_logic;
-              wram_raddr   : out integer range 0 to nrows - 1; 
+              wram_raddr   : out natural range 0 to nrows - 1; 
               wram_din     : in std_logic_vector (15 downto 0);
               wram_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
@@ -66,7 +66,7 @@ architecture Behavioral of fifo_cpe_bundle is
     end component std_fifo;
 
     signal wram_rden: std_logic;
-    signal wram_raddr: integer range 0 to nrows - 1; 
+    signal wram_raddr: natural range 0 to nrows - 1; 
     signal wram_din: std_logic_vector (15 downto 0);
     signal wram_vin: std_logic;
     signal ve_datain: std_logic_vector (15 downto 0);

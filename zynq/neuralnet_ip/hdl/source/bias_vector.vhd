@@ -8,7 +8,7 @@ use work.fixed_pkg.all;
 use ieee.math_real.all;
 
 entity bias_vector is
-generic (nrows: integer := 100);
+generic (nrows: natural := 100);
 port (
     clk: in std_logic;
     alrst: in std_logic; 
@@ -29,8 +29,8 @@ architecture Behavioral of bias_vector is
 
 component delay_buffer is
     generic(
-        ncycles: integer;
-        width:   integer
+        ncycles: natural;
+        width:   natural
     );
     port(
         clk: in std_logic;
@@ -42,24 +42,24 @@ end component delay_buffer;
 
 component three_port_ram is
     generic (
-        width: integer := 16;
-        depth: integer := 128
+        width: natural := 16;
+        depth: natural := 128
     );
     port (
         clk: in std_logic;
         alrst: in std_logic;
         -- read port A
         re_a: in std_logic;
-        addr_a: in integer range 0 to depth - 1;
+        addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
         dout_a: out std_logic_vector (width - 1 downto 0); 
         -- read port B
         re_b: in std_logic;
-        addr_b: in integer range 0 to depth - 1;
+        addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
         dout_b: out std_logic_vector (width - 1 downto 0); 
         -- write port C
-        addr_c: in integer range 0 to depth - 1;
+        addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
         din_c: in std_logic_vector (width - 1 downto 0)
     );
@@ -72,17 +72,17 @@ signal unbiased_delayed: std_logic_vector (15 downto 0);
 signal fp_rdata : std_logic_vector (15 downto 0);
 
 -- block ram read address for inference
-signal fp_raddr: integer range 0 to nrows - 1;
+signal fp_raddr: natural range 0 to nrows - 1;
 -- block ram read address when updating during training
-signal bp_raddr: integer range 0 to nrows - 1;
+signal bp_raddr: natural range 0 to nrows - 1;
 -- existing bias read from bram
 signal bp_rdata: std_logic_vector (15 downto 0);
 -- block ram write address, lags raddr by 2 cycles
-signal bp_waddr: integer range 0 to nrows - 1;
+signal bp_waddr: natural range 0 to nrows - 1;
 -- updated bias written back during training
 signal bp_wdata: std_logic_vector (15 downto 0);
 
-signal bp_raddr_pipe: integer range 0 to nrows - 1;
+signal bp_raddr_pipe: natural range 0 to nrows - 1;
 
 signal upd_data_pipe_in : std_logic_vector (16 downto 0);
 signal upd_data_pipe_out : std_logic_vector (16 downto 0);

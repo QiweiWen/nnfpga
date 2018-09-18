@@ -22,12 +22,12 @@ architecture tb of tb_row_processor is
 
     component row_processor
         generic (
-            ncols: integer := 100
+            ncols: natural := 100
         );
         port (clk        : in std_logic;
               alrst      : in std_logic;
               wram_rden    : out std_logic;
-              wram_raddr   : out integer;
+              wram_raddr   : out natural;
               wram_din     : in std_logic_vector (15 downto 0);
               wram_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
@@ -41,7 +41,7 @@ architecture tb of tb_row_processor is
               datafwd    : out std_logic_vector (15 downto 0));
     end component;
     
-    constant data_width : integer := 16;
+    constant data_width : natural := 16;
     component std_fifo is
         generic (
             constant data_width  : positive := 8;
@@ -63,36 +63,36 @@ architecture tb of tb_row_processor is
 
     component three_port_ram is
         generic (
-            width: integer := 16;
-            depth: integer := 128
+            width: natural := 16;
+            depth: natural := 128
         );
         port (
             clk: in std_logic;
             alrst: in std_logic;
             -- read port A
             re_a: in std_logic;
-            addr_a: in integer range 0 to depth - 1;
+            addr_a: in natural range 0 to depth - 1;
             vout_a: out std_logic;
             dout_a: out std_logic_vector (width - 1 downto 0); 
             -- read port B
             re_b: in std_logic;
-            addr_b: in integer range 0 to depth - 1;
+            addr_b: in natural range 0 to depth - 1;
             vout_b: out std_logic;
             dout_b: out std_logic_vector (width - 1 downto 0); 
             -- write port C
-            addr_c: in integer range 0 to depth - 1;
+            addr_c: in natural range 0 to depth - 1;
             vin_c: in std_logic;
             din_c: in std_logic_vector (width - 1 downto 0)
         );
     end component three_port_ram;
     
-    constant ncols : integer := 5; 
+    constant ncols : natural := 5; 
     
     signal clk        : std_logic;
     signal alrst      : std_logic;
     -- row processor signals
     signal wram_rden    : std_logic;
-    signal wram_raddr   : integer;
+    signal wram_raddr   : natural;
     signal wram_din     : std_logic_vector (15 downto 0);
     signal wram_vin     : std_logic;
     signal ve_datain  : std_logic_vector (15 downto 0);
@@ -107,14 +107,14 @@ architecture tb of tb_row_processor is
 
     -- wram cache signals
     signal re_a: std_logic;
-    signal addr_a: integer range 0 to ncols - 1;
+    signal addr_a: natural range 0 to ncols - 1;
     signal vout_a: std_logic;
     signal dout_a: std_logic_vector (16 - 1 downto 0); 
     signal re_b: std_logic;
-    signal addr_b: integer range 0 to ncols - 1;
+    signal addr_b: natural range 0 to ncols - 1;
     signal vout_b: std_logic;
     signal dout_b: std_logic_vector (16 - 1 downto 0); 
-    signal addr_c: integer range 0 to ncols - 1;
+    signal addr_c: natural range 0 to ncols - 1;
     signal vin_c: std_logic;
     signal din_c: std_logic_vector (16 - 1 downto 0);
 

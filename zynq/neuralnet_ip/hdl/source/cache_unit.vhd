@@ -8,7 +8,7 @@ use work.fixed_pkg.all;
 entity cache is
 generic
 (
-    ram_depth: integer := 128
+    ram_depth: natural := 128
 );
 port
 (
@@ -23,134 +23,116 @@ port
     vout:       out std_logic;
 -- signals that go to the weight ram
     ram_rden:   out std_logic;
-    ram_raddr:  out integer range 0 to ram_depth - 1;
+    ram_raddr:  out natural range 0 to ram_depth - 1;
     ram_rdata:  in std_logic_vector(15 downto 0);
     ram_vin  :  in std_logic
 );
 end cache;
 
 architecture behavioural of cache is
--- cache registers and read/write pointers
-    type regs_t is array(integer range <>) of slv_17_t;
-    signal regs: regs_t(3 downto 0);
-    signal rdptr: integer range 0 to 3;
-    signal wrptr: integer range 0 to 3;
-    signal almost_full: std_logic;
-    signal full: std_logic;
---
-    signal sig_rdy: std_logic;
-    signal sig_vout: std_logic;
---
+-- cache registers
+    constant nregs: natural := 4;
+    type regs_t is array(nregs - 1 downto 0) of slv_16_t;
+    signal regs: regs_t;
+-- fifo signals
+    signal sig_empty: std_logic;
+    signal sig_full: std_logic;
+    signal rdptr: natural range 0 to nregs - 1;
+    signal wrptr: natural range 0 to nregs - 1;
+    signal size: natural range 0 to nregs;
+    signal do_read: std_logic;
+-- block ram signals
     signal sig_ram_rden: std_logic;
-    signal sig_ram_raddr: integer range 0 to ram_depth - 1;
---
-    signal preload_count: integer range 0 to 4;
+    signal sig_ram_raddr: natural range 0 to ram_depth - 1;
+-- decide whether to load more data into cache
+    signal prefetch_count: natural range 0 to nregs;
+    signal do_prefetch: std_logic;
 begin
-    almost_full <= '1' when regs(0)(16) = '1' and regs(1)(16) = '1' 
-                       and regs(2)(16) = '1' else '0';
-
-    full <= '1' when regs(0)(16) = '1' and regs(1)(16) = '1' 
-                 and regs(2)(16) = '1' and regs(3)(16) = '1' else '0';
-    rdy <= sig_rdy;
--- we become ready to serve read requests the first time the
--- cache fills up and remain so until being reset
-rdy_proc: process(clk) is
-    begin
-        if (rising_edge(clk)) then
-            if (alrst = '0') then
-                sig_rdy <= '0';
-            else
-                if (sig_rdy = '1') then
-                    sig_rdy <= '1';
-                else
-                    if (almost_full  = '1' and ram_vin = '1') then
-                        sig_rdy <= '1';
-                    else
-                        sig_rdy <= '0';
-                    end if;
-                end if;
-            end if;
-        end if;
-    end process;
-
--- 0-latency end to the processing elements
-    rdata <= regs(rdptr)(15 downto 0);
-    sig_vout <= '1' when rden = '1' and regs(rdptr)(16) = '1' else '0';
-    vout <= sig_vout;
-
-    rdptr <= 3 when (regs(0)(16) = '0' and regs(1)(16) = '0' 
-                 and regs(2)(16) = '0' and regs(3)(16) = '1') else
-             2 when (regs(0)(16) = '0' and regs(1)(16) = '0' and regs(2)(16) = '1') else
-             1 when (regs(0)(16) = '0' and regs(1)(16) = '1') else 0;
-    
-    wrptr <= 3 when (regs(0)(16) = '1' and regs(1)(16) = '1' 
-                 and regs(2)(16) = '1' and regs(3)(16) = '0') else 
-             2 when (regs(0)(16) = '1' and regs(1)(16) = '1' and regs(2)(16) = '0') else 
-             1 when (regs(0)(16) = '1' and regs(1)(16) = '0') else 0;
-
--- 2-cycle latency end to the blockram
-    ram_rden <= sig_ram_rden;
+    rdy <= sig_full;
+-- logic for serving read requests
+    do_read <= '1' when rden = '1' and sig_empty = '0' else '0';
+    vout <= do_read;
+    rdata <= regs(rdptr);
+-- empty and full signals
+    sig_empty <= '1' when size = 0 else '0';
+    sig_full <= '1' when size = nregs else '0';
+-- prefetch logic
+    do_prefetch <= '1' when (alrst = '1') and (prefetch_count /= nregs) else '0';
+    ram_rden <= do_prefetch;
     ram_raddr <= sig_ram_raddr;
-    sig_ram_rden <= '1' when (alrst = '1') and (full = '0' or rden = '1') 
-                                           and preload_count /= 4 else '0';
 
-ram_raddr_proc:
+    raddr_proc:
     process(clk) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
                 sig_ram_raddr <= 0;
-            else
-                if (sig_ram_rden = '1') then
-                    sig_ram_raddr <= (sig_ram_raddr + 1) mod ram_depth;
-                end if;
+            elsif (do_prefetch = '1') then
+                sig_ram_raddr <= (sig_ram_raddr + 1) mod ram_depth;
             end if;
         end if;
     end process;
-
-preload_count_proc:
+-- size logic
+    size_proc:
     process(clk) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                preload_count <= 0;
+                size <= 0;
+            elsif (ram_vin = '1' and do_read = '0') then
+                size <= (size + 1) mod (nregs + 1);
+            elsif (do_read = '1' and ram_vin = '0') then
+                size <= (size - 1) mod (nregs + 1);
+            end if;
+        end if;
+    end process;
+
+-- read/write ptr logic
+    ptr_proc:
+    process(clk) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                rdptr <= 0;
+                wrptr <= 0;
             else
-                if (sig_ram_rden = '1' and sig_vout = '0') then
-                    preload_count <= (preload_count + 1) mod 5;
-                elsif (sig_ram_rden = '0' and sig_vout = '1') then
-                    preload_count <= (preload_count - 1) mod 5;
+                if (do_read = '1') then
+                    rdptr <= (rdptr + 1) mod nregs;
+                end if;
+                if (ram_vin = '1') then
+                    wrptr <= (wrptr + 1) mod nregs;
                 end if;
             end if;
         end if;
     end process;
 
-cache_populate:
+-- populate cache
+    cache_populate:
     process(clk) is
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
                 regs <= (others => (others => '0'));
-            else
-                if (wrptr /= rdptr) then
-                    if (sig_vout = '1') then
-                        regs(rdptr)(16) <= '0';
-                    end if;
-
-                    if (ram_vin = '1') then
-                        regs(wrptr)(16) <= ram_vin;
-                        regs(wrptr)(15 downto 0) <= ram_rdata;
-                    end if;
-                else
-                    if (ram_vin = '1') then
-                        regs(wrptr)(16) <= ram_vin;
-                        regs(wrptr)(15 downto 0) <= ram_rdata;
-                    elsif (sig_vout = '1') then
-                        regs(rdptr)(16) <= '0';
-                    end if;
-                end if;
-
+            elsif (ram_vin = '1') then
+                regs(wrptr) <= ram_rdata;
             end if;
         end if;
     end process;
+
+-- preload count process
+    prefetch_counting:
+    process(clk) is
+    begin
+        if (rising_edge(clk)) then
+            if (alrst = '0') then
+                prefetch_count <= 0;
+            elsif (do_prefetch = '1' and do_read = '0') then
+                prefetch_count <= (prefetch_count + 1) mod (nregs + 1);
+            elsif (do_read = '1' and do_prefetch = '0') then
+                prefetch_count <= (prefetch_count - 1) mod (nregs + 1);
+            end if;
+        end if;
+    end process;
+
 
 end behavioural;

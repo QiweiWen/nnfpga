@@ -18,7 +18,7 @@ end tb_bias_vector;
 architecture tb of tb_bias_vector is
     
     component bias_vector
-        generic (nrows: integer := 100);
+        generic (nrows: natural := 100);
         port (clk      : in std_logic;
               alrst    : in std_logic;
               unbiased : in std_logic_vector (31 downto 0);
@@ -29,7 +29,7 @@ architecture tb of tb_bias_vector is
               uvin     : in std_logic);
     end component;
 
-    constant nrows: integer := 5;
+    constant nrows: natural := 5;
 
     signal clk      : std_logic;
     signal alrst    : std_logic;

@@ -15,16 +15,16 @@ end trow_testbench;
 
 architecture Behavioral of trow_testbench is
 
-constant ntests: integer := 10;
+constant ntests: natural := 10;
 
-constant ntcols: integer := 5;
-constant ncols : integer := ntcols;
-constant dfifo : integer := ntests;
-constant data_width : integer := 16;
+constant ntcols: natural := 5;
+constant ncols : natural := ntcols;
+constant dfifo : natural := ntests;
+constant data_width : natural := 16;
 
 constant period: time := 100 ns;
 
-type testcase_t is array (integer range <>) of real; 
+type testcase_t is array (natural range <>) of real; 
 signal dl_testcases: testcase_t (0 to ntests * ncols - 1) := 
 (0.583486,0.574348,0.319676,-0.797673,0.450610,
 0.611267,0.572265,-0.667909,0.192147,0.437322,
@@ -51,7 +51,7 @@ signal initial_weight: testcase_t (0 to ncols - 1) :=
 
 component trow_processor is
 generic (
-    ncols: integer := 100
+    ncols: natural := 100
 );
 port(
     clk: in std_logic;
@@ -69,12 +69,12 @@ port(
     deltafwd: out std_logic_vector (15 downto 0);
 -- weight memory read ports 
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to ncols - 1; 
+    wram_raddr: out natural range 0 to ncols - 1; 
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- weight memory write ports
     wram_wren: out std_logic;
-    wram_waddr: out integer range 0 to ncols - 1;
+    wram_waddr: out natural range 0 to ncols - 1;
     wram_wdata: out std_logic_vector (15 downto 0);
 -- bias unit write ports
     bias_change_dout: out std_logic_vector (15 downto 0);
@@ -92,24 +92,24 @@ end component trow_processor;
 
 component three_port_ram is
     generic (
-        width: integer := 16;
-        depth: integer := 128
+        width: natural := 16;
+        depth: natural := 128
     );
     port (
         clk: in std_logic;
         alrst: in std_logic;
         -- read port A
         re_a: in std_logic;
-        addr_a: in integer range 0 to depth - 1;
+        addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
         dout_a: out std_logic_vector (width - 1 downto 0); 
         -- read port B
         re_b: in std_logic;
-        addr_b: in integer range 0 to depth - 1;
+        addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
         dout_b: out std_logic_vector (width - 1 downto 0); 
         -- write port C
-        addr_c: in integer range 0 to depth - 1;
+        addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
         din_c: in std_logic_vector (width - 1 downto 0)
     );
@@ -161,16 +161,16 @@ signal deltaout: std_logic_vector (15 downto 0);
 signal trow_validout: std_logic;
 
 signal wram_rden: std_logic;
-signal wram_raddr: integer range 0 to ncols - 1; 
+signal wram_raddr: natural range 0 to ncols - 1; 
 signal wram_din : std_logic_vector (15 downto 0);
 signal wram_vin : std_logic;
 
 signal wram_wren: std_logic;
-signal wram_waddr: integer range 0 to ncols - 1;
+signal wram_waddr: natural range 0 to ncols - 1;
 signal wram_wdata: std_logic_vector (15 downto 0);
 
 signal wram_wren_bp: std_logic;
-signal wram_waddr_bp: integer range 0 to ncols - 1;
+signal wram_waddr_bp: natural range 0 to ncols - 1;
 signal wram_wdata_bp: std_logic_vector (15 downto 0);
 
 signal bp_aebug: std_logic_vector (16 downto 0);
@@ -182,7 +182,7 @@ signal bp_rst: std_logic;
 
 
 signal wram_wren_tb: std_logic;
-signal wram_waddr_tb: integer range 0 to ncols - 1;
+signal wram_waddr_tb: natural range 0 to ncols - 1;
 signal wram_wdata_tb: std_logic_vector (15 downto 0);
 
 signal apll1_writeen : std_logic;

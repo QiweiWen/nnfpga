@@ -16,13 +16,13 @@ end tb_cpe_massive;
 
 architecture tb of tb_cpe_massive is
     
-    constant nrows: integer := 5;
-    constant dfifo: integer := 256;
-    constant fifo_rate: integer := 5;
-    constant ncols: integer := 3;
+    constant nrows: natural := 5;
+    constant dfifo: natural := 256;
+    constant fifo_rate: natural := 5;
+    constant ncols: natural := 3;
 
     component fifo_cpe_bundle
-        generic (nrows: integer; dfifo: integer; offset: integer := 0);
+        generic (nrows: natural; dfifo: natural; offset: natural := 0);
         port (clk     : in std_logic;
               alrst   : in std_logic;
               writeen : in std_logic;
@@ -111,7 +111,7 @@ begin
     end process;
 
     fifo_populate: process (clk, alrst)
-        variable cycle: integer;
+        variable cycle: natural;
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then

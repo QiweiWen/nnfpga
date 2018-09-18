@@ -9,14 +9,14 @@ use ieee.math_real.all;
 
 entity tcol_processor is
 generic (
-    nrows: integer := 100
+    nrows: natural := 100
 );
 port (
     clk:    in std_logic;
     alrst:  in std_logic;
 -- weight memory read ports
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to nrows - 1;
+    wram_raddr: out natural range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- delta input ports
@@ -40,7 +40,7 @@ port (
     deltaout: out std_logic_vector (15 downto 0);
 -- weight memory write ports
     wram_wren: out std_logic;
-    wram_waddr: out integer range 0 to nrows - 1;
+    wram_waddr: out natural range 0 to nrows - 1;
     wram_wdata: out std_logic_vector (15 downto 0);
 -- bias unit write ports
     bias_change_dout: out std_logic_vector (15 downto 0);
@@ -62,14 +62,14 @@ architecture Behavioral of tcol_processor is
 
 component column_processor is
 generic (
-    nrows: integer := 100
+    nrows: natural := 100
 );
 port(
     clk: in std_logic;
     alrst: in std_logic;
 -- wram cache external interface
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to nrows - 1;
+    wram_raddr: out natural range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- vector element input channel
@@ -90,7 +90,7 @@ port(
 );
 end component column_processor;
 
-signal sig_wram_raddr: integer range 0 to nrows - 1;
+signal sig_wram_raddr: natural range 0 to nrows - 1;
 signal dl_latched: std_logic_vector (15 downto 0);
 signal dl_final: std_logic_vector (15 downto 0);
 signal minus_lambda_dl: std_logic_vector (15 downto 0);
@@ -101,7 +101,7 @@ signal weight_adj_data: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
 -- delay wram read address by 3 cycles to become wram writeback address
 -- delay wram read data by 1 cycle to align with weight_adj_data
-type wram_raddr_pipe_t is array (3 downto 0) of integer range 0 to nrows - 1;
+type wram_raddr_pipe_t is array (3 downto 0) of natural range 0 to nrows - 1;
 signal wram_raddr_pipe: wram_raddr_pipe_t;
 signal wram_din_delayed: std_logic_vector (15 downto 0);
 
@@ -171,7 +171,7 @@ begin
 end process;
 
 lambda_dl_process: process (dl_final) is
-    constant shift_amount : integer := fraction_to_shift (LEARN_RATE);
+    constant shift_amount : natural := fraction_to_shift (LEARN_RATE);
     variable padding : std_logic_vector (shift_amount - 1 downto 0);
 begin
     padding := (others => dl_final(15));

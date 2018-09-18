@@ -33,15 +33,15 @@ architecture behavioral of std_fifo is
 
     component true_dpram_sclk is
         generic (
-            width: integer := 16;
-            depth: integer := 128
+            width: natural := 16;
+            depth: natural := 128
         );
         port 
         (	
             data_a	: in std_logic_vector(width - 1 downto 0);
             data_b	: in std_logic_vector(width - 1 downto 0);
-            addr_a	: in integer range 0 to depth - 1;
-            addr_b	: in integer range 0 to depth - 1;
+            addr_a	: in natural range 0 to depth - 1;
+            addr_b	: in natural range 0 to depth - 1;
             we_a	: in std_logic;
             we_b	: in std_logic;
             clk		: in std_logic;
@@ -51,9 +51,9 @@ architecture behavioral of std_fifo is
         
     end component true_dpram_sclk;
 
-    signal rdptr: integer range 0 to fifo_depth - 1;
-    signal wrptr: integer range 0 to fifo_depth - 1;
-    signal size: integer range 0 to fifo_depth - 1;
+    signal rdptr: natural range 0 to fifo_depth - 1;
+    signal wrptr: natural range 0 to fifo_depth - 1;
+    signal size: natural range 0 to fifo_depth;
 
     signal do_read: std_logic;
     signal do_write: std_logic;

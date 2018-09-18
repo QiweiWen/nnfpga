@@ -19,7 +19,7 @@ end sigmoid;
 
 architecture Behavioural of sigmoid is
 
-constant PIPE_LEN: integer := 630;
+constant PIPE_LEN: natural := 630;
 
 signal pipe_in: std_logic_vector (PIPE_LEN - 1 downto 0);
 signal pipe_out: std_logic_vector (PIPE_LEN - 1 downto 0);

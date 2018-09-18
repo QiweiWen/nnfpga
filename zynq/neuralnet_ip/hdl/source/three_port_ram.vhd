@@ -3,24 +3,24 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity three_port_ram is
     generic (
-        width: integer := 16;
-        depth: integer := 128
+        width: natural := 16;
+        depth: natural := 128
     );
     port (
         clk: in std_logic;
         alrst: in std_logic;
         -- read port A
         re_a: in std_logic;
-        addr_a: in integer range 0 to depth - 1;
+        addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
         dout_a: out std_logic_vector (width - 1 downto 0); 
         -- read port B
         re_b: in std_logic;
-        addr_b: in integer range 0 to depth - 1;
+        addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
         dout_b: out std_logic_vector (width - 1 downto 0); 
         -- write port C
-        addr_c: in integer range 0 to depth - 1;
+        addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
         din_c: in std_logic_vector (width - 1 downto 0)
     );
@@ -29,15 +29,15 @@ end three_port_ram;
 architecture Behavioral of three_port_ram is
     component true_dpram_sclk is
         generic (
-            width: integer := 16;
-            depth: integer := 128
+            width: natural := 16;
+            depth: natural := 128
         );
         port 
         (	
             data_a	: in std_logic_vector(width - 1 downto 0);
             data_b	: in std_logic_vector(width - 1 downto 0);
-            addr_a	: in integer range 0 to depth - 1;
-            addr_b	: in integer range 0 to depth - 1;
+            addr_a	: in natural range 0 to depth - 1;
+            addr_b	: in natural range 0 to depth - 1;
             we_a	: in std_logic;
             we_b	: in std_logic;
             clk		: in std_logic;

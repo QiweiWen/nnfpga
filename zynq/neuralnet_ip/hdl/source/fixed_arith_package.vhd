@@ -16,7 +16,7 @@ function fun_add_truncate (
 
 function fun_mul_truncate (
     datain: std_logic_vector;
-    zeropt: integer
+    zeropt: natural
 ) return std_logic_vector;
 
 function func_safe_sum (
@@ -28,10 +28,10 @@ function func_safe_sum (
 -- to save luts, ffs and dsps
 function fraction_to_shift (
     lambda: real
-)return integer;
+)return natural;
 
-type wordarr_t is array (integer range <>) of std_logic_vector (15 downto 0);
-function log2( i : natural) return integer;
+type wordarr_t is array (natural range <>) of std_logic_vector (15 downto 0);
+function log2( i : natural) return natural;
 
 end package;
 
@@ -71,7 +71,7 @@ end function;
 
 function fun_mul_truncate (
     datain: std_logic_vector;
-    zeropt: integer
+    zeropt: natural
 ) return std_logic_vector is
     variable carry: std_logic;
     variable var_ret: std_logic_vector (16 - 1 downto 0);
@@ -124,9 +124,9 @@ begin
     return ret;
 end function;
 
-function log2( i : natural) return integer is
-variable temp    : integer := i;
-variable ret_val : integer := 0; 
+function log2( i : natural) return natural is
+variable temp    : natural := i;
+variable ret_val : natural := 0; 
 variable roundup: std_logic := '0';
 begin                         
     while temp > 1 loop
@@ -144,16 +144,16 @@ end function;
 
 function fraction_to_shift (
     lambda: real
-)return integer is
+)return natural is
     subtype word_t is std_logic_vector (15 downto 0);
     variable lambda_sfixed: word_t; 
 
-    variable lambda_as_int: integer;
+    variable lambda_as_int: natural;
 begin
     if (lambda > 0.5) then
         return 0;
     end if;
-    -- convert to sfixed, interpret as integer 
+    -- convert to sfixed, interpret as natural 
     lambda_sfixed := word_t(to_sfixed (lambda, PARAM_DEC - 1, -PARAM_FRC)); 
     lambda_as_int := to_integer(unsigned(lambda_sfixed));
 

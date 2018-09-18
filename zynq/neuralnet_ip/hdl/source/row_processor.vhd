@@ -12,14 +12,14 @@ use ieee.math_real.all;
 
 entity row_processor is
 generic (
-    ncols: integer := 100
+    ncols: natural := 100
 );
 port(
     clk: in std_logic;
     alrst: in std_logic;
 -- wram cache external interface
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to ncols - 1; 
+    wram_raddr: out natural range 0 to ncols - 1; 
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- vector input channel
@@ -52,10 +52,10 @@ port (
 end component accumulator;
 
 signal ve_datain_delayed: std_logic_vector (15 downto 0);
-signal col_ptr: integer range 0 to ncols - 1; 
+signal col_ptr: natural range 0 to ncols - 1; 
 -- the intermediate product term
 signal product: std_logic_vector (31 downto 0);
-signal sig_wram_raddr: integer range 0 to ncols - 1;
+signal sig_wram_raddr: natural range 0 to ncols - 1;
 
 signal lastone: std_logic;
 

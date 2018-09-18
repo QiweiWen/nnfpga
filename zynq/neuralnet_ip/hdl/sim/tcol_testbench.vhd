@@ -17,14 +17,14 @@ architecture behavioural of tcol_testbench is
 
 -- This TB puts an array of tcol processors to the test
 -- nrows = tcol size, ncols = #instances
-constant ntests: integer := 10;
-constant ncols : integer := 5;
-constant nrows : integer := 8;
-constant data_width : integer := 16;
+constant ntests: natural := 10;
+constant ncols : natural := 5;
+constant nrows : natural := 8;
+constant data_width : natural := 16;
 constant period: time := 100 ns;
 
-type float_2d_arr_t is array (integer range <>, integer range <>) of real;
-type float_1d_arr_t is array (integer range <>) of real;
+type float_2d_arr_t is array (natural range <>, natural range <>) of real;
+type float_1d_arr_t is array (natural range <>) of real;
 
 -- first dimension: each test case
 -- second dimension: element in each dl fifo
@@ -74,13 +74,13 @@ signal tcol_weights: float_2d_arr_t(0 to ncols - 1, 0 to nrows - 1) :=
 
 component tcol_processor is
 generic (
-    nrows: integer := 100
+    nrows: natural := 100
 );
 port (
     clk:    in std_logic;
     alrst:  in std_logic;
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to nrows - 1;
+    wram_raddr: out natural range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
     dl_datain: in std_logic_vector (15 downto 0);
@@ -96,7 +96,7 @@ port (
     validout: out std_logic;
     deltaout: out std_logic_vector (15 downto 0);
     wram_wren: out std_logic;
-    wram_waddr: out integer range 0 to nrows - 1;
+    wram_waddr: out natural range 0 to nrows - 1;
     wram_wdata: out std_logic_vector (15 downto 0);
     bias_change_dout: out std_logic_vector (15 downto 0);
     bias_change_vout: out std_logic;
@@ -113,24 +113,24 @@ end component tcol_processor;
 
 component three_port_ram is
     generic (
-        width: integer := 16;
-        depth: integer := 128
+        width: natural := 16;
+        depth: natural := 128
     );
     port (
         clk: in std_logic;
         alrst: in std_logic;
         -- read port A
         re_a: in std_logic;
-        addr_a: in integer range 0 to depth - 1;
+        addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
         dout_a: out std_logic_vector (width - 1 downto 0);
         -- read port B
         re_b: in std_logic;
-        addr_b: in integer range 0 to depth - 1;
+        addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
         dout_b: out std_logic_vector (width - 1 downto 0);
         -- write port C
-        addr_c: in integer range 0 to depth - 1;
+        addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
         din_c: in std_logic_vector (width - 1 downto 0)
     );
@@ -161,11 +161,11 @@ signal bp_rst: std_logic := '0';
 -- other components reset signal
 signal rst: std_logic;
 
-type bram_addr_array_t is array(integer range <>) of
-                          integer range 0 to nrows - 1;
-type word_array_t is array(integer range <>) of
+type bram_addr_array_t is array(natural range <>) of
+                          natural range 0 to nrows - 1;
+type word_array_t is array(natural range <>) of
                           std_logic_vector(15 downto 0);
-type dword_array_t is array(integer range <>) of
+type dword_array_t is array(natural range <>) of
                           std_logic_vector(31 downto 0);
 
 -- ++++++++++++++++++++++
@@ -254,7 +254,7 @@ signal dLL1: real := 42.0;
 
 begin
     debug_process: process(clk) is
-        variable waddr: integer;
+        variable waddr: natural;
     begin
         if (rising_edge(clk)) then
             if (rst = '0') then

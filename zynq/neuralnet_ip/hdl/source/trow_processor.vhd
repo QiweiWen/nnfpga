@@ -22,7 +22,7 @@ use ieee.math_real.all;
 --            trow processor is used, the others are redundant and will be trimmed
 entity trow_processor is
 generic (
-    ncols: integer := 100
+    ncols: natural := 100
 );
 port(
     clk: in std_logic;
@@ -40,12 +40,12 @@ port(
     deltafwd: out std_logic_vector (15 downto 0);
 -- weight memory read ports 
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to ncols - 1; 
+    wram_raddr: out natural range 0 to ncols - 1; 
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- weight memory write ports
     wram_wren: out std_logic;
-    wram_waddr: out integer range 0 to ncols - 1;
+    wram_waddr: out natural range 0 to ncols - 1;
     wram_wdata: out std_logic_vector (15 downto 0);
 -- bias unit write ports
     bias_change_dout: out std_logic_vector (15 downto 0);
@@ -66,7 +66,7 @@ architecture Behavioral of trow_processor is
 -- dl and wram are shared between row processor
 -- and derivative unit
 signal sig_wram_rden : std_logic;
-signal sig_wram_raddr: integer range 0 to ncols - 1;
+signal sig_wram_raddr: natural range 0 to ncols - 1;
 -- i.e. product almost ready, fetch last level
 -- unactivated output right now
 -- multiplication result
@@ -89,20 +89,20 @@ signal weight_adj_data: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
 -- delay wram read address by 3 cycles to become wram writeback address
 -- delay wram read data by 1 cycle to align with weight_adj_data
-type wram_raddr_pipe_t is array (3 downto 0) of integer range 0 to ncols - 1;
+type wram_raddr_pipe_t is array (3 downto 0) of natural range 0 to ncols - 1;
 signal wram_raddr_pipe: wram_raddr_pipe_t;
 signal wram_din_delayed: std_logic_vector (15 downto 0);
 
 component row_processor is
 generic (
-    ncols: integer := 100
+    ncols: natural := 100
 );
 port(
     clk: in std_logic;
     alrst: in std_logic;
 -- wram cache external interface
     wram_rden: out std_logic;
-    wram_raddr: out integer range 0 to ncols - 1; 
+    wram_raddr: out natural range 0 to ncols - 1; 
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- vector input channel
@@ -198,7 +198,7 @@ begin
     end process;
 
     minus_lambda_dl_process: process (dl_datain) is
-        constant shift_amount : integer := fraction_to_shift (LEARN_RATE);
+        constant shift_amount : natural := fraction_to_shift (LEARN_RATE);
         variable padding : std_logic_vector (shift_amount - 1 downto 0);
         variable lambda_dl: std_logic_vector (15 downto 0);
     begin
