@@ -58,3 +58,12 @@ behaviour.
 Once tcol PE is tested I will start on the metaprogramming tool for the top module. Might use a preprocessing language
 now that there's a stable place to put HDL design files.
 
+18/09/2018
+-------------
+1. verified tcol output
+2. wrote an FF-backed FIFO cache for the weight ram. this is neccessary because not all vector input to processing elements
+   have to arrive from blockram-backed FIFOs (2-cycle latency); row processors are always ready to consume vector input,
+   making the two-cycle delay unneeded.
+  
+   with the cache unit in place, we can get rid of the combinatiorial "ack" signal from the FIFO and use valid-out signals
+   to drive consumer logic instead.
