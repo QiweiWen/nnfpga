@@ -20,7 +20,7 @@ end tb_cache;
 architecture tb of tb_cache is
 
     constant ram_depth : natural := 10;
-    component cache
+    component ram_cache
         generic
         (
             ram_depth: natural := 128
@@ -101,7 +101,7 @@ begin
         end if;
     end process;
 
-    dut : cache
+    dut : ram_cache
     generic map (ram_depth => ram_depth)
     port map (clk       => clk,
               alrst     => cache_reset,
@@ -166,6 +166,7 @@ begin
             wait for 100 ns;
         end loop;
         cache_reset <= '1';
+        vin_c <= '0';
         wait until rdy = '1';
         rden <= '1';    
         wait for 500 ns;

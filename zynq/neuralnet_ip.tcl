@@ -68,7 +68,8 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/sigmoidgrad.vhd"]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/sigmoid.vhd"]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/silly_test.vhd" ]\
- [file normalize "${origin_dir}/neuralnet_ip/hdl/source/cache_unit.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/source/ram_cache.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/source/fifo_cache.vhd" ]\
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -204,6 +205,7 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/trow_testbench.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/tcol_testbench.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/cache_tb.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/fifo_cache_tb.vhd" ]\
 ]
 add_files -norecurse -fileset $obj $files
 

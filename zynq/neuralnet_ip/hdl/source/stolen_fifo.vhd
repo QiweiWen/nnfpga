@@ -18,7 +18,6 @@ entity std_fifo is
         datain	: in  std_logic_vector (data_width - 1 downto 0);
         readen	: in  std_logic;
         dataout	: out std_logic_vector (data_width - 1 downto 0);
-        ackout  : out std_logic;
         validout: out std_logic;
         empty	: out std_logic;
         full	: out std_logic
@@ -62,7 +61,6 @@ begin
     -- delay readen and empty for two cycles to drive output valid flag
     do_read <= '1' when readen = '1' and sig_empty = '0' else '0';
     do_write <= '1' when writeen = '1' and sig_full = '0' else '0';
-    ackout <= do_read;
     vout_proc: process (clk, rst)
     begin
         if (rising_edge(clk)) then
