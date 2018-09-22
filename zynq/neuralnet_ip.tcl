@@ -70,6 +70,7 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/silly_test.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/ram_cache.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/fifo_cache.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/source/cached_fifo.vhd" ]\
 ]
 add_files -norecurse -fileset $obj $files
 

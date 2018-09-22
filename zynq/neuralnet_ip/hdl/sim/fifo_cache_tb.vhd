@@ -20,64 +20,34 @@ end tb_fifo_cache;
 architecture tb of tb_fifo_cache is
 
     constant fifo_depth : natural := 10;
-    constant data_width : natural := 16;
 
-    component fifo_cache is
-    generic
-    (
-        fifo_depth: natural := 128
-    );
-    port
-    (
-        clk:        in std_logic;
-        alrst:      in std_logic;
-        cache_empty:out std_logic;
-        rden:       in std_logic;
-        rdata:      out std_logic_vector(15 downto 0);
-        vout:       out std_logic;
-        fifo_empty: in std_logic;
-        fifo_rden:   out std_logic;
-        fifo_rdata:  in std_logic_vector(15 downto 0);
-        fifo_vin  :  in std_logic
-    );
-    end component fifo_cache;
-
-    component std_fifo is
+    component cached_fifo is
         generic (
-            constant data_width  : positive := 8;
             constant fifo_depth	: positive := 256
         );
         port ( 
             clk		: in  std_logic;
-            rst		: in  std_logic;
+            alrst		: in  std_logic;
             writeen	: in  std_logic;
-            datain	: in  std_logic_vector (data_width - 1 downto 0);
+            datain	: in  std_logic_vector (15 downto 0);
             readen	: in  std_logic;
-            dataout	: out std_logic_vector (data_width - 1 downto 0);
-            ackout  : out std_logic;
+            dataout	: out std_logic_vector (15 downto 0);
             validout: out std_logic;
             empty	: out std_logic;
             full	: out std_logic
         );
-    end component std_fifo;
+    end component cached_fifo;
 
     signal clk       : std_logic;
     signal alrst     : std_logic;
-    signal cache_empty: std_logic;
-    signal rden      : std_logic;
-    signal rdata     : std_logic_vector (15 downto 0);
-    signal vout      : std_logic;
     signal fifo_rden  : std_logic;
     signal fifo_empty: std_logic;
     signal fifo_rdata : std_logic_vector (15 downto 0);
     signal fifo_vin   : std_logic;
---
     signal fifo_writeen     : std_logic;
     signal fifo_datain     : std_logic_vector(15 downto 0);
 -- 
     signal sig_debug : std_logic_vector(15 downto 0);
---
-    signal cache_reset: std_logic;
 
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
@@ -90,8 +60,8 @@ begin
             if (alrst = '0') then
                 sig_debug <= X"dead"; 
             else
-                if (vout = '1') then
-                    sig_debug <= rdata;
+                if (fifo_vin = '1') then
+                    sig_debug <= fifo_rdata;
                 else
                     sig_debug <= X"beef";
                 end if;
@@ -99,31 +69,16 @@ begin
         end if;
     end process;
 
-    dut : fifo_cache
+    dut_fifo: cached_fifo
     generic map (fifo_depth => fifo_depth)
-    port map (clk       => clk,
-              alrst     => cache_reset,
-              cache_empty => cache_empty,
-              rden      => rden,
-              rdata     => rdata,
-              vout      => vout,
-              fifo_empty => fifo_empty,
-              fifo_rden  => fifo_rden,
-              fifo_rdata => fifo_rdata,
-              fifo_vin   => fifo_vin);
-
-    dut_fifo: std_fifo
-    generic map (data_width => data_width,
-                 fifo_depth => fifo_depth)
     port map
     (
         clk         => clk,
-        rst         => alrst,
+        alrst         => alrst,
         writeen     => fifo_writeen,
         datain      => fifo_datain,
         readen      => fifo_rden,
         dataout     => fifo_rdata,
-        ackout      => open,
         validout    => fifo_vin,
         empty       => fifo_empty,
         full        => open
@@ -136,8 +91,6 @@ begin
     -- EDIT: Check that clk is really your main clock signal
     clk <= TbClock;
 
-    rden <= '1' when cache_empty = '0' and cache_reset = '1' else '0';
-
     stimuli : process
         procedure param_put (
             signal target: out std_logic_vector (15 downto 0);
@@ -149,8 +102,8 @@ begin
     begin
         fifo_writeen <= '0';
         fifo_datain <= (others => '0');
+        fifo_rden <= '0';
         alrst <= '0';
-        cache_reset <= '0';
         wait for 100 ns;
         alrst <= '1';
         wait for 100 ns;
@@ -159,13 +112,9 @@ begin
             param_put(fifo_datain, (i + 1));
             wait for 100 ns;
         end loop;
-        cache_reset <= '1';
         fifo_writeen <= '0';
-        wait for 2000 ns;
-        fifo_writeen <= '1';
-        param_put(fifo_datain, 11);
-        wait for 100 ns;
-        fifo_writeen <= '0';
+        fifo_rden <= '1';
+
         wait;
     end process;
 
