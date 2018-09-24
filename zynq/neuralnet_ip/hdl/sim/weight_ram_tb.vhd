@@ -133,8 +133,14 @@ begin
               param_put(ps_din, (i + 1));
               wait for 100 ns;
           end loop;
-          ps_load <= '0';
           ps_we <= '0';
+          ps_re <= '1';
+          for i in 0 to depth - 1 loop
+              ps_addr <= i; 
+              wait for 100 ns;
+          end loop;
+          wait for 200 ns;
+          ps_load <= '0';
   
           wait until rdy = '1'; 
           re_fwd <= '1'; 

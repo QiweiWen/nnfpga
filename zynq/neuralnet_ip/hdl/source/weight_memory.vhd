@@ -107,6 +107,9 @@ end component ram_cache;
 
 signal cache_rst : std_logic;
 
+signal ps_load_pipe : std_logic; 
+signal ps_load_pipe2: std_logic;
+
 begin
 
 bram_inst: three_port_ram
@@ -179,6 +182,21 @@ tpr_vin_c <= ps_we when ps_load = '1' else we_bkwd;
 tpr_din_c <= ps_din when ps_load = '1' else din_bkwd;
 
 --
-cache_rst <= '0' when alrst = '0' or ps_load = '1' else '1';
+cache_rst_proc:
+process(clk) is
+begin
+    if (rising_edge(clk)) then
+        if (alrst = '0') then
+            ps_load_pipe <= '0';
+            ps_load_pipe2 <= '0';
+        else
+            ps_load_pipe <= ps_load;
+            ps_load_pipe2 <= ps_load_pipe;
+        end if;
+    end if;
+end process;
+
+cache_rst <= '1' when alrst = '1' and ps_load = '0' and 
+             ps_load_pipe = '0' and ps_load_pipe2 = '0' else '0';
 
 end behavioural;
