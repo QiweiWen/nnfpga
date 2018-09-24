@@ -105,6 +105,8 @@ component ram_cache is
     );
 end component ram_cache;
 
+signal cache_rst : std_logic;
+
 begin
 
 bram_inst: three_port_ram
@@ -131,7 +133,7 @@ generic map (ram_depth => depth)
 port map
 (
     clk         => clk,
-    alrst       => alrst,
+    alrst       => cache_rst,
     rdy         => rdy,
     rden        => re_fwd,
     rdata       => dout_fwd,
@@ -147,7 +149,7 @@ generic map (ram_depth => depth)
 port map
 (
     clk         => clk,
-    alrst       => alrst,
+    alrst       => cache_rst,
     rdy         => open,
     rden        => re_bkwd,
     rdata       => dout_bkwd,
@@ -175,5 +177,8 @@ bkwd_cache_ram_rdata <= tpr_dout_b when ps_load = '0' else (others => '0');
 tpr_addr_c <= ps_addr when ps_load = '1' else waddr_bkwd;
 tpr_vin_c <= ps_we when ps_load = '1' else we_bkwd;
 tpr_din_c <= ps_din when ps_load = '1' else din_bkwd;
+
+--
+cache_rst <= '0' when alrst = '0' or ps_load = '1' else '1';
 
 end behavioural;

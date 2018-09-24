@@ -71,6 +71,7 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/ram_cache.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/fifo_cache.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/cached_fifo.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/source/weight_memory.vhd" ]\
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -207,6 +208,7 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/tcol_testbench.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/cache_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/fifo_cache_tb.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/weight_ram_tb.vhd" ]\
 ]
 add_files -norecurse -fileset $obj $files
 
