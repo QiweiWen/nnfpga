@@ -11,7 +11,7 @@ entity std_fifo is
         constant data_width  : positive := 8;
         constant fifo_depth	: positive := 256
     );
-    port ( 
+    port (
         clk		: in  std_logic;
         rst		: in  std_logic;
         writeen	: in  std_logic;
@@ -35,8 +35,8 @@ architecture behavioral of std_fifo is
             width: natural := 16;
             depth: natural := 128
         );
-        port 
-        (	
+        port
+        (
             data_a	: in std_logic_vector(width - 1 downto 0);
             data_b	: in std_logic_vector(width - 1 downto 0);
             addr_a	: in natural range 0 to depth - 1;
@@ -47,7 +47,7 @@ architecture behavioral of std_fifo is
             q_a		: out std_logic_vector(width - 1 downto 0);
             q_b		: out std_logic_vector(width - 1 downto 0)
         );
-        
+
     end component true_dpram_sclk;
 
     signal rdptr: natural range 0 to fifo_depth - 1;
@@ -73,7 +73,7 @@ begin
             end if;
         end if;
     end process;
-    
+
     empty <= sig_empty;
     full  <= sig_full;
     sig_empty <= '1' when size = 0 else '0';
@@ -103,19 +103,19 @@ begin
             end if;
         end if;
     end process;
-    
+
     memory_module: true_dpram_sclk
     generic map (width => data_width, depth => fifo_depth)
     port map(
         data_a => (others => '0'),
         addr_a => rdptr,
-        we_a   => '0', 
+        we_a   => '0',
         q_a    => dataout,
-        data_b => datain, 
+        data_b => datain,
         addr_b => wrptr,
         we_b   => do_write,
         clk    => clk,
         q_b    => open
     );
-		
+
 end Behavioral;

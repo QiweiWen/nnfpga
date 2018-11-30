@@ -16,7 +16,7 @@ entity tb_bias_vector is
 end tb_bias_vector;
 
 architecture tb of tb_bias_vector is
-    
+
     component bias_vector
         generic (nrows: natural := 100);
         port (clk      : in std_logic;
@@ -47,7 +47,7 @@ architecture tb of tb_bias_vector is
     signal latched_biased: real;
 
 begin
-    
+
     debug_proc: process (clk, alrst) is
     begin
         if (rising_edge(clk)) then
@@ -81,14 +81,14 @@ begin
         constant  val: real
     ) is
     begin
-        updated <= slv_16_t(to_sfixed (val, PARAM_DEC - 1, -PARAM_FRC)); 
+        updated <= slv_16_t(to_sfixed (val, PARAM_DEC - 1, -PARAM_FRC));
     end procedure;
 
     procedure unbias_put (
         constant val: real
     ) is
     begin
-        unbiased <= slv_32_t(to_sfixed (val, 2 * PARAM_DEC - 1, -2*PARAM_FRC)); 
+        unbiased <= slv_32_t(to_sfixed (val, 2 * PARAM_DEC - 1, -2*PARAM_FRC));
     end procedure;
 
     begin
@@ -110,7 +110,7 @@ begin
             wait for 100 ns;
         end loop;
         uvin <= '0';
-    
+
         vin <= '1';
         for i in 1 to 10 loop
             unbias_put (1.0*real(i));

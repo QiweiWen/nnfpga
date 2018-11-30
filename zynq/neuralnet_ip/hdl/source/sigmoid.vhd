@@ -6,7 +6,7 @@ library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;
 
 
--- Positive half of the sigmoid function 
+-- Positive half of the sigmoid function
 entity sigmoid is
 port (
     clk: in std_logic;

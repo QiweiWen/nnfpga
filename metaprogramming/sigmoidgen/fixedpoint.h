@@ -26,9 +26,9 @@ public:
     }
 
     double to_float(void){
-       return ((double)_data) / _fraction_term; 
+       return ((double)_data) / _fraction_term;
     }
- 
+
     Fixed& operator=(double d){
         _data = (FT)(d * _fraction_term);
         return *this;
@@ -38,7 +38,7 @@ public:
         return _data;
     }
 private:
-    size_t  _fraction_term; 
+    size_t  _fraction_term;
     int     _decimals;
     int     _fractions;
     FT      _data;

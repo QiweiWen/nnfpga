@@ -43,12 +43,12 @@ architecture tb of tb_bias_unit is
     signal latched_debug_output: real;
 
 begin
-    
+
     debugproc: process (clk) is
     begin
         if (rising_edge(clk)) then
             if (vout = '1') then
-                latched_debug_output <= 
+                latched_debug_output <=
                         to_real(to_sfixed(biased, PARAM_DEC - 1, -PARAM_FRC));
             end if;
         end if;
@@ -101,7 +101,7 @@ begin
         vin <= '1';
         wait for 100 ns;
         vin <= '0';
-        
+
         wait;
     end process;
 

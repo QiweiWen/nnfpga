@@ -11,7 +11,7 @@ port (
     rst: in std_logic;
     datain: in std_logic_vector (16 - 1 downto 0);
     validin: in std_logic;
-    dataout: 
+    dataout:
         out std_logic_vector (16 - 1 downto 0);
     validout: out std_logic);
 end sigmoidgradfull;
@@ -39,7 +39,7 @@ begin
 in_absval_proc: process (datain) is
     variable in_inverse: std_logic_vector(14 downto 0);
 begin
-    in_inverse := not (datain(14 downto 0)); 
+    in_inverse := not (datain(14 downto 0));
     innegative <= std_logic_vector (unsigned (in_inverse) + 1);
 end process;
 

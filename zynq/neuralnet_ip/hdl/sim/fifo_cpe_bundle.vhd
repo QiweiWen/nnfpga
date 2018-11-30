@@ -12,7 +12,7 @@ entity fifo_cpe_bundle is
     port (
         clk: in std_logic;
         alrst: in std_logic;
-    -- fifo ports 
+    -- fifo ports
         writeen	: in  std_logic;
         datain	: in  std_logic_vector (15 downto 0);
         full   : out std_logic;
@@ -31,7 +31,7 @@ architecture Behavioral of fifo_cpe_bundle is
         port (clk        : in std_logic;
               alrst      : in std_logic;
               wram_rden    : out std_logic;
-              wram_raddr   : out natural range 0 to nrows - 1; 
+              wram_raddr   : out natural range 0 to nrows - 1;
               wram_din     : in std_logic_vector (15 downto 0);
               wram_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
@@ -51,7 +51,7 @@ architecture Behavioral of fifo_cpe_bundle is
             constant data_width  : positive := 8;
             constant fifo_depth	: positive := 256
         );
-        port ( 
+        port (
             clk		: in  std_logic;
             rst		: in  std_logic;
             writeen	: in  std_logic;
@@ -66,7 +66,7 @@ architecture Behavioral of fifo_cpe_bundle is
     end component std_fifo;
 
     signal wram_rden: std_logic;
-    signal wram_raddr: natural range 0 to nrows - 1; 
+    signal wram_raddr: natural range 0 to nrows - 1;
     signal wram_din: std_logic_vector (15 downto 0);
     signal wram_vin: std_logic;
     signal ve_datain: std_logic_vector (15 downto 0);
@@ -75,7 +75,7 @@ architecture Behavioral of fifo_cpe_bundle is
     signal ve_ack: std_logic;
 
     signal wram_din_next: std_logic_vector (15 downto 0);
-    signal wram_vin_next: std_logic; 
+    signal wram_vin_next: std_logic;
 
     -- fifo signals
     signal empty: std_logic;
@@ -94,7 +94,7 @@ begin
             wram_din <= wram_din_next;
         end if;
     end process;
-    
+
     readen <= '1' when ve_req = '1' and empty = '0' else '0';
     fifo_port_map: std_fifo
     generic map (data_width => 16, fifo_depth => dfifo)
@@ -102,13 +102,13 @@ begin
         clk => clk,
         rst => alrst,
         writeen => writeen,
-        datain => datain, 
+        datain => datain,
         readen => readen,
         dataout => ve_datain,
         ackout => ve_ack,
         validout => ve_validin,
         empty => empty,
-        full => full 
+        full => full
     );
 
     cpe_port_map: column_processor

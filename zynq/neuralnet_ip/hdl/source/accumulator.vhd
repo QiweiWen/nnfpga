@@ -19,7 +19,7 @@ end accumulator;
 
 architecture Behavioral of accumulator is
 
-signal sig_sum: std_logic_vector (31 downto 0); 
+signal sig_sum: std_logic_vector (31 downto 0);
 signal sig_validout: std_logic;
 
 begin
@@ -38,7 +38,7 @@ begin
                 sig_sum <= (others => '0');
             end if;
         elsif (validin = '1') then
-            full_sum := slv_33_t(to_sfixed(sig_sum, 2*PARAM_DEC - 1, -2*PARAM_FRC) + 
+            full_sum := slv_33_t(to_sfixed(sig_sum, 2*PARAM_DEC - 1, -2*PARAM_FRC) +
                                       to_sfixed(datain,  2*PARAM_DEC - 1, -2*PARAM_FRC));
             sig_sum <= fun_add_truncate (full_sum);
         end if;
@@ -52,7 +52,7 @@ begin
         if (alrst = '0') then
             sig_validout <= '0';
         else
-            sig_validout <= lastone;  
+            sig_validout <= lastone;
         end if;
     end if;
 end process;

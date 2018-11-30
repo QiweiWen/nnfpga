@@ -31,7 +31,7 @@ static void metaprogram (int dec, int frc, bool grad){
         Metaprogrammer mp(tt, grad);
         mp.do_metaprogram();
     }catch (const std::exception& e){
-        printf ("failed opening template %s for reading: %s\n",  
+        printf ("failed opening template %s for reading: %s\n",
                 grad? SIGMOIDGRADFILE:SIGMOIDFILE, strerror (errno));
     }
 }
@@ -41,7 +41,7 @@ int main (int argc, char** argv){
     int decimals = -1, fractions = -1;
     bool decset = false, fracset = false, isgrad = false;
     std::string errmsg;
-        
+
     while ((c = getopt(argc, argv, OPTIONS)) != -1){
         bool wrong = false;
         switch (c){
@@ -57,7 +57,7 @@ int main (int argc, char** argv){
             isgrad = true;
             break;
         case '?':
-            errmsg = std::string("Unrecognised option ") + (char)optopt; 
+            errmsg = std::string("Unrecognised option ") + (char)optopt;
             wrong = true;
             break;
         case ':':
@@ -66,7 +66,7 @@ int main (int argc, char** argv){
             break;
         }
         if (wrong)
-            goto WRONG; 
+            goto WRONG;
     }
     if (!decset){
         errmsg = "Decimal bit depth not set";
@@ -77,9 +77,9 @@ int main (int argc, char** argv){
         goto WRONG;
     }
     if ((decimals < 0 || fractions < 0) || (decimals + fractions > MAXWIDTH)){
-        errmsg = std::string ("Invalid bit depths specified: ") 
-                                + std::to_string(decimals) + "," 
-                                + std::to_string(fractions); 
+        errmsg = std::string ("Invalid bit depths specified: ")
+                                + std::to_string(decimals) + ","
+                                + std::to_string(fractions);
         goto WRONG;
     }
     metaprogram (decimals, fractions, isgrad);
@@ -87,4 +87,4 @@ int main (int argc, char** argv){
 WRONG:
     print_usage (EXECNAME, errmsg);
     return EXIT_FAILURE;
-}   
+}

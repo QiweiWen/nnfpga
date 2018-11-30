@@ -44,7 +44,7 @@ begin
     begin
         if (rising_edge(clk)) then
             if (rst = '0') then
-                debug <= -2.0; 
+                debug <= -2.0;
             elsif (validout = '1') then
                 debug <= to_real (to_sfixed(dataout, PARAM_DEC - 1, -PARAM_FRC));
             end if;
@@ -76,7 +76,7 @@ begin
         wait for 100 ns;
         validin <= '1';
         for i in -5 to 5 loop
-            datain <= slv_16_t(to_sfixed (real(i), PARAM_DEC - 1, -PARAM_FRC)); 
+            datain <= slv_16_t(to_sfixed (real(i), PARAM_DEC - 1, -PARAM_FRC));
             wait for 100 ns;
         end loop;
         validin <= '0';

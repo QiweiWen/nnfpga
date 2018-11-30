@@ -13,12 +13,12 @@ entity three_port_ram is
         re_a: in std_logic;
         addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
-        dout_a: out std_logic_vector (width - 1 downto 0); 
+        dout_a: out std_logic_vector (width - 1 downto 0);
         -- read port B
         re_b: in std_logic;
         addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
-        dout_b: out std_logic_vector (width - 1 downto 0); 
+        dout_b: out std_logic_vector (width - 1 downto 0);
         -- write port C
         addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
@@ -32,8 +32,8 @@ architecture Behavioral of three_port_ram is
             width: natural := 16;
             depth: natural := 128
         );
-        port 
-        (	
+        port
+        (
             data_a	: in std_logic_vector(width - 1 downto 0);
             data_b	: in std_logic_vector(width - 1 downto 0);
             addr_a	: in natural range 0 to depth - 1;
@@ -45,7 +45,7 @@ architecture Behavioral of three_port_ram is
             q_b		: out std_logic_vector(width - 1 downto 0)
         );
     end component true_dpram_sclk;
-    
+
     signal re_a_pipe, re_b_pipe: std_logic;
     signal r1_colliding: std_logic;
     signal r2_colliding: std_logic;
@@ -99,7 +99,7 @@ ram_2: true_dpram_sclk
     );
 
 -- collision avoidance logic
-r1_colliding <= '1' when addr_a = addr_c and vin_c = '1' else '0'; 
+r1_colliding <= '1' when addr_a = addr_c and vin_c = '1' else '0';
 r2_colliding <= '1' when addr_b = addr_c and vin_c = '1' else '0';
 
 

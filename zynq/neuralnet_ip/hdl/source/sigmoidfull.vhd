@@ -39,15 +39,15 @@ signal sigmoid_compliment: std_logic_vector (15 downto 0);
 
 signal dout_pipe: std_logic_vector (15 downto 0);
 
-signal sfixed_one: std_logic_vector (15 downto 0); 
+signal sfixed_one: std_logic_vector (15 downto 0);
 
 begin
     sfixed_one <= (PARAM_FRC => '1', others => '0');
-    
+
     in_absval_proc: process (datain) is
         variable in_inverse: std_logic_vector(14 downto 0);
     begin
-        in_inverse := not (datain(14 downto 0)); 
+        in_inverse := not (datain(14 downto 0));
         innegative <= std_logic_vector (unsigned (in_inverse) + 1);
     end process;
 
@@ -57,7 +57,7 @@ begin
         clk => clk,
         rst => rst,
         datain => inabsval,
-        validin => validin, 
+        validin => validin,
         dataout => sigmoid_dout(14 downto 0),
         validout => sigmoid_vout
     );
@@ -68,7 +68,7 @@ begin
                                             unsigned (sigmoid_dout));
     dout_pipe <= sigmoid_dout when insign_delayed = '0' else
                  sigmoid_compliment;
-    
+
     outproc: process (clk, rst) is
     begin
         if (rising_edge(clk)) then

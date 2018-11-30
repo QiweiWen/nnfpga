@@ -6,8 +6,8 @@ entity true_dpram_sclk is
                 width: natural := 16;
                 depth: natural := 128
             );
-    port 
-    (	
+    port
+    (
         data_a	: in std_logic_vector(width - 1 downto 0);
         data_b	: in std_logic_vector(width - 1 downto 0);
         addr_a	: in natural range 0 to depth - 1;
@@ -38,7 +38,7 @@ begin
         -- Port A
     process(clk)
     begin
-        if(rising_edge(clk)) then 
+        if(rising_edge(clk)) then
             if(we_a = '1') then
                 ram(addr_a) := data_a;
             end if;

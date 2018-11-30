@@ -24,8 +24,8 @@ constant data_width : natural := 16;
 
 constant period: time := 100 ns;
 
-type testcase_t is array (natural range <>) of real; 
-signal dl_testcases: testcase_t (0 to ntests * ncols - 1) := 
+type testcase_t is array (natural range <>) of real;
+signal dl_testcases: testcase_t (0 to ntests * ncols - 1) :=
 (0.583486,0.574348,0.319676,-0.797673,0.450610,
 0.611267,0.572265,-0.667909,0.192147,0.437322,
 -0.378571,0.548800,0.311309,0.187077,0.443624,
@@ -37,7 +37,7 @@ signal dl_testcases: testcase_t (0 to ntests * ncols - 1) :=
 0.584197,0.578320,0.329827,-0.798744,0.451349,
 0.607979,-0.440198,0.327813,0.195254,0.441677);
 
-signal all1_testcases: testcase_t (0 to ntests - 1) := 
+signal all1_testcases: testcase_t (0 to ntests - 1) :=
 (0.387906,0.376820,0.274759,0.445996,0.319601,
 0.322106,0.237987,0.313754,0.360545,0.315768);
 
@@ -45,7 +45,7 @@ signal apll1_testcases: testcase_t (0 to ntests - 1) :=
 (0.237435,0.234827,0.199266,0.247084,0.217456,
 0.218354,0.181349,0.215313,0.230552,0.216059);
 
-signal initial_weight: testcase_t (0 to ncols - 1) := 
+signal initial_weight: testcase_t (0 to ncols - 1) :=
 (-0.139193,0.251833,-0.375736,-0.132665,-0.059883);
 
 
@@ -67,9 +67,9 @@ port(
 -- vector input forwarded to the adjacent row processor down the line
     validfwd: out std_logic;
     deltafwd: out std_logic_vector (15 downto 0);
--- weight memory read ports 
+-- weight memory read ports
     wram_rden: out std_logic;
-    wram_raddr: out natural range 0 to ncols - 1; 
+    wram_raddr: out natural range 0 to ncols - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
 -- weight memory write ports
@@ -102,12 +102,12 @@ component three_port_ram is
         re_a: in std_logic;
         addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
-        dout_a: out std_logic_vector (width - 1 downto 0); 
+        dout_a: out std_logic_vector (width - 1 downto 0);
         -- read port B
         re_b: in std_logic;
         addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
-        dout_b: out std_logic_vector (width - 1 downto 0); 
+        dout_b: out std_logic_vector (width - 1 downto 0);
         -- write port C
         addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
@@ -120,7 +120,7 @@ component std_fifo is
         constant data_width  : positive := 8;
         constant fifo_depth  : positive := 256
     );
-    port ( 
+    port (
         clk	: in  std_logic;
         rst	: in  std_logic;
         writeen	: in  std_logic;
@@ -161,7 +161,7 @@ signal deltaout: std_logic_vector (15 downto 0);
 signal trow_validout: std_logic;
 
 signal wram_rden: std_logic;
-signal wram_raddr: natural range 0 to ncols - 1; 
+signal wram_raddr: natural range 0 to ncols - 1;
 signal wram_din : std_logic_vector (15 downto 0);
 signal wram_vin : std_logic;
 
@@ -201,7 +201,7 @@ wram_wren <= wram_wren_tb;
 wram_waddr <= wram_waddr_tb;
 wram_wdata <= wram_wdata_tb;
 
-clk <= not clk after period/2; 
+clk <= not clk after period/2;
 
 debug_process: process (clk, rst) is
 begin
@@ -228,7 +228,7 @@ begin
 end process;
 
 dl_fifo: std_fifo
-generic map (data_width => 16, fifo_depth => dfifo * ntcols)  
+generic map (data_width => 16, fifo_depth => dfifo * ntcols)
 port map (
     clk => clk,
     rst => rst,
@@ -245,7 +245,7 @@ port map (
 dl_readen <= dl_readen_bp;
 
 all1_fifo: std_fifo
-generic map (data_width => 16, fifo_depth => dfifo)  
+generic map (data_width => 16, fifo_depth => dfifo)
 port map (
     clk => clk,
     rst => rst,
@@ -260,7 +260,7 @@ port map (
 );
 
 apll1_fifo: std_fifo
-generic map (data_width => 16, fifo_depth => dfifo)  
+generic map (data_width => 16, fifo_depth => dfifo)
 port map (
     clk => clk,
     rst => rst,
@@ -285,10 +285,10 @@ port map (
     dl_req  =>  dl_readen_bp,
     deltaout => deltaout,
     validout => trow_validout,
-    
+
     validfwd => open,
     deltafwd => open,
-    
+
     wram_rden => wram_rden,
     wram_raddr => wram_raddr,
     wram_din => wram_din,
@@ -315,7 +315,7 @@ generic map (width => 16, depth => ntcols)
 port map (
     clk     => clk,
     alrst   => rst,
-    
+
     re_a    => wram_rden,
     addr_a  => wram_raddr,
     vout_a  => wram_vin,
@@ -333,8 +333,8 @@ port map (
 
 stimuli: process
     procedure param_put (
-        signal target: out std_logic_vector (15 downto 0); 
-        constant value : real 
+        signal target: out std_logic_vector (15 downto 0);
+        constant value : real
     )is
     begin
         target <= slv_16_t (to_sfixed (value, PARAM_DEC - 1, -PARAM_FRC));
@@ -360,7 +360,7 @@ begin
     -- set up initial weight
     for i in 0 to ncols - 1 loop
         wram_waddr_tb <= i;
-        param_put (wram_wdata_tb, initial_weight (i)); 
+        param_put (wram_wdata_tb, initial_weight (i));
         wait for 100 ns;
     end loop;
     wram_wren_tb <= '0';

@@ -1,21 +1,21 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
+-- Company:
+-- Engineer:
+--
 -- Create Date: 26.01.2018 19:58:50
--- Design Name: 
+-- Design Name:
 -- Module Name: delay_buffer - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
+-- Project Name:
+-- Target Devices:
+-- Tool Versions:
+-- Description:
+--
+-- Dependencies:
+--
 -- Revision:
 -- Revision 0.01 - File Created
 -- Additional Comments:
--- 
+--
 ----------------------------------------------------------------------------------
 
 
@@ -36,10 +36,10 @@ entity delay_buffer is
 end delay_buffer;
 
 architecture Behavioral of delay_buffer is
-    
+
     type shiftreg_t is array (ncycles downto 0)
         of std_logic_vector (width - 1 downto 0);
-    
+
     signal shiftreg : shiftreg_t;
 begin
     shiftgen:

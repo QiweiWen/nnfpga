@@ -1,7 +1,7 @@
 #ifndef TMPGEN_H
 #define TMPGEN_H
 
-#include "truthtable.h" 
+#include "truthtable.h"
 #include "fixedpoint.h"
 #include <utility>
 #include <iostream>
@@ -14,8 +14,8 @@
 #define PIPE_OUT "pipe_out"
 #define SUM_OUT  "dataout"
 
-#define SIGMOIDFILE "./template/sigmoid.vhd.in" 
-#define SIGMOIDGRADFILE "./template/sigmoidgrad.vhd.in" 
+#define SIGMOIDFILE "./template/sigmoid.vhd.in"
+#define SIGMOIDGRADFILE "./template/sigmoidgrad.vhd.in"
 #define CUE "<GO>"
 #define CONST_DUMP "<DICT>"
 
@@ -27,12 +27,12 @@ typedef struct{
 }vhdl_const_t;
 
 class Metaprogrammer{
-public: 
-    Metaprogrammer(TruthTable& tt, bool isgrad): 
+public:
+    Metaprogrammer(TruthTable& tt, bool isgrad):
         _tt(tt), infile (isgrad? SIGMOIDGRADFILE: SIGMOIDFILE)
     {
         if (!infile.is_open()){
-            throw std::exception(); 
+            throw std::exception();
         }
     }
     void espresso_start(void);

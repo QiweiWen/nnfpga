@@ -24,7 +24,7 @@ architecture tb of tb_column_processor is
         port (clk        : in std_logic;
               alrst      : in std_logic;
               wram_rden    : out std_logic;
-              wram_raddr   : out natural range 0 to nrows - 1; 
+              wram_raddr   : out natural range 0 to nrows - 1;
               wram_din     : in std_logic_vector (15 downto 0);
               wram_vin     : in std_logic;
               ve_datain  : in std_logic_vector (15 downto 0);
@@ -70,16 +70,16 @@ begin
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                latched_partial_sum <= 0.0; 
+                latched_partial_sum <= 0.0;
             else
                 if (ovfwd = '1') then
-                    latched_partial_sum <= 
+                    latched_partial_sum <=
                         to_real(to_sfixed(odfwd, 2*PARAM_DEC - 1, -2*PARAM_FRC));
                 end if;
             end if;
         end if;
     end process;
-    
+
     fake_data: process (clk) is
     begin
         if (rising_edge (clk)) then

@@ -9,7 +9,7 @@ typedef double (*FApprox) (double);
 extern double unisigmoid (double);
 extern double unisigmoidgrad (double in);
 
-typedef struct{  
+typedef struct{
     int position;
     bool onoff;
 }bit_t;

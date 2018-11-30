@@ -25,7 +25,7 @@ architecture tb of tb_fifo_cache is
         generic (
             constant fifo_depth	: positive := 256
         );
-        port ( 
+        port (
             clk		: in  std_logic;
             alrst		: in  std_logic;
             writeen	: in  std_logic;
@@ -46,7 +46,7 @@ architecture tb of tb_fifo_cache is
     signal fifo_vin   : std_logic;
     signal fifo_writeen     : std_logic;
     signal fifo_datain     : std_logic_vector(15 downto 0);
--- 
+--
     signal sig_debug : std_logic_vector(15 downto 0);
 
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
@@ -58,7 +58,7 @@ begin
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                sig_debug <= X"dead"; 
+                sig_debug <= X"dead";
             else
                 if (fifo_vin = '1') then
                     sig_debug <= fifo_rdata;

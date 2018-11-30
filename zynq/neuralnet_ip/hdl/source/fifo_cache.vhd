@@ -19,7 +19,7 @@ port
     rden:       in std_logic;
     rdata:      out std_logic_vector(15 downto 0);
     vout:       out std_logic;
--- signals that go to the bram-backed fifo 
+-- signals that go to the bram-backed fifo
     fifo_empty: in std_logic;
     fifo_rden:   out std_logic;
     fifo_rdata:  in std_logic_vector(15 downto 0);
@@ -51,7 +51,7 @@ begin
     sig_empty <= '1' when size = 0 else '0';
     cache_empty <= sig_empty;
 -- prefetch logic
-    do_prefetch <= '1' when (alrst = '1') and 
+    do_prefetch <= '1' when (alrst = '1') and
                             (prefetch_count /= nregs and fifo_empty = '0') else '0';
     fifo_rden <= do_prefetch;
 

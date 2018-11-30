@@ -56,7 +56,7 @@ begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
                 sig_rdy <= '0';
-            elsif (sig_rdy = '0') then 
+            elsif (sig_rdy = '0') then
                 if (size = nregs - 1 and ram_vin = '1') then
                     sig_rdy <= '1';
                 end if;

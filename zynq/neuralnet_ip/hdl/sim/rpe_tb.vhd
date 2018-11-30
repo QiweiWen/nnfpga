@@ -40,14 +40,14 @@ architecture tb of tb_row_processor is
               validfwd   : out std_logic;
               datafwd    : out std_logic_vector (15 downto 0));
     end component;
-    
+
     constant data_width : natural := 16;
     component std_fifo is
         generic (
             constant data_width  : positive := 8;
             constant fifo_depth	: positive := 256
         );
-        port ( 
+        port (
             clk		: in  std_logic;
             rst		: in  std_logic;
             writeen	: in  std_logic;
@@ -73,21 +73,21 @@ architecture tb of tb_row_processor is
             re_a: in std_logic;
             addr_a: in natural range 0 to depth - 1;
             vout_a: out std_logic;
-            dout_a: out std_logic_vector (width - 1 downto 0); 
+            dout_a: out std_logic_vector (width - 1 downto 0);
             -- read port B
             re_b: in std_logic;
             addr_b: in natural range 0 to depth - 1;
             vout_b: out std_logic;
-            dout_b: out std_logic_vector (width - 1 downto 0); 
+            dout_b: out std_logic_vector (width - 1 downto 0);
             -- write port C
             addr_c: in natural range 0 to depth - 1;
             vin_c: in std_logic;
             din_c: in std_logic_vector (width - 1 downto 0)
         );
     end component three_port_ram;
-    
-    constant ncols : natural := 5; 
-    
+
+    constant ncols : natural := 5;
+
     signal clk        : std_logic;
     signal alrst      : std_logic;
     -- row processor signals
@@ -109,11 +109,11 @@ architecture tb of tb_row_processor is
     signal re_a: std_logic;
     signal addr_a: natural range 0 to ncols - 1;
     signal vout_a: std_logic;
-    signal dout_a: std_logic_vector (16 - 1 downto 0); 
+    signal dout_a: std_logic_vector (16 - 1 downto 0);
     signal re_b: std_logic;
     signal addr_b: natural range 0 to ncols - 1;
     signal vout_b: std_logic;
-    signal dout_b: std_logic_vector (16 - 1 downto 0); 
+    signal dout_b: std_logic_vector (16 - 1 downto 0);
     signal addr_c: natural range 0 to ncols - 1;
     signal vin_c: std_logic;
     signal din_c: std_logic_vector (16 - 1 downto 0);
@@ -128,28 +128,28 @@ architecture tb of tb_row_processor is
     signal empty	:  std_logic;
     signal full	:  std_logic;
 
-    
 
-    signal debug_product_latch: real; 
+
+    signal debug_product_latch: real;
 
     constant TbPeriod : time := 100 ns; -- EDIT Put right period here
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
 
 begin
-    
-    
+
+
     debug:
     process (clk, alrst) is
     begin
-        
-        
+
+
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                debug_product_latch <= 0.0; 
+                debug_product_latch <= 0.0;
             else
                 if (validout = '1') then
-                    debug_product_latch <= 
+                    debug_product_latch <=
                         to_real(to_sfixed(dataout, 2*PARAM_DEC - 1, -2*PARAM_FRC));
                 end if;
             end if;
@@ -199,7 +199,7 @@ begin
               validfwd   => validfwd,
               datafwd    => datafwd);
 
-    dut_ram : three_port_ram 
+    dut_ram : three_port_ram
     generic map (depth => ncols)
     port map (
         clk => clk,
@@ -217,7 +217,7 @@ begin
         -- write port C
         addr_c => addr_c,
         vin_c => vin_c,
-        din_c => din_c 
+        din_c => din_c
     );
 
     -- Clock generation
@@ -244,11 +244,11 @@ begin
         vin_c <= '1';
         for i in 0 to ncols - 1 loop
             addr_c <= i;
-            din_c <= slv_16_t(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC)); 
+            din_c <= slv_16_t(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));
             wait for 100 ns;
         end loop;
         vin_c <= '0';
-        
+
         -- multiplication test
         writeen <= '1';
         for i in 0 to 7 loop
@@ -258,7 +258,7 @@ begin
 
         writeen <= '0';
         wait for 500 ns;
-            
+
         writeen <= '1';
         for i in 0 to 1 loop
             datain <= slv_16_t(to_sfixed (i, PARAM_DEC - 1, -PARAM_FRC));

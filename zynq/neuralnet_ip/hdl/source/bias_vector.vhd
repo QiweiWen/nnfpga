@@ -11,7 +11,7 @@ entity bias_vector is
 generic (nrows: natural := 100);
 port (
     clk: in std_logic;
-    alrst: in std_logic; 
+    alrst: in std_logic;
 -- product vector from column vectors
     unbiased: in std_logic_vector (31 downto 0);
     vin:  in std_logic;
@@ -52,12 +52,12 @@ component three_port_ram is
         re_a: in std_logic;
         addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
-        dout_a: out std_logic_vector (width - 1 downto 0); 
+        dout_a: out std_logic_vector (width - 1 downto 0);
         -- read port B
         re_b: in std_logic;
         addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
-        dout_b: out std_logic_vector (width - 1 downto 0); 
+        dout_b: out std_logic_vector (width - 1 downto 0);
         -- write port C
         addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
@@ -143,7 +143,7 @@ memaddr_proc: process (clk, alrst) is
     end process;
 
 -- bias read and write-back
-upd_data_pipe_in (15 downto 0) <= updated; 
+upd_data_pipe_in (15 downto 0) <= updated;
 upd_data_pipe_in (16)          <= uvin;
 
 upd_data_pipe: delay_buffer

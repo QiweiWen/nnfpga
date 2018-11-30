@@ -13,7 +13,7 @@ generic
 port
 (
     clk     : in std_logic;
-    alrst   : in std_logic; 
+    alrst   : in std_logic;
     writeen	: in  std_logic;
     datain	: in  std_logic_vector (15 downto 0);
     readen	: in  std_logic;
@@ -51,7 +51,7 @@ component std_fifo is
         constant data_width  : positive := 8;
         constant fifo_depth	: positive := 256
     );
-    port ( 
+    port (
         clk		: in  std_logic;
         rst		: in  std_logic;
         writeen	: in  std_logic;
@@ -84,7 +84,7 @@ port map
     fifo_empty  => uncached_empty,
     fifo_rden   => uncached_rden,
     fifo_rdata  => uncached_rdata,
-    fifo_vin    => uncached_vin 
+    fifo_vin    => uncached_vin
 );
 
 fifo_inst: std_fifo
@@ -102,4 +102,4 @@ port map
     full        => full
 );
 
-end behavioural; 
+end behavioural;

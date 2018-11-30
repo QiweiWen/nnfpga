@@ -10,7 +10,7 @@ entity weight_memory is
         depth : natural := 128
     );
     port
-    (  
+    (
         clk : in std_logic;
         alrst : in std_logic;
         rdy : out std_logic;
@@ -26,13 +26,13 @@ entity weight_memory is
         we_bkwd : in std_logic;
         din_bkwd : in std_logic_vector(15 downto 0);
         waddr_bkwd : in natural range 0 to depth - 1;
-        -- ports for parameter sideload 
+        -- ports for parameter sideload
         ps_load : in std_logic;
         ps_we : in std_logic;
         ps_re : in std_logic;
         ps_addr : in natural range 0 to depth - 1;
         ps_din : in std_logic_vector(15 downto 0);
-        ps_dout : out std_logic_vector(15 downto 0); 
+        ps_dout : out std_logic_vector(15 downto 0);
         ps_vout : out std_logic
     );
 end weight_memory;
@@ -74,11 +74,11 @@ component three_port_ram is
         re_a: in std_logic;
         addr_a: in natural range 0 to depth - 1;
         vout_a: out std_logic;
-        dout_a: out std_logic_vector (width - 1 downto 0); 
+        dout_a: out std_logic_vector (width - 1 downto 0);
         re_b: in std_logic;
         addr_b: in natural range 0 to depth - 1;
         vout_b: out std_logic;
-        dout_b: out std_logic_vector (width - 1 downto 0); 
+        dout_b: out std_logic_vector (width - 1 downto 0);
         addr_c: in natural range 0 to depth - 1;
         vin_c: in std_logic;
         din_c: in std_logic_vector (width - 1 downto 0)
@@ -107,7 +107,7 @@ end component ram_cache;
 
 signal cache_rst : std_logic;
 
-signal ps_load_pipe : std_logic; 
+signal ps_load_pipe : std_logic;
 signal ps_load_pipe2: std_logic;
 
 begin
@@ -170,7 +170,7 @@ tpr_addr_a <= ps_addr when ps_load = '1' else fwd_cache_ram_raddr;
 fwd_cache_ram_vin <= tpr_vout_a when ps_load = '0' else '0';
 fwd_cache_ram_rdata <= tpr_dout_a when ps_load = '0' else (others => '0');
 ps_vout <= tpr_vout_a when ps_load = '1' else '0';
-ps_dout <= tpr_dout_a when ps_load = '1' else (others => '0'); 
+ps_dout <= tpr_dout_a when ps_load = '1' else (others => '0');
 
 tpr_re_b <= '0' when ps_load = '1' else bkwd_cache_ram_rden;
 tpr_addr_b <= 0 when ps_load = '1' else bkwd_cache_ram_raddr;
@@ -196,7 +196,7 @@ begin
     end if;
 end process;
 
-cache_rst <= '1' when alrst = '1' and ps_load = '0' and 
+cache_rst <= '1' when alrst = '1' and ps_load = '0' and
              ps_load_pipe = '0' and ps_load_pipe2 = '0' else '0';
 
 end behavioural;

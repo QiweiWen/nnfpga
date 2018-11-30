@@ -15,7 +15,7 @@ end silly_test;
 architecture Behavioral of silly_test is
     signal vin_latched: std_logic;
     signal din_latched: std_logic_vector (15 downto 0);
-    
+
     signal vout_next: std_logic;
     signal dout_next: std_logic_vector (15 downto 0);
 

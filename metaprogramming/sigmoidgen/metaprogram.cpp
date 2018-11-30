@@ -19,15 +19,15 @@ void Metaprogrammer::print_product_term
     _pipe_bits.push_back (pipeline_bit);
 
     if (term.empty()){
-        printf (PROD_OUT " (%zu) <= \'1\';\n", pipeline_bit); 
+        printf (PROD_OUT " (%zu) <= \'1\';\n", pipeline_bit);
     }else{
         printf (PROD_OUT " (%zu) <= \'1\' when ", pipeline_bit);
         for (auto& bit: term){
-            printf (INPUT " (%d) = \'%d\' and ", bit.position, bit.onoff?1:0); 
+            printf (INPUT " (%d) = \'%d\' and ", bit.position, bit.onoff?1:0);
         }
         printf ("(true) else '0';\n");
     }
-    
+
     ++pipeline_bit;
 }
 
@@ -36,14 +36,14 @@ void Metaprogrammer::print_sum_term (const sumterm_t& term, int pin){
         printf (SUM_OUT " (%d) <= \'0\';\n", pin);
         return;
     }
-    std::vector<size_t> pipeline_bits; 
+    std::vector<size_t> pipeline_bits;
     for (auto itr = term.begin(); itr != term.end(); ++itr){
         print_product_term (*itr, pipeline_bits);
     }
 
     printf (SUM_OUT " (%d) <= \'1\' when ", pin);
     for (auto bit: pipeline_bits){
-        printf (PIPE_OUT " (%zu) = \'1\' or ", bit); 
+        printf (PIPE_OUT " (%zu) = \'1\' or ", bit);
     }
     printf ("(false) else '0';");
 }
@@ -61,7 +61,7 @@ void Metaprogrammer::do_metaprogram (void){
     std::string line;
     espresso_start();
     vector_result_t result = _tt.get_vector_result();
-    
+
     // insert a pipeline register between the and gates and or gates
     // to reduce fan-out
     size_t register_size = 0;
@@ -75,7 +75,7 @@ void Metaprogrammer::do_metaprogram (void){
 
     while (getline (infile, line)){
         if (line.find (CONST_DUMP) != std::string::npos){
-            print_dictionary (); 
+            print_dictionary ();
         }else if (line.find (CUE) != std::string::npos){
             for (size_t i = 0; i < result.size(); ++i){
                 print_sum_term (result[i], i);
@@ -88,7 +88,7 @@ void Metaprogrammer::do_metaprogram (void){
 }
 
 static inline bool print_as_binary (size_t bits, const Fixed& num, FILE* fd){
-    FT data = num.get_data(); 
+    FT data = num.get_data();
     FT mask = ((FT)1 << (bits - 1));
     for (size_t i = 0; i < bits; ++i){
         int result = fprintf (fd, (mask & data)?"1":"0");
@@ -104,15 +104,15 @@ bool Metaprogrammer::stream_to_espresso (int fd){
     FILE* stream = fdopen (fd, "w");
     fprintf (stream, ".i %d\n", _tt._width);
     fprintf (stream, ".o %d\n", _tt._width);
-    const std::vector <Result>& raw = _tt.get_table();   
+    const std::vector <Result>& raw = _tt.get_table();
     bool success = true;
     for (auto itr = raw.begin(); itr != raw.end(); ++itr){
-        success = success && print_as_binary (_tt._width, itr->input, stream); 
-        success = success && (fprintf (stream, " ") >= 0); 
+        success = success && print_as_binary (_tt._width, itr->input, stream);
+        success = success && (fprintf (stream, " ") >= 0);
         success = success && print_as_binary (_tt._width, itr->output, stream);
         success = success && (fprintf (stream, "\n") >= 0);
         if (!success){
-            return success; 
+            return success;
         }
     }
     success = success && (fprintf (stream, ".e\n") >= 0);
@@ -120,11 +120,11 @@ bool Metaprogrammer::stream_to_espresso (int fd){
     return success;
 }
 
-/* 
+/*
  * extract product term from the left column
  * in the form of --01-110
  */
-static inline void read_input_column 
+static inline void read_input_column
 (const std::string& column, prodterm_t& term, const TruthTable& _tt)
 {
     for (int i = 0; i < _tt._width; ++i){
@@ -204,7 +204,7 @@ void Metaprogrammer::espresso_start(void){
     mkfifo (optimised_table, 0666);
 
     int pid = fork();
-    if (pid == 0){ 
+    if (pid == 0){
         int infd = open (orig_table, O_RDONLY);
         int outfd = open (optimised_table, O_WRONLY);
         dup2 (infd, STDIN_FILENO);

@@ -76,7 +76,7 @@ architecture tb of tb_cache is
     signal addr_c    : natural range 0 to ram_depth - 1;
     signal vin_c     : std_logic;
     signal din_c     : std_logic_vector(15 downto 0);
--- 
+--
     signal sig_debug : std_logic_vector(15 downto 0);
 --
     signal cache_reset: std_logic;
@@ -90,7 +90,7 @@ begin
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                sig_debug <= X"dead"; 
+                sig_debug <= X"dead";
             else
                 if (vout = '1') then
                     sig_debug <= rdata;
@@ -168,7 +168,7 @@ begin
         cache_reset <= '1';
         vin_c <= '0';
         wait until rdy = '1';
-        rden <= '1';    
+        rden <= '1';
         wait for 500 ns;
         rden <= '0';
         wait for 200 ns;

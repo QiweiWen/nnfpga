@@ -21,7 +21,7 @@ double unisigmoidgrad (double in){
 
 TruthTable::TruthTable (int dec, int frc, FApprox func):
     _dec (dec), _frc (frc), _func(func), _width(dec + frc),
-   _vector_result(_width) 
+   _vector_result(_width)
 {
     table_fill ();
     gen_vector_result();
@@ -68,14 +68,14 @@ void TruthTable::gen_vector_result (void)
                 //found new product term
                 prodterm_t term;
                 number_to_prodterm (input.get_data(), term, _width);
-                _vector_result[i].push_back(term); 
+                _vector_result[i].push_back(term);
             }
             mask = mask << 1;
         }
     }
 }
 
-const vector_result_t& 
+const vector_result_t&
 TruthTable::get_vector_result(void) const {
     return _vector_result;
 }

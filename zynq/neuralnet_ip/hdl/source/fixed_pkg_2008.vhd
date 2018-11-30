@@ -9,11 +9,11 @@
 -- RCS ID: $Id: fixed_pkg_c.vhd,v 1.1 2006/05/09 19:21:24 sandeepd Exp $
 --
 --  Created for VHDL-200X par, David Bishop (dbishop@vhdl.org)
--- 
+--
 --
 --
 -- This file has some changes to allow to be able to use fixed-point in
--- conjunction with VHDL2008 
+-- conjunction with VHDL2008
 ------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -807,7 +807,7 @@ package fixed_pkg is
     constant overflow_style : BOOLEAN := fixed_overflow_style;  -- saturate by default
     constant round_style    : BOOLEAN := fixed_round_style)  -- rounding by default
     return INTEGER;
-  
+
   -- Because of the farily complicated sizing rules in the fixed point
   -- packages these functions are provided to compute the result ranges
   -- Example:
@@ -836,7 +836,7 @@ package fixed_pkg is
   -- Same as above, but using the "size_res" input only for their ranges:
   -- signal uf1multuf2 : ufixed (ufixed_high (uf1, '*', uf2) downto
   --                             ufixed_low (uf1, '*', uf2));
-  -- uf1multuf2 <= uf1 * uf2;  
+  -- uf1multuf2 <= uf1 * uf2;
   function ufixed_high (size_res  : ufixed;
                         operation : CHARACTER := 'X';
                         size_res2 : ufixed)
@@ -1399,7 +1399,7 @@ package body fixed_pkg is
   type stdlogic_table is array(STD_ULOGIC, STD_ULOGIC) of STD_ULOGIC;
   constant match_logic_table : stdlogic_table := (
     -----------------------------------------------------
-    -- U    X    0    1    Z    W    L    H    -         |   |  
+    -- U    X    0    1    Z    W    L    H    -         |   |
     -----------------------------------------------------
     ('U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', '1'),  -- | U |
     ('U', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '1'),  -- | X |
@@ -1411,10 +1411,10 @@ package body fixed_pkg is
     ('U', 'X', '0', '1', 'X', 'X', '0', '1', '1'),  -- | H |
     ('1', '1', '1', '1', '1', '1', '1', '1', '1')   -- | - |
     );
-  
+
     constant no_match_logic_table : stdlogic_table := (
     -----------------------------------------------------
-    -- U    X    0    1    Z    W    L    H    -         |   |  
+    -- U    X    0    1    Z    W    L    H    -         |   |
     -----------------------------------------------------
     ('U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', '0'),  -- | U |
     ('U', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '0'),  -- | X |
@@ -1834,7 +1834,7 @@ package body fixed_pkg is
   end function "+";
 
   function "+" (
-    l, r : sfixed)    -- sfixed(a downto b) + sfixed(c downto d) = 
+    l, r : sfixed)    -- sfixed(a downto b) + sfixed(c downto d) =
     return sfixed is                    -- sfixed(max(a,c)+1 downto min(b,d))
     constant left_index       : INTEGER := maximum(l'high, r'high)+1;
     constant right_index      : INTEGER := mins(l'low, r'low);
@@ -1881,7 +1881,7 @@ package body fixed_pkg is
   end function "-";
 
   function "-" (
-    l, r : sfixed)    -- sfixed(a downto b) - sfixed(c downto d) = 
+    l, r : sfixed)    -- sfixed(a downto b) - sfixed(c downto d) =
     return sfixed is                    -- sfixed(max(a,c)+1 downto min(b,d))
     constant left_index       : INTEGER := maximum(l'high, r'high)+1;
     constant right_index      : INTEGER := mins(l'low, r'low);
@@ -1923,7 +1923,7 @@ package body fixed_pkg is
   end function "*";
 
   function "*" (
-    l, r : sfixed)    -- sfixed(a downto b) * sfixed(c downto d) = 
+    l, r : sfixed)    -- sfixed(a downto b) * sfixed(c downto d) =
     return sfixed is                    --  sfixed(a+c+1 downto b+d)
     variable lslv       : SIGNED (l'length-1 downto 0);
     variable rslv       : SIGNED (r'length-1 downto 0);
@@ -1943,14 +1943,14 @@ package body fixed_pkg is
   end function "*";
 
   function "/" (
-    l, r : ufixed)    -- ufixed(a downto b) / ufixed(c downto d) = 
+    l, r : ufixed)    -- ufixed(a downto b) / ufixed(c downto d) =
     return ufixed is                    --  ufixed(a-d downto b-c-1)
   begin
     return divide (l, r);
   end function "/";
 
   function "/" (
-    l, r : sfixed)    -- sfixed(a downto b) / sfixed(c downto d) = 
+    l, r : sfixed)    -- sfixed(a downto b) / sfixed(c downto d) =
     return sfixed is                    -- sfixed(a-d+1 downto b-c)
   begin
     return divide (l, r);
@@ -2352,7 +2352,7 @@ package body fixed_pkg is
     return scalb (y => y,
                   N => to_integer(N));
   end function scalb;
-  
+
   function Is_Negative (arg : sfixed) return BOOLEAN is
   begin
     if to_X01(arg(arg'high)) = '1' then
@@ -4075,7 +4075,7 @@ package body fixed_pkg is
       when others   => return left_index;  -- For abs and default
     end case;
   end function ufixed_high;
-  
+
   function ufixed_low (left_index, right_index   : INTEGER;
                        operation                 : CHARACTER := 'X';
                        left_index2, right_index2 : INTEGER   := 0)
@@ -4091,7 +4091,7 @@ package body fixed_pkg is
       when others   => return right_index;  -- for abs and default
     end case;
   end function ufixed_low;
-  
+
   function sfixed_high (left_index, right_index   : INTEGER;
                         operation                 : CHARACTER := 'X';
                         left_index2, right_index2 : INTEGER   := 0)
@@ -4128,7 +4128,7 @@ package body fixed_pkg is
   -- Same as above, but using the "size_res" input only for their ranges:
   -- signal uf1multuf2 : ufixed (ufixed_high (uf1, '*', uf2) downto
   --                             ufixed_low (uf1, '*', uf2));
-  -- uf1multuf2 <= uf1 * uf2;  
+  -- uf1multuf2 <= uf1 * uf2;
   function ufixed_high (size_res  : ufixed;
                         operation : CHARACTER := 'X';
                         size_res2 : ufixed)
@@ -4523,7 +4523,7 @@ package body fixed_pkg is
     argslv := to_slv(arg);
     return Is_X(argslv);
   end function Is_X;
-  
+
   function Is_X (
     arg : sfixed)
     return BOOLEAN is
@@ -4876,7 +4876,7 @@ package body fixed_pkg is
       return result;
     end if;
   end function to_ufixed;
-  
+
   function to_sfixed (
     arg                     : SIGNED;   -- signed
     size_res                : sfixed;   -- for size only
@@ -4896,7 +4896,7 @@ package body fixed_pkg is
       return result;
     end if;
   end function to_sfixed;
-  
+
   function resize (
     arg                     : ufixed;                           -- input
     size_res                : ufixed;                           -- for size only
@@ -7057,7 +7057,7 @@ package body fixed_pkg is
       return justify(result, justified, field);
     end if;
   end function to_ostring;
-  -------------------------------------------------------------------   
+  -------------------------------------------------------------------
   function to_hstring (
     value     : STD_LOGIC_VECTOR;
     justified : SIDE  := right;
@@ -7342,7 +7342,7 @@ package body fixed_pkg is
       report "fixed_generic_pkg.from_hstring: Bad string "& hstring severity error;
     return result;
   end function from_hstring;
-  
+
   function from_string (
     bstring              : STRING;      -- binary string
     constant left_index  : INTEGER;

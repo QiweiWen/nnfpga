@@ -15,7 +15,7 @@ entity tb_cpe_massive is
 end tb_cpe_massive;
 
 architecture tb of tb_cpe_massive is
-    
+
     constant nrows: natural := 5;
     constant dfifo: natural := 256;
     constant fifo_rate: natural := 5;
@@ -35,7 +35,7 @@ architecture tb of tb_cpe_massive is
               ovfwd   : out std_logic;
               odfwd   : out std_logic_vector (31 downto 0));
     end component;
-    
+
     type std_logic_arr is array (ncols - 1 downto 0) of std_logic;
     type std_logic_v16_arr is array (ncols - 1 downto 0) of std_logic_vector(15 downto 0);
     type std_logic_v32_arr is array (ncols - 1 downto 0) of std_logic_vector(31 downto 0);
@@ -60,7 +60,7 @@ architecture tb of tb_cpe_massive is
 
 begin
     dutgen:
-    for I in ncols - 1 downto 0 generate 
+    for I in ncols - 1 downto 0 generate
         dut : fifo_cpe_bundle
         generic map (nrows => nrows, dfifo => dfifo, offset => I)
         port map (clk     => clk,
@@ -74,11 +74,11 @@ begin
                   idfwd   => idfwd(I),
                   ovfwd   => ovfwd(I),
                   odfwd   => odfwd(I));
-    
-        isync(I) <= '1' when I = 0 else osync(I - 1); 
+
+        isync(I) <= '1' when I = 0 else osync(I - 1);
         ivfwd(I) <= '1' when I = 0 else ovfwd(I - 1);
         idfwd(I) <= (others => '0') when I = 0 else odfwd(I - 1);
-  
+
     end generate;
 
     debug:
@@ -86,10 +86,10 @@ begin
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                latched_partial_sum <= -42.0; 
+                latched_partial_sum <= -42.0;
             else
                 if (ovfwd(ncols - 1) = '1') then
-                    latched_partial_sum <= 
+                    latched_partial_sum <=
                         to_real(to_sfixed(odfwd(ncols - 1), 2*PARAM_DEC - 1, -2*PARAM_FRC));
                 end if;
             end if;
@@ -119,12 +119,12 @@ begin
             else
                 cycle := (cycle + 1) mod fifo_rate;
             end if;
-            for I in ncols - 1 downto 0 loop   
+            for I in ncols - 1 downto 0 loop
                 if ((cycle + I) mod fifo_rate = fifo_rate - 1) then
-                    writeen(I) <= '1'; 
+                    writeen(I) <= '1';
                     datain(I) <= std_logic_vector (to_unsigned(I, 8)) & X"00";
                 else
-                    writeen(I) <= '0'; 
+                    writeen(I) <= '0';
                 end if;
             end loop;
         end if;

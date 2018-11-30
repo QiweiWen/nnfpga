@@ -20,7 +20,7 @@ entity tb_weight_memory is
 end tb_weight_memory;
 
 architecture tb of tb_weight_memory is
-    
+
     constant depth : natural := 10;
     component weight_memory
         generic
@@ -68,7 +68,7 @@ architecture tb of tb_weight_memory is
     signal ps_dout    : std_logic_vector (15 downto 0);
     signal ps_vout    : std_logic;
 
-    constant TbPeriod : time := 100 ns; 
+    constant TbPeriod : time := 100 ns;
     signal TbClock : std_logic := '0';
     signal TbSimEnded : std_logic := '0';
 
@@ -98,10 +98,10 @@ begin
 
       -- Clock generation
       TbClock <= not TbClock after TbPeriod/2 when TbSimEnded /= '1' else '0';
-  
+
       -- EDIT: Check that clk is really your main clock signal
       clk <= TbClock;
-  
+
       stimuli : process
           procedure param_put (
               signal target: out std_logic_vector (15 downto 0);
@@ -122,7 +122,7 @@ begin
           ps_re <= '0';
           ps_addr <= 0;
           ps_din <= (others => '0');
-  
+
           alrst <= '0';
           wait for 100 ns;
           alrst <= '1';
@@ -136,17 +136,17 @@ begin
           ps_we <= '0';
           ps_re <= '1';
           for i in 0 to depth - 1 loop
-              ps_addr <= i; 
+              ps_addr <= i;
               wait for 100 ns;
           end loop;
           wait for 200 ns;
           ps_load <= '0';
-  
-          wait until rdy = '1'; 
-          re_fwd <= '1'; 
+
+          wait until rdy = '1';
+          re_fwd <= '1';
           wait for 200 ns;
           re_bkwd <= '1';
-  
+
           wait;
       end process;
 
