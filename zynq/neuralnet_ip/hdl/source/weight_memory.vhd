@@ -165,15 +165,16 @@ port map
 
 -- 3-port-ram port allocation
 
-tpr_re_a <= ps_re when ps_load = '1' else fwd_cache_ram_rden;
-tpr_addr_a <= ps_addr when ps_load = '1' else fwd_cache_ram_raddr;
-fwd_cache_ram_vin <= tpr_vout_a when ps_load = '0' else '0';
-fwd_cache_ram_rdata <= tpr_dout_a when ps_load = '0' else (others => '0');
-ps_vout <= tpr_vout_a when ps_load = '1' else '0';
-ps_dout <= tpr_dout_a when ps_load = '1' else (others => '0');
+tpr_re_a <= fwd_cache_ram_rden;
+tpr_addr_a <= fwd_cache_ram_raddr;
+fwd_cache_ram_vin <= tpr_vout_a;
+fwd_cache_ram_rdata <= tpr_dout_a;
 
-tpr_re_b <= '0' when ps_load = '1' else bkwd_cache_ram_rden;
-tpr_addr_b <= 0 when ps_load = '1' else bkwd_cache_ram_raddr;
+ps_vout <= tpr_vout_b when ps_load = '1' else '0';
+ps_dout <= tpr_dout_b when ps_load = '1' else (others => '0');
+
+tpr_re_b <= ps_re when ps_load = '1' else bkwd_cache_ram_rden;
+tpr_addr_b <= ps_addr when ps_load = '1' else bkwd_cache_ram_raddr;
 bkwd_cache_ram_vin <= tpr_vout_b when ps_load = '0' else '0';
 bkwd_cache_ram_rdata <= tpr_dout_b when ps_load = '0' else (others => '0');
 

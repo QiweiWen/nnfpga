@@ -1,6 +1,3 @@
--- 1/5/2018
--- dug this fellow from the grave to see if it can be reused
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -64,7 +61,7 @@ begin
 wram_rden <= '1' when ve_validin = '1' and wram_rdy = '1' else '0';
 
 -- row processor is always ready to consume more vector elements
-ready <= '1' when alrst = '1' else '0';
+ready <= '1' when alrst = '1' and wram_rdy = '1' else '0';
 
 -- pass stuff to the next PE down the line
 fwd_proc:

@@ -201,7 +201,7 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/fifo_cpe_bundle.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/massive_cpe_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/row_bias_tb.vhd" ]\
- [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/rpe_tb.vhd" ]\
+ [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/row_processor_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/bias_vector_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/sigmoid_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/trow_testbench.vhd" ]\
@@ -241,7 +241,7 @@ set file "row_bias_tb.vhd"
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
-set file "rpe_tb.vhd"
+set file "row_processor_tb.vhd"
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
