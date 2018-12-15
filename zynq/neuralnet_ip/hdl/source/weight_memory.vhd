@@ -105,8 +105,13 @@ component ram_cache is
     );
 end component ram_cache;
 
-signal cache_rst : std_logic;
+signal bkwd_cache_rst : std_logic;
+signal fwd_cache_rst : std_logic;
 
+signal ps_write : std_logic;
+
+signal ps_write_pipe : std_logic;
+signal ps_write_pipe2 : std_logic;
 signal ps_load_pipe : std_logic;
 signal ps_load_pipe2: std_logic;
 
@@ -136,7 +141,7 @@ generic map (ram_depth => depth)
 port map
 (
     clk         => clk,
-    alrst       => cache_rst,
+    alrst       => fwd_cache_rst,
     rdy         => rdy,
     rden        => re_fwd,
     rdata       => dout_fwd,
@@ -152,7 +157,7 @@ generic map (ram_depth => depth)
 port map
 (
     clk         => clk,
-    alrst       => cache_rst,
+    alrst       => bkwd_cache_rst,
     rdy         => open,
     rden        => re_bkwd,
     rdata       => dout_bkwd,
@@ -190,14 +195,23 @@ begin
         if (alrst = '0') then
             ps_load_pipe <= '0';
             ps_load_pipe2 <= '0';
+            ps_write_pipe <= '0';
+            ps_write_pipe2 <= '0';
         else
             ps_load_pipe <= ps_load;
             ps_load_pipe2 <= ps_load_pipe;
+            ps_write_pipe <= ps_write;
+            ps_write_pipe2 <= ps_write_pipe;
         end if;
     end if;
 end process;
 
-cache_rst <= '1' when alrst = '1' and ps_load = '0' and
+ps_write <= '1' when ps_load = '1' and ps_we = '1' else '0';
+
+bkwd_cache_rst <= '1' when alrst = '1' and ps_load = '0' and
              ps_load_pipe = '0' and ps_load_pipe2 = '0' else '0';
+
+fwd_cache_rst <= '1' when alrst = '1' and ps_write = '0' and
+             ps_write_pipe = '0' and ps_write_pipe2 = '0' else '0';
 
 end behavioural;

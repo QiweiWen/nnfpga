@@ -76,9 +76,6 @@ signal prod_vtrunc: std_logic;
 
 signal delta_validout_next: std_logic;
 signal dll1_full: std_logic_vector (31 downto 0);
--- delay prefetch signal by one cycle to account
--- for truncation
-signal apll1_rden_pipe: std_logic;
 -- all1 (previous activated result) signals
 signal all1_latched: std_logic_vector (15 downto 0);
 signal all1_final: std_logic_vector (15 downto 0);
@@ -115,7 +112,6 @@ port(
 -- product terms output channel
     dataout: out std_logic_vector (31 downto 0);
     validout: out std_logic;
-    fvalid: out std_logic;
 -- vector input forwarded to the adjacent row processor down the line
     validfwd: out std_logic;
     datafwd: out std_logic_vector (15 downto 0)
@@ -161,7 +157,6 @@ begin
         ve_validin  => dl_validin,
         dataout     => prod_dout,
         validout    => prod_vout,
-        fvalid      => apll1_rden_pipe,
         validfwd    => validfwd,
         datafwd     => deltafwd
     );
@@ -173,21 +168,20 @@ begin
     begin
         if (rising_edge(clk)) then
             if (alrst = '0') then
-                apll1_rden <= '0';
                 prod_trunc <= (others => '0');
                 prod_vtrunc <= '0';
                 dll1_full <= (others => '0');
                 validout <= '0';
             else
-                apll1_rden <= apll1_rden_pipe;
                 prod_trunc <= fun_mul_truncate (prod_dout, 15);
                 prod_vtrunc <= prod_vout;
                 dll1_full <= slv_32_t (to_sfixed (prod_trunc,  PARAM_DEC - 1, -PARAM_FRC) *
-                                          to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
+                                       to_sfixed (apll1_datain, PARAM_DEC - 1, -PARAM_FRC));
                 validout <= delta_validout_next;
             end if;
         end if;
     end process;
+    apll1_rden <= prod_vtrunc;
     -- derivative calculation and weight update part
 
     -- read new activated vector element when new dl is being read

@@ -135,17 +135,16 @@ begin
           end loop;
           ps_we <= '0';
           ps_re <= '1';
+
+          re_fwd <= '1';
+          re_bkwd <= '1';
+
           for i in 0 to depth - 1 loop
               ps_addr <= i;
               wait for 100 ns;
           end loop;
           wait for 200 ns;
           ps_load <= '0';
-
-          wait until rdy = '1';
-          re_fwd <= '1';
-          wait for 200 ns;
-          re_bkwd <= '1';
 
           wait;
       end process;
