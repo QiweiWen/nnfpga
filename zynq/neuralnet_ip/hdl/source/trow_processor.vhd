@@ -27,10 +27,10 @@ generic (
 port(
     clk: in std_logic;
     alrst: in std_logic;
+    ready : out std_logic;
 -- delta vector input channel
     dl_datain: in std_logic_vector (15 downto 0);
     dl_validin: in std_logic;
-    dl_req     : out std_logic;
 -- product terms output channel
     deltaout: out std_logic_vector (15 downto 0);
     validout: out std_logic;
@@ -41,6 +41,7 @@ port(
     wram_rden: out std_logic;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
+    wram_rdy : in std_logic;
 -- weight memory write ports
     wram_wren: out std_logic;
     wram_waddr: out natural range 0 to ncols - 1;
@@ -85,7 +86,6 @@ signal weight_adj_data: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
 -- signal to assert when the module becomes ready
 -- to accept backprop input
-signal sig_ready : std_logic;
 signal rpe_ready : std_logic;
 
 -- delay wram read address by 2 cycles to become wram writeback address
@@ -106,6 +106,7 @@ port(
     wram_rden: out std_logic;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
+    wram_rdy : in std_logic;
 -- vector input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
@@ -137,9 +138,8 @@ begin
     end process;
 
     -- when the cached fifos and weight ram cache are ready
-    sig_ready <= '1' when rpe_ready = '1' and all1_empty = '0' and
-                          apll1_empty = '0'
-                     else '0';
+    ready <= '1' when rpe_ready = '1' and all1_empty = '0' and
+                      apll1_empty = '0' else '0';
 
     wram_rden <= sig_wram_rden;
 
@@ -150,9 +150,10 @@ begin
         clk         => clk,
         alrst       => alrst,
         ready       => rpe_ready,
-        wram_rden     => sig_wram_rden,
-        wram_din      => wram_din,
-        wram_vin      => wram_vin,
+        wram_rden   => sig_wram_rden,
+        wram_din    => wram_din,
+        wram_vin    => wram_vin,
+        wram_rdy    => wram_rdy,
         ve_datain   => dl_datain,
         ve_validin  => dl_validin,
         dataout     => prod_dout,

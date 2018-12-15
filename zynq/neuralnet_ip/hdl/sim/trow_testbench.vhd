@@ -17,8 +17,8 @@ architecture Behavioral of trow_testbench is
 
 constant ntests: natural := 10;
 
-constant ntcols: natural := 5;
-constant ncols : natural := ntcols;
+constant ncols : natural := 5;
+constant ram_depth : natural := ncols;
 constant dfifo : natural := ntests;
 constant data_width : natural := 16;
 
@@ -48,7 +48,6 @@ signal apll1_testcases: testcase_t (0 to ntests - 1) :=
 signal initial_weight: testcase_t (0 to ncols - 1) :=
 (-0.139193,0.251833,-0.375736,-0.132665,-0.059883);
 
-
 component trow_processor is
 generic (
     ncols: natural := 100
@@ -56,336 +55,186 @@ generic (
 port(
     clk: in std_logic;
     alrst: in std_logic;
--- delta vector input channel
+    ready : out std_logic;
     dl_datain: in std_logic_vector (15 downto 0);
     dl_validin: in std_logic;
-    dl_ack     : in std_logic;
-    dl_req     : out std_logic;
--- product terms output channel
     deltaout: out std_logic_vector (15 downto 0);
     validout: out std_logic;
--- vector input forwarded to the adjacent row processor down the line
     validfwd: out std_logic;
     deltafwd: out std_logic_vector (15 downto 0);
--- weight memory read ports
     wram_rden: out std_logic;
-    wram_raddr: out natural range 0 to ncols - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
--- weight memory write ports
+    wram_rdy : in std_logic;
     wram_wren: out std_logic;
     wram_waddr: out natural range 0 to ncols - 1;
     wram_wdata: out std_logic_vector (15 downto 0);
--- bias unit write ports
     bias_change_dout: out std_logic_vector (15 downto 0);
     bias_change_vout: out std_logic;
--- aL-1 input for derivative calculation
     all1_datain: in std_logic_vector (15 downto 0);
     all1_validin: in std_logic;
-    all1_req: out std_logic;
--- sigmoid-prime L-1 input for backprop
+    all1_rden: out std_logic;
+    all1_empty: in std_logic;
     apll1_datain: in std_logic_vector (15 downto 0);
     apll1_validin: in std_logic;
-    apll1_req: out std_logic
+    apll1_rden: out std_logic;
+    apll1_empty: in std_logic
 );
 end component trow_processor;
 
-component three_port_ram is
-    generic (
-        width: natural := 16;
-        depth: natural := 128
-    );
-    port (
-        clk: in std_logic;
-        alrst: in std_logic;
-        -- read port A
-        re_a: in std_logic;
-        addr_a: in natural range 0 to depth - 1;
-        vout_a: out std_logic;
-        dout_a: out std_logic_vector (width - 1 downto 0);
-        -- read port B
-        re_b: in std_logic;
-        addr_b: in natural range 0 to depth - 1;
-        vout_b: out std_logic;
-        dout_b: out std_logic_vector (width - 1 downto 0);
-        -- write port C
-        addr_c: in natural range 0 to depth - 1;
-        vin_c: in std_logic;
-        din_c: in std_logic_vector (width - 1 downto 0)
-    );
-end component three_port_ram;
+component cached_fifo is
+generic
+(
+    fifo_depth : natural := 128
+);
+port
+(
+    clk     : in std_logic;
+    alrst   : in std_logic;
+    writeen	: in  std_logic;
+    datain	: in  std_logic_vector (15 downto 0);
+    readen	: in  std_logic;
+    dataout	: out std_logic_vector (15 downto 0);
+    validout: out std_logic;
+    empty	: out std_logic;
+    full	: out std_logic
+);
+end component cached_fifo;
 
-component std_fifo is
-    generic (
-        constant data_width  : positive := 8;
-        constant fifo_depth  : positive := 256
-    );
-    port (
-        clk	: in  std_logic;
-        rst	: in  std_logic;
-        writeen	: in  std_logic;
-        datain	: in  std_logic_vector (data_width - 1 downto 0);
-        readen	: in  std_logic;
-        dataout	: out std_logic_vector (data_width - 1 downto 0);
-        ackout  : out std_logic;
-        validout: out std_logic;
-        empty	: out std_logic;
-        full	: out std_logic
-    );
-end component std_fifo;
+component weight_memory is
+generic (
+    ram_depth : natural := 128
+);
+port
+(
+    clk : in std_logic;
+    alrst : in std_logic;
+    rdy : out std_logic;
+    re_fwd: in std_logic;
+    vout_fwd : out std_logic;
+    dout_fwd : out std_logic_vector(15 downto 0);
+    re_bkwd: in std_logic;
+    vout_bkwd : out std_logic;
+    dout_bkwd : out std_logic_vector(15 downto 0);
+    we_bkwd : in std_logic;
+    din_bkwd : in std_logic_vector(15 downto 0);
+    waddr_bkwd : in natural range 0 to ram_depth - 1;
+    ps_load : in std_logic;
+    ps_we : in std_logic;
+    ps_re : in std_logic;
+    ps_addr : in natural range 0 to ram_depth - 1;
+    ps_din : in std_logic_vector(15 downto 0);
+    ps_dout : out std_logic_vector(15 downto 0);
+    ps_vout : out std_logic
+);
+end component weight_memory;
 
-signal clk: std_logic := '0';
+-- weight memory signals
+signal clk : std_logic := '0';
+signal alrst : std_logic;
+signal wram_rdy : std_logic;
+signal re_bkwd : std_logic;
+signal vout_bkwd : std_logic;
+signal dout_bkwd : std_logic_vector(15 downto 0);
+signal ps_load : std_logic;
+signal ps_we : std_logic;
+signal ps_addr : natural range 0 to ram_depth - 1;
+signal ps_din : std_logic_vector(15 downto 0);
+
+-- all1 fifo signals
+signal all1_writeen : std_logic;
+signal all1_datain : std_logic_vector (15 downto 0);
+signal all1_readen : std_logic;
+signal all1_dataout : std_logic_vector (15 downto 0);
+signal all1_validout : std_logic;
+signal all1_empty : std_logic;
+
+-- apll1 fifo signals
+signal apll1_writeen : std_logic;
+signal apll1_datain : std_logic_vector (15 downto 0);
+signal apll1_readen : std_logic;
+signal apll1_dataout : std_logic_vector (15 downto 0);
+signal apll1_validout : std_logic;
+signal apll1_empty : std_logic;
+
+-- backprop output and debug signals
+signal wram_wren_bp: std_logic;
+signal wram_waddr_bp: natural range 0 to ncols - 1;
+signal wram_wdata_bp: std_logic_vector (15 downto 0);
+signal deltaout : std_logic_vector (15 downto 0);
+signal trow_validout : std_logic;
 
 signal deltaout_debug: real;
 signal wram_wdata_debug: real;
 signal wram_rdata_debug: real;
 
-signal all1_readen  : std_logic;
-signal all1_dataout : std_logic_vector (data_width - 1 downto 0);
-signal all1_ackout  : std_logic;
-signal all1_validout: std_logic;
+-- misc. trow signals
+signal trow_ready: std_logic;
 
-signal apll1_readen  : std_logic;
-signal apll1_dataout : std_logic_vector (data_width - 1 downto 0);
-signal apll1_ackout  : std_logic;
-signal apll1_validout: std_logic;
+signal dl_datain: std_logic_vector(15 downto 0);
+signal dl_validin: std_logic;
 
-signal dl_readen  : std_logic;
-signal dl_readen_bp: std_logic;
-signal dl_dataout : std_logic_vector (data_width - 1 downto 0);
-signal dl_ackout  : std_logic;
-signal dl_validout: std_logic;
-
-signal deltaout: std_logic_vector (15 downto 0);
-
-signal trow_validout: std_logic;
-
-signal wram_rden: std_logic;
-signal wram_raddr: natural range 0 to ncols - 1;
-signal wram_din : std_logic_vector (15 downto 0);
-signal wram_vin : std_logic;
-
-signal wram_wren: std_logic;
-signal wram_waddr: natural range 0 to ncols - 1;
-signal wram_wdata: std_logic_vector (15 downto 0);
-
-signal wram_wren_bp: std_logic;
-signal wram_waddr_bp: natural range 0 to ncols - 1;
-signal wram_wdata_bp: std_logic_vector (15 downto 0);
-
-signal bp_aebug: std_logic_vector (16 downto 0);
-
--- testbench signals
-
-signal rst: std_logic;
-signal bp_rst: std_logic;
-
-
-signal wram_wren_tb: std_logic;
-signal wram_waddr_tb: natural range 0 to ncols - 1;
-signal wram_wdata_tb: std_logic_vector (15 downto 0);
-
-signal apll1_writeen : std_logic;
-signal apll1_datain  : std_logic_vector (data_width - 1 downto 0);
-
-signal dl_writeen : std_logic;
-signal dl_datain  : std_logic_vector (data_width - 1 downto 0);
-
-signal all1_writeen : std_logic;
-signal all1_datain  : std_logic_vector (data_width - 1 downto 0);
-
+signal bias_change_dout: std_logic_vector(15 downto 0);
+signal bias_change_vout: std_logic;
 
 begin
-
-wram_wren <= wram_wren_tb;
-wram_waddr <= wram_waddr_tb;
-wram_wdata <= wram_wdata_tb;
 
 clk <= not clk after period/2;
 
-debug_process: process (clk, rst) is
+debug_process: process (clk, alrst) is
 begin
     if (rising_edge(clk)) then
-        if (rst = '0') then
+        if (alrst = '0') then
             deltaout_debug <= -42.0;
             wram_wdata_debug <= -42.0;
             wram_rdata_debug <= -42.0;
         else
             if (trow_validout = '1') then
-                deltaout_debug <= to_real (to_sfixed(deltaout, PARAM_DEC - 1, -PARAM_FRC));
+                deltaout_debug <= to_real(to_sfixed(deltaout, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
-            if (wram_vin = '1') then
-                wram_rdata_debug <= to_real (to_sfixed(wram_din, PARAM_DEC - 1, -PARAM_FRC));
+            if (vout_bkwd = '1') then
+                wram_rdata_debug <= to_real(to_sfixed(dout_bkwd, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
             if (wram_wren_bp = '1') then
-                wram_wdata_debug <= to_real (to_sfixed(wram_wdata_bp, PARAM_DEC - 1, -PARAM_FRC));
+                wram_wdata_debug <= to_real(to_sfixed(wram_wdata_bp, PARAM_DEC - 1, -PARAM_FRC));
             end if;
 
         end if;
     end if;
 end process;
 
-dl_fifo: std_fifo
-generic map (data_width => 16, fifo_depth => dfifo * ntcols)
+uut: trow_processor
+generic map (ncols => ncols)
 port map (
-    clk => clk,
-    rst => rst,
-    writeen => dl_writeen,
-    datain => dl_datain,
-    readen => dl_readen,
-    dataout => dl_dataout,
-    ackout => dl_ackout,
-    validout => dl_validout,
-    empty => open,
-    full => open
+    clk                 => clk,
+    alrst               => alrst,
+    ready               => trow_ready,
+    dl_datain           => dl_datain,
+    dl_validin          => dl_validin,
+    deltaout            => deltaout,
+    validout            => trow_validout,
+    validfwd            => open,
+    deltafwd            => open,
+    wram_rden           => re_bkwd,
+    wram_din            => dout_bkwd,
+    wram_vin            => vout_bkwd,
+    wram_rdy            => wram_rdy,
+    wram_wren           => wram_wren_bp,
+    wram_waddr          => wram_waddr_bp,
+    wram_wdata          => wram_wdata_bp,
+    bias_change_dout    => bias_change_dout,
+    bias_change_vout    => bias_change_vout,
+    all1_datain         => all1_dataout,
+    all1_validin        => all1_validout,
+    all1_rden           => all1_readen,
+    all1_empty          => all1_empty,
+    apll1_datain        => apll1_dataout,
+    apll1_validin       => apll1_validout,
+    apll1_rden          => apll1_readen,
+    apll1_empty         => apll1_empty
 );
-
-dl_readen <= dl_readen_bp;
-
-all1_fifo: std_fifo
-generic map (data_width => 16, fifo_depth => dfifo)
-port map (
-    clk => clk,
-    rst => rst,
-    writeen => all1_writeen,
-    datain => all1_datain,
-    readen => all1_readen,
-    dataout => all1_dataout,
-    ackout => all1_ackout,
-    validout => all1_validout,
-    empty => open,
-    full => open
-);
-
-apll1_fifo: std_fifo
-generic map (data_width => 16, fifo_depth => dfifo)
-port map (
-    clk => clk,
-    rst => rst,
-    writeen => apll1_writeen,
-    datain => apll1_datain,
-    readen => apll1_readen,
-    dataout => apll1_dataout,
-    ackout => apll1_ackout,
-    validout => apll1_validout,
-    empty => open,
-    full => open
-);
-
-backprop: trow_processor
-generic map (ncols => ntcols)
-port map (
-    clk   => clk,
-    alrst => bp_rst,
-    dl_datain => dl_dataout,
-    dl_validin => dl_validout,
-    dl_ack  => dl_ackout,
-    dl_req  =>  dl_readen_bp,
-    deltaout => deltaout,
-    validout => trow_validout,
-
-    validfwd => open,
-    deltafwd => open,
-
-    wram_rden => wram_rden,
-    wram_raddr => wram_raddr,
-    wram_din => wram_din,
-    wram_vin => wram_vin,
-
-    wram_wren => wram_wren_bp,
-    wram_waddr => wram_waddr_bp,
-    wram_wdata => wram_wdata_bp,
-
-    bias_change_dout => open,
-    bias_change_vout => open,
-
-    all1_datain => all1_dataout,
-    all1_validin => all1_validout,
-    all1_req => all1_readen,
-
-    apll1_datain => apll1_dataout,
-    apll1_validin => apll1_validout,
-    apll1_req => apll1_readen
-);
-
-weight_memory: three_port_ram
-generic map (width => 16, depth => ntcols)
-port map (
-    clk     => clk,
-    alrst   => rst,
-
-    re_a    => wram_rden,
-    addr_a  => wram_raddr,
-    vout_a  => wram_vin,
-    dout_a  => wram_din,
-
-    re_b    => '0',
-    addr_b  => 0,
-    vout_b  => open,
-    dout_b  => open,
-
-    addr_c  => wram_waddr,
-    vin_c   => wram_wren,
-    din_c   => wram_wdata
-);
-
-stimuli: process
-    procedure param_put (
-        signal target: out std_logic_vector (15 downto 0);
-        constant value : real
-    )is
-    begin
-        target <= slv_16_t (to_sfixed (value, PARAM_DEC - 1, -PARAM_FRC));
-    end procedure;
-begin
-
--- hold trow_processor reset signal low, set up parameters
-    rst             <= '0';
-    bp_rst          <= '0';
-    wram_wren_tb      <= '0';
-    wram_waddr_tb     <= 0;
-    wram_wdata_tb     <= (others => '0');
-    apll1_writeen   <= '0';
-    apll1_datain    <= (others => '0');
-    dl_writeen      <= '0';
-    dl_datain       <= (others => '0');
-    all1_writeen    <= '0';
-    all1_datain     <= (others => '0');
-    wait for period;
-    rst <= '1';
-    wait for period;
-    wram_wren_tb <= '1';
-    -- set up initial weight
-    for i in 0 to ncols - 1 loop
-        wram_waddr_tb <= i;
-        param_put (wram_wdata_tb, initial_weight (i));
-        wait for 100 ns;
-    end loop;
-    wram_wren_tb <= '0';
-    all1_writeen <= '1';
-    apll1_writeen <= '1';
-    -- set up sigmoid and sigmoid prime fifos
-    for i in 0 to ntests - 1 loop
-        param_put (all1_datain, all1_testcases (i));
-        param_put (apll1_datain, apll1_testcases (i));
-        wait for 100 ns;
-    end loop;
-    all1_writeen <= '0';
-    apll1_writeen <= '0';
-    dl_writeen <= '1';
-    -- set up delta input vector fifo
-    for i in 0 to ntests * ncols - 1 loop
-        param_put (dl_datain, dl_testcases (i));
-        wait for 100 ns;
-    end loop;
-    dl_writeen <= '0';
-    bp_rst <= '1';
-    wait for 100 ns;
-    -- go on and let trow do its thing
-    wait;
-end process;
 
 
 end Behavioral;
