@@ -1,0 +1,6 @@
+16/12/2018
+----------------------
+
+finished: getting row and transpose row processors working with 0-latency fifo and weight ram
+immediate TODO: run old testbench and verify trow output; do the same conversion on tcol and col
+later TODO: work on generating neural net layers and connecting them automatically, work on PS sideload mux tree

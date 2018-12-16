@@ -103,7 +103,7 @@ end component cached_fifo;
 
 component weight_memory is
 generic (
-    ram_depth : natural := 128
+    depth : natural := 128
 );
 port
 (
@@ -235,6 +235,110 @@ port map (
     apll1_rden          => apll1_readen,
     apll1_empty         => apll1_empty
 );
+
+weightram: weight_memory
+generic map (depth => ram_depth)
+port map (
+    clk                 => clk,
+    alrst               => alrst,
+    rdy                 => wram_rdy,
+    re_fwd              => '0',
+    vout_fwd            => open,
+    dout_fwd            => open,
+    re_bkwd             => re_bkwd,
+    vout_bkwd           => vout_bkwd,
+    dout_bkwd           => dout_bkwd,
+    we_bkwd             => '0',
+    din_bkwd            => (others => '0'),
+    waddr_bkwd          => 0,
+    ps_load             => ps_load,
+    ps_we               => ps_we,
+    ps_re               => '0',
+    ps_addr             => ps_addr,
+    ps_din              => ps_din,
+    ps_dout             => open,
+    ps_vout             => open
+);
+
+all1_fifo: cached_fifo
+generic map (fifo_depth => dfifo * ncols)
+port map (
+    clk                 => clk,
+    alrst               => alrst,
+    writeen             => all1_writeen,
+    datain              => all1_datain,
+    readen              => all1_readen,
+    dataout             => all1_dataout,
+    validout            => all1_validout,
+    empty               => all1_empty,
+    full                => open
+);
+
+apll1_fifo: cached_fifo
+generic map (fifo_depth => dfifo * ncols)
+port map (
+    clk                 => clk,
+    alrst               => alrst,
+    writeen             => apll1_writeen,
+    datain              => apll1_datain,
+    readen              => apll1_readen,
+    dataout             => apll1_dataout,
+    validout            => apll1_validout,
+    empty               => apll1_empty,
+    full                => open
+);
+
+stimuli: process
+    procedure param_put (
+        signal target: out std_logic_vector (15 downto 0);
+        constant value : real
+    )is
+    begin
+        target <= slv_16_t (to_sfixed (value, PARAM_DEC - 1, -PARAM_FRC));
+    end procedure;
+begin
+    alrst <= '0';
+    wait for 100 ns;
+    alrst <= '1';
+    ps_load <= '1';
+    dl_validin <= '0';
+    wait for 100 ns;
+
+    ps_we <= '1';
+    -- set up initial weight
+    for i in 0 to ncols - 1 loop
+        ps_addr <= i;
+        param_put (ps_din, initial_weight (i));
+        wait for 100 ns;
+    end loop;
+    ps_we <= '0';
+    ps_load <= '0';
+
+    all1_writeen <= '1';
+    apll1_writeen <= '1';
+    -- set up sigmoid and sigmoid prime fifos
+    for i in 0 to ntests - 1 loop
+        param_put (all1_datain, all1_testcases (i));
+        param_put (apll1_datain, apll1_testcases (i));
+        wait for 100 ns;
+    end loop;
+    all1_writeen <= '0';
+    apll1_writeen <= '0';
+
+    if trow_ready /= '1' then
+        wait until trow_ready = '1';
+    end if;
+
+    dl_validin <= '1';
+    -- set up delta input vector fifo
+    for i in 0 to ntests * ncols - 1 loop
+        param_put (dl_datain, dl_testcases (i));
+        wait for 100 ns;
+    end loop;
+    dl_validin <= '0';
+
+    wait; 
+end process;
 
 
 end Behavioral;
