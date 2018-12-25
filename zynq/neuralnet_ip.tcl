@@ -59,7 +59,6 @@ set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/stolen_fifo.vhd"]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/row_processor.vhd"]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/column_processor.vhd" ]\
- [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/fifo_cpe_bundle.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/bias_vector.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/bias_unit.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/three_port_ram.vhd" ]\
@@ -124,10 +123,6 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 set file "column_processor.vhd"
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "VHDL" -objects $file_obj
-
-set file "fifo_cpe_bundle.vhd"
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
@@ -197,9 +192,6 @@ set obj [get_filesets sim_1]
 set files [list \
  [file normalize "${origin_dir}/neuralnet_ip/hdl/source/fixed_pkg_2008.vhd"]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/lfsr_tb.vhd" ]\
- [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/cpe_tb_simple.vhd" ]\
- [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/fifo_cpe_bundle.vhd" ]\
- [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/massive_cpe_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/row_bias_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/row_processor_tb.vhd" ]\
  [file normalize "${origin_dir}/neuralnet_ip/hdl/sim/bias_vector_tb.vhd" ]\
@@ -222,18 +214,6 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 set file "lfsr_tb.vhd"
-set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
-set_property -name "file_type" -value "VHDL" -objects $file_obj
-
-set file "cpe_tb_simple.vhd"
-set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
-set_property -name "file_type" -value "VHDL" -objects $file_obj
-
-set file "fifo_cpe_bundle.vhd"
-set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
-set_property -name "file_type" -value "VHDL" -objects $file_obj
-
-set file "massive_cpe_tb.vhd"
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 

@@ -19,11 +19,11 @@ port(
     wram_raddr: out natural range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
+    wram_rdy : in std_logic;
 -- vector element input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
     ve_req     : out std_logic;
-    ve_ack     : in std_logic;
 -- synchronisation signals
     osync:   out std_logic;
     isync:   in std_logic;
@@ -50,7 +50,6 @@ architecture Behavioral of column_processor is
     signal odfwd_next: std_logic_vector (31 downto 0);
     signal ovfwd_next: std_logic;
     signal sig_A: std_logic_vector (15 downto 0);
-    signal sig_ve_ack_last: std_logic;
 
     signal sig_product: std_logic_vector (31 downto 0);
     signal sig_product_latched: std_logic_vector (31 downto 0);
@@ -60,21 +59,10 @@ architecture Behavioral of column_processor is
     signal product_valid_next: std_logic;
 begin
 
--- latch the status of ve_ack in the last cycle
-ve_ack_latch: process (clk, alrst) is
-begin
-    if (rising_edge(clk)) then
-        if (alrst = '0') then
-            sig_ve_ack_last <= '0';
-        else
-            sig_ve_ack_last <= ve_ack;
-        end if;
-    end if;
-end process;
-
 -- FIFO read synchronisation
 sig_ve_req <= '1' when sig_wram_raddr_curr = 0 else '0';
-ve_req <= '1' when sig_ve_req = '1' and isync = '1' and alrst = '1' else '0';
+ve_req <= '1' when sig_ve_req = '1' and isync = '1' and wram_rdy = '1'
+                   and alrst = '1' else '0';
 
 osync_proc: process (clk, alrst) is
 begin
@@ -82,7 +70,7 @@ begin
         if (alrst = '0') then
             osync <= '0';
         else
-            osync <= ve_ack;
+            osync <= ve_validin;
         end if;
     end if;
 end process;
@@ -115,16 +103,16 @@ end process;
 
 wram_raddr <= sig_wram_raddr_curr;
 sig_wram_raddr_next <= (sig_wram_raddr_curr + 1) mod nrows when sig_wram_raddr_curr /= 0 else
-                                                     1 when ve_ack = '1' else 0;
+                        1 when ve_validin = '1' else 0;
 
 wram_rden <= '1' when sig_wram_raddr_curr /= 0 else
-           '1' when ve_ack = '1' else '0';
+           '1' when ve_validin = '1' else '0';
 
 sig_A <= ve_datain when ve_validin = '1' else vector_element;
 -- sig_B === wram_din
 
 sig_product <= slv_32_t (to_sfixed (sig_A, PARAM_DEC - 1, -PARAM_FRC) *
-                             to_sfixed (wram_din, PARAM_DEC - 1, -PARAM_FRC));
+                         to_sfixed (wram_din, PARAM_DEC - 1, -PARAM_FRC));
 
 sum_product_align: process (clk, alrst) is
 begin
@@ -141,8 +129,8 @@ end process;
 
 product_valid_next <= wram_vin;
 
-full_sum   <= slv_33_t (to_sfixed (idfwd,               2*PARAM_DEC - 1, -2*PARAM_FRC) +
-                            to_sfixed (sig_product_latched, 2*PARAM_DEC - 1, -2*PARAM_FRC));
+full_sum   <= slv_33_t (to_sfixed (idfwd, 2*PARAM_DEC - 1, -2*PARAM_FRC) +
+                        to_sfixed (sig_product_latched, 2*PARAM_DEC - 1, -2*PARAM_FRC));
 
 odfwd_next <= fun_add_truncate(full_sum);
 ovfwd_next <= '1' when product_valid = '1' and ivfwd = '1' else '0';

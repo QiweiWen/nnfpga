@@ -337,7 +337,7 @@ begin
     end loop;
     dl_validin <= '0';
 
-    wait; 
+    wait;
 end process;
 
 

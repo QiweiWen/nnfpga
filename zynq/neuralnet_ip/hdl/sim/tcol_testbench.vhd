@@ -80,13 +80,12 @@ port (
     clk:    in std_logic;
     alrst:  in std_logic;
     wram_rden: out std_logic;
-    wram_raddr: out natural range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
+    wram_rdy : in std_logic;
     dl_datain: in std_logic_vector (15 downto 0);
     dl_validin: in std_logic;
     dl_req     : out std_logic;
-    dl_ack     : in std_logic;
     osync:   out std_logic;
     isync:   in std_logic;
     ivfwd: in std_logic;
@@ -103,61 +102,66 @@ port (
     all1_datain: in std_logic_vector (15 downto 0);
     all1_validin: in std_logic;
     all1_req: out std_logic;
+    all1_empty : in std_logic;
     all1_fwd: out std_logic_vector (15 downto 0);
     all1_vfwd: out std_logic;
     apll1_datain: in std_logic_vector (15 downto 0);
     apll1_validin: in std_logic;
-    apll1_req: out std_logic
+    apll1_req: out std_logic;
+    apll1_empty: in std_logic
 );
 end component tcol_processor;
 
-component three_port_ram is
+component weight_memory is
     generic (
-        width: natural := 16;
-        depth: natural := 128
+        depth : natural := 128
     );
-    port (
-        clk: in std_logic;
-        alrst: in std_logic;
-        -- read port A
-        re_a: in std_logic;
-        addr_a: in natural range 0 to depth - 1;
-        vout_a: out std_logic;
-        dout_a: out std_logic_vector (width - 1 downto 0);
-        -- read port B
-        re_b: in std_logic;
-        addr_b: in natural range 0 to depth - 1;
-        vout_b: out std_logic;
-        dout_b: out std_logic_vector (width - 1 downto 0);
-        -- write port C
-        addr_c: in natural range 0 to depth - 1;
-        vin_c: in std_logic;
-        din_c: in std_logic_vector (width - 1 downto 0)
+    port
+    (
+        clk : in std_logic;
+        alrst : in std_logic;
+        rdy : out std_logic;
+        -- forward read port
+        re_fwd: in std_logic;
+        vout_fwd : out std_logic;
+        dout_fwd : out std_logic_vector(15 downto 0);
+        -- backward read port
+        re_bkwd: in std_logic;
+        vout_bkwd : out std_logic;
+        dout_bkwd : out std_logic_vector(15 downto 0);
+        -- backward write port
+        we_bkwd : in std_logic;
+        din_bkwd : in std_logic_vector(15 downto 0);
+        waddr_bkwd : in natural range 0 to depth - 1;
+        -- ports for parameter sideload
+        ps_load : in std_logic;
+        ps_we : in std_logic;
+        ps_re : in std_logic;
+        ps_addr : in natural range 0 to depth - 1;
+        ps_din : in std_logic_vector(15 downto 0);
+        ps_dout : out std_logic_vector(15 downto 0);
+        ps_vout : out std_logic
     );
-end component three_port_ram;
+end component weight_memory;
 
-component std_fifo is
+component cached_fifo is
     generic (
-        constant data_width  : positive := 8;
         constant fifo_depth  : positive := 256
     );
     port (
         clk	: in  std_logic;
-        rst	: in  std_logic;
+        alrst	: in  std_logic;
         writeen	: in  std_logic;
         datain	: in  std_logic_vector (data_width - 1 downto 0);
         readen	: in  std_logic;
         dataout	: out std_logic_vector (data_width - 1 downto 0);
-        ackout  : out std_logic;
         validout: out std_logic;
         empty	: out std_logic;
         full	: out std_logic
     );
-end component std_fifo;
+end component cached_fifo;
 
 signal clk: std_logic := '0';
--- tcol reset signal
-signal bp_rst: std_logic := '0';
 -- other components reset signal
 signal rst: std_logic;
 
@@ -171,17 +175,14 @@ type dword_array_t is array(natural range <>) of
 -- ++++++++++++++++++++++
 --   ncols * block ram
 -- ++++++++++++++++++++++
-signal ram_re_a_array: std_logic_vector(ncols - 1 downto 0);
-signal ram_addr_a_array: bram_addr_array_t(ncols - 1 downto 0);
-signal ram_vout_a_array: std_logic_vector(ncols - 1 downto 0);
-signal ram_dout_a_array: word_array_t(ncols - 1 downto 0);
-signal ram_re_b_array: std_logic_vector(ncols - 1 downto 0);
-signal ram_addr_b_array: bram_addr_array_t(ncols - 1 downto 0);
-signal ram_vout_b_array: std_logic_vector(ncols - 1 downto 0);
-signal ram_dout_b_array: word_array_t(ncols - 1 downto 0);
-signal ram_addr_c_array: bram_addr_array_t(ncols - 1 downto 0);
-signal ram_vin_c_array: std_logic_vector(ncols - 1 downto 0);
-signal ram_din_c_array: word_array_t(ncols - 1 downto 0);
+signal rdy_array: std_logic_vector(ncols - 1 downto 0);
+signal re_bkwd_array: std_logic_vector(ncols - 1 downto 0);
+signal vout_bkwd_array: std_logic_vector(ncols - 1 downto 0);
+signal dout_bkwd_array: word_array_t(ncols - 1 downto 0);
+signal ps_load_array: std_logic_vector(ncols - 1 downto 0);
+signal ps_we_array: std_logic_vector(ncols - 1 downto 0);
+signal ps_addr_array: bram_addr_array_t(ncols - 1 downto 0);
+signal ps_din_array: word_array_t(ncols - 1 downto 0);
 
 -- ++++++++++++++++++++++
 --    ncols * dL FIFO
@@ -190,7 +191,6 @@ signal dL_writeen_array: std_logic_vector(ncols - 1 downto 0);
 signal dL_datain_array: word_array_t(ncols -1 downto 0);
 signal dL_readen_array: std_logic_vector(ncols - 1 downto 0);
 signal dL_dataout_array: word_array_t(ncols - 1 downto 0);
-signal dL_ackout_array: std_logic_vector(ncols - 1 downto 0);
 signal dL_validout_array: std_logic_vector(ncols - 1 downto 0);
 signal dL_empty_array: std_logic_vector(ncols - 1 downto 0);
 signal dL_full_array: std_logic_vector(ncols - 1 downto 0);
@@ -202,7 +202,6 @@ signal aLL1_writeen: std_logic;
 signal aLL1_datain: std_logic_vector (data_width - 1 downto 0);
 signal aLL1_readen: std_logic;
 signal aLL1_dataout: std_logic_vector (data_width - 1 downto 0);
-signal aLL1_ackout: std_logic;
 signal aLL1_validout: std_logic;
 signal aLL1_empty: std_logic;
 signal aLL1_full: std_logic;
@@ -214,7 +213,6 @@ signal apLL1_writeen: std_logic;
 signal apLL1_datain: std_logic_vector (data_width - 1 downto 0);
 signal apLL1_readen: std_logic;
 signal apLL1_dataout: std_logic_vector (data_width - 1 downto 0);
-signal apLL1_ackout: std_logic;
 signal apLL1_validout: std_logic;
 signal apLL1_empty: std_logic;
 signal apLL1_full: std_logic;
@@ -243,6 +241,8 @@ signal tcol_all1_vfwd_array: std_logic_vector(ncols - 1 downto 0);
 signal tcol_apll1_datain_array: word_array_t(ncols - 1 downto 0);
 signal tcol_apll1_validin_array: std_logic_vector(ncols - 1 downto 0);
 signal tcol_apll1_req_array: std_logic_vector(ncols - 1 downto 0);
+signal tcol_all1_empty_array: std_logic_vector(ncols - 1 downto 0);
+signal tcol_apll1_empty_array: std_logic_vector(ncols - 1 downto 0);
 
 -- +++++++++++++++++++++++
 --     Debug signals
@@ -288,33 +288,31 @@ begin
 
     clk <= not clk after period/2;
 
-    aLL1_inst: std_fifo
-    generic map (data_width => 16, fifo_depth => ntests * nrows)
+    aLL1_inst: cached_fifo
+    generic map (fifo_depth => ntests * nrows)
     port map
     (
         clk     => clk,
-        rst     => rst,
+        alrst     => rst,
         writeen => aLL1_writeen,
         datain  => aLL1_datain,
         readen  => aLL1_readen,
         dataout => aLL1_dataout,
-        ackout  => aLL1_ackout,
         validout => aLL1_validout,
         empty   => aLL1_empty,
         full    => aLL1_full
     );
 
-    apLL1_inst: std_fifo
-    generic map (data_width => 16, fifo_depth => ntests * nrows)
+    apLL1_inst: cached_fifo
+    generic map (fifo_depth => ntests * nrows)
     port map
     (
         clk     => clk,
-        rst     => rst,
+        alrst     => rst,
         writeen => apLL1_writeen,
         datain  => apLL1_datain,
         readen  => apLL1_readen,
         dataout => apLL1_dataout,
-        ackout  => apLL1_ackout,
         validout => apLL1_validout,
         empty   => apLL1_empty,
         full    => apLL1_full
@@ -324,39 +322,44 @@ begin
     for I in 0 to ncols - 1 generate
         -- generate each of the word fifos and
         -- weight rams and wire them up
-        dut_dl_fifo: std_fifo
-        generic map (data_width => 16, fifo_depth => ntests * nrows)
+        dut_dl_fifo: cached_fifo
+        generic map (fifo_depth => ntests * nrows)
         port map
         (
             clk     => clk,
-            rst     => rst,
+            alrst     => rst,
             writeen => dL_writeen_array(I),
             datain  => dL_datain_array(I),
             readen  => dL_readen_array(I),
             dataout => dL_dataout_array(I),
-            ackout  => dL_ackout_array(I),
             validout => dL_validout_array(I),
             empty   => dL_empty_array(I),
             full    => dL_full_array(I)
         );
 
-        dut_weight_ram: three_port_ram
-        generic map(width => 16, depth => nrows)
+        dut_weight_ram: weight_memory
+        generic map(depth => nrows)
         port map
         (
-            clk     => clk,
-            alrst   => rst,
-            re_a    => ram_re_a_array(I),
-            addr_a  => ram_addr_a_array(I),
-            vout_a  => ram_vout_a_array(I),
-            dout_a  => ram_dout_a_array(I),
-            re_b    => ram_re_b_array(I),
-            addr_b  => ram_addr_b_array(I),
-            vout_b  => ram_vout_b_array(I),
-            dout_b  => ram_dout_b_array(I),
-            addr_c  => ram_addr_c_array(I),
-            vin_c   => ram_vin_c_array(I),
-            din_c   => ram_din_c_array(I)
+            clk         => clk,
+            alrst       => rst,
+            rdy  => rdy_array(I),
+            re_fwd => '0',
+            vout_fwd  => open,
+            dout_fwd  => open,
+            re_bkwd => re_bkwd_array(I),
+            vout_bkwd  => vout_bkwd_array(I),
+            dout_bkwd  => dout_bkwd_array(I),
+            we_bkwd  => '0',
+            din_bkwd  => (others => '0'),
+            waddr_bkwd  => 0,
+            ps_load  => ps_load_array(I),
+            ps_we  => ps_we_array(I),
+            ps_re  => '0',
+            ps_addr  => ps_addr_array(I),
+            ps_din  => ps_din_array(I),
+            ps_dout  => open,
+            ps_vout  => open
         );
 
         dut_tcol_proc: tcol_processor
@@ -364,15 +367,14 @@ begin
         port map
         (
             clk         => clk,
-            alrst       => bp_rst,
-            wram_rden     => ram_re_a_array(I),
-            wram_raddr    => ram_addr_a_array(I),
-            wram_din      => ram_dout_a_array(I),
-            wram_vin      => ram_vout_a_array(I),
+            alrst       => rst,
+            wram_rden   => re_bkwd_array(I),
+            wram_din    => dout_bkwd_array(I),
+            wram_vin    => vout_bkwd_array(I),
+            wram_rdy    => rdy_array(I),
             dl_datain   => dL_dataout_array(I),
             dl_validin  => dL_validout_array(I),
             dl_req      => dL_readen_array(I),
-            dl_ack      => dL_ackout_array(I),
             osync       => tcol_osync_array(I),
             isync       => tcol_isync_array(I),
             ivfwd       => tcol_ivfwd_array(I),
@@ -389,11 +391,13 @@ begin
             all1_datain => tcol_all1_datain_array(I),
             all1_validin => tcol_all1_validin_array(I),
             all1_req => tcol_all1_req_array(I),
+            all1_empty => tcol_all1_empty_array(I),
             all1_fwd => tcol_all1_fwd_array(I),
             all1_vfwd => tcol_all1_vfwd_array(I),
             apll1_datain => tcol_apll1_datain_array(I),
             apll1_validin => tcol_apll1_validin_array(I),
-            apll1_req => tcol_apll1_req_array(I)
+            apll1_req => tcol_apll1_req_array(I),
+            apll1_empty => tcol_apll1_empty_array(I)
         );
 
         tcol_isync_array(I) <= '1' when I = 0 else tcol_osync_array(I - 1);
@@ -402,18 +406,16 @@ begin
 
         tcol_all1_datain_array(I) <= aLL1_dataout when I = 0 else tcol_all1_fwd_array(I - 1);
         tcol_all1_validin_array(I) <= aLL1_validout when I = 0 else tcol_all1_vfwd_array(I - 1);
+        tcol_all1_empty_array(I) <= all1_empty when I = 0 else '0';
 
         tcol_apll1_datain_array(I) <= apLL1_dataout when I = ncols - 1 else (others => '0');
         tcol_apll1_validin_array(I) <= apLL1_validout when I = ncols - 1 else '0';
+        tcol_apll1_empty_array(I) <= apLL1_empty when I = ncols - 1 else '0';
 
     end generate;
 
     aLL1_readen <= tcol_all1_req_array(0);
     apLL1_readen <= tcol_apll1_req_array(ncols - 1);
-
-    -- tie down unused ports
-    ram_re_b_array <= (others => '0');
-    ram_addr_b_array <= (others => 0);
 
     stimulus: process is
         procedure param_put (
@@ -425,13 +427,13 @@ begin
         end procedure;
     begin
         rst <= '0';
-        bp_rst <= '0';
         for I in 0 to ncols - 1 loop
             dL_writeen_array(I) <= '0';
             dL_datain_array(I) <= (others => '0');
-            ram_vin_c_array(I) <= '0';
-            ram_din_c_array(I) <= (others => '0');
-            ram_addr_c_array(I) <= 0;
+            ps_we_array(I) <= '0';
+            ps_din_array(I) <= (others => '0');
+            ps_addr_array(I) <= 0;
+            ps_load_array(I) <= '0';
         end loop;
         aLL1_writeen <= '0';
         aLL1_datain <= (others => '0');
@@ -461,16 +463,17 @@ begin
         dl_writeen_array <= (others => '0');
 
         -- set up blockram weights
-        ram_vin_c_array <= (others => '1');
+        ps_load_array <= (others => '1');
+        ps_we_array <= (others => '1');
         for I in 0 to nrows - 1 loop
-            ram_addr_c_array <= (others => I);
+            ps_addr_array <= (others => I);
             for J in 0 to ncols - 1 loop
-                param_put(ram_din_c_array(J), tcol_weights(J, I));
+                param_put(ps_din_array(J), tcol_weights(J, I));
             end loop;
             wait for 100 ns;
         end loop;
-        ram_vin_c_array <= (others => '0');
-        bp_rst <= '1';
+        ps_we_array <= (others => '0');
+        ps_load_array <= (others => '0');
         wait;
     end process;
 

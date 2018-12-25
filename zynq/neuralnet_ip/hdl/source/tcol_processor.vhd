@@ -16,14 +16,13 @@ port (
     alrst:  in std_logic;
 -- weight memory read ports
     wram_rden: out std_logic;
-    wram_raddr: out natural range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
+    wram_rdy : in std_logic;
 -- delta input ports
     dl_datain: in std_logic_vector (15 downto 0);
     dl_validin: in std_logic;
     dl_req     : out std_logic;
-    dl_ack     : in std_logic;
 -- synchronisation signals
     osync:   out std_logic;
     isync:   in std_logic;
@@ -49,12 +48,14 @@ port (
     all1_datain: in std_logic_vector (15 downto 0);
     all1_validin: in std_logic;
     all1_req: out std_logic;
+    all1_empty : in std_logic;
     all1_fwd: out std_logic_vector (15 downto 0);
     all1_vfwd: out std_logic;
 -- sigmoid-prime L-1 input for backprop
     apll1_datain: in std_logic_vector (15 downto 0);
     apll1_validin: in std_logic;
-    apll1_req: out std_logic
+    apll1_req: out std_logic;
+    apll1_empty: in std_logic
 );
 end tcol_processor;
 
@@ -72,11 +73,11 @@ port(
     wram_raddr: out natural range 0 to nrows - 1;
     wram_din : in std_logic_vector (15 downto 0);
     wram_vin : in std_logic;
+    wram_rdy : in std_logic;
 -- vector element input channel
     ve_datain: in std_logic_vector (15 downto 0);
     ve_validin: in std_logic;
     ve_req     : out std_logic;
-    ve_ack     : in std_logic;
 -- synchronisation signals
     osync:   out std_logic;
     isync:   in std_logic;
@@ -90,6 +91,7 @@ port(
 );
 end component column_processor;
 
+signal ve_req: std_logic;
 signal sig_wram_raddr: natural range 0 to nrows - 1;
 signal dl_latched: std_logic_vector (15 downto 0);
 signal dl_final: std_logic_vector (15 downto 0);
@@ -99,9 +101,9 @@ signal lambda_dl: std_logic_vector (15 downto 0);
 -- minus_lambda_dl * all1
 signal weight_adj_data: std_logic_vector (15 downto 0);
 signal weight_adj_valid: std_logic;
--- delay wram read address by 3 cycles to become wram writeback address
+-- delay wram read address by 2 cycles to become wram writeback address
 -- delay wram read data by 1 cycle to align with weight_adj_data
-type wram_raddr_pipe_t is array (3 downto 0) of natural range 0 to nrows - 1;
+type wram_raddr_pipe_t is array (1 downto 0) of natural range 0 to nrows - 1;
 signal wram_raddr_pipe: wram_raddr_pipe_t;
 signal wram_din_delayed: std_logic_vector (15 downto 0);
 
@@ -116,8 +118,6 @@ signal dll1_full: std_logic_vector (31 downto 0);
 
 begin
 
-wram_raddr <= sig_wram_raddr;
-
 backprop: column_processor
 generic map (nrows => nrows)
 port map (
@@ -127,10 +127,10 @@ port map (
     wram_raddr        => sig_wram_raddr,
     wram_din          => wram_din,
     wram_vin          => wram_vin,
+    wram_rdy        => wram_rdy,
     ve_datain       => dl_datain,
     ve_validin      => dl_validin,
-    ve_req          => dl_req,
-    ve_ack          => dl_ack,
+    ve_req          => ve_req,
     osync           => osync,
     isync           => isync,
     ivfwd           => ivfwd,
@@ -139,10 +139,12 @@ port map (
     odfwd           => sig_odfwd
 );
 
+dl_req <= '1' when all1_empty = '0' and apll1_empty = '0' and ve_req = '1';
+
 odfwd <= sig_odfwd;
 ovfwd <= sig_ovfwd;
 
-all1_req <= '1' when sig_wram_raddr /= 0 or dl_ack = '1' else '0';
+all1_req <= '1' when sig_wram_raddr /= 0 or dl_validin = '1' else '0';
 
 dl_latch: process (clk, alrst) is
 begin
@@ -217,14 +219,11 @@ wram_wraddr_proc: process (clk, alrst) is
 begin
     if (rising_edge (clk)) then
         if (alrst = '0') then
-            for I in 3 downto 0 loop
-                wram_raddr_pipe (I) <= 0;
-            end loop;
+            wram_raddr_pipe (1) <= 0;
+            wram_raddr_pipe (0) <= 0;
         else
-            wram_raddr_pipe (3) <= sig_wram_raddr;
-            for I in 2 downto 0 loop
-                wram_raddr_pipe (I) <= wram_raddr_pipe (I + 1);
-            end loop;
+            wram_raddr_pipe (1) <= sig_wram_raddr;
+            wram_raddr_pipe (0) <= wram_raddr_pipe (1);
         end if;
     end if;
 end process;
@@ -245,8 +244,7 @@ begin
     end if;
 end process;
 
-
-apll1_req <= ivfwd;
+apll1_req <= prod_vtrunc;
 delta_validout_next <= '1' when apll1_validin = '1' and prod_vtrunc = '1' else '0';
 deltaout <= dll1_full (PARAM_FRC * 2 + PARAM_DEC - 1 downto PARAM_FRC);
 
