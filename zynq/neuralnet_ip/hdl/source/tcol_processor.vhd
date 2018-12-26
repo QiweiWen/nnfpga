@@ -139,7 +139,7 @@ port map (
     odfwd           => sig_odfwd
 );
 
-dl_req <= '1' when all1_empty = '0' and apll1_empty = '0' and ve_req = '1';
+dl_req <= '1' when all1_empty = '0' and apll1_empty = '0' and ve_req = '1' else '0';
 
 odfwd <= sig_odfwd;
 ovfwd <= sig_ovfwd;

@@ -452,16 +452,6 @@ begin
         apLL1_writeen <= '0';
         aLL1_writeen <= '0';
 
-        -- set up dL fifos
-        dl_writeen_array <= (others => '1');
-        for I in 0 to ntests - 1 loop
-            for J in 0 to ncols - 1 loop
-                param_put(dL_datain_array(J), dl_input(I, J));
-            end loop;
-            wait for 100 ns;
-        end loop;
-        dl_writeen_array <= (others => '0');
-
         -- set up blockram weights
         ps_load_array <= (others => '1');
         ps_we_array <= (others => '1');
@@ -474,6 +464,17 @@ begin
         end loop;
         ps_we_array <= (others => '0');
         ps_load_array <= (others => '0');
+
+        -- set up dL fifos
+        dl_writeen_array <= (others => '1');
+        for I in 0 to ntests - 1 loop
+            for J in 0 to ncols - 1 loop
+                param_put(dL_datain_array(J), dl_input(I, J));
+            end loop;
+            wait for 100 ns;
+        end loop;
+        dl_writeen_array <= (others => '0');
+
         wait;
     end process;
 
